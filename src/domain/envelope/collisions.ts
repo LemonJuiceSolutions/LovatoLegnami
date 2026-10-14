@@ -26,6 +26,9 @@ export interface Collision {
   readonly message: string;
 }
 
+/** Tolleranza geometrica minima (D3): residui numerici non sono collisioni. */
+const GEOMETRIC_EPS = 1e-6;
+
 const fmt = (v: number) => String(Math.round(v * 10) / 10).replace(".", ",");
 
 /**
@@ -40,6 +43,7 @@ export function checkCollisions(assembly: Pick<Assembly, "pieces">, envelope: En
   const c = envelope.floor.corners;
   const floorMin = Math.min(0, c.frontLeft, c.frontRight, c.backLeft, c.backRight, ...envelope.floor.points.map((p) => p.z));
   const obstacles = absoluteObstacles(envelope).filter((o) => !o.ignored);
+  const tol = Math.max(tolerance, GEOMETRIC_EPS);
   const out: Collision[] = [];
   for (const p of assembly.pieces) {
     const obb = pieceObb(p);
@@ -61,7 +65,7 @@ export function checkCollisions(assembly: Pick<Assembly, "pieces">, envelope: En
       excess[5][1] = Math.max(excess[5][1], v.z - H);
     }
     const [side, depth] = excess.reduce((a, b) => (b[1] > a[1] ? b : a));
-    if (depth > tolerance)
+    if (depth > tol)
       out.push({
         pieceId: p.id,
         obstacleId: ENVELOPE_ID,
@@ -71,7 +75,7 @@ export function checkCollisions(assembly: Pick<Assembly, "pieces">, envelope: En
       });
     for (const o of obstacles) {
       const pen = obbAabbPenetration(obb, o.box);
-      if (pen > tolerance)
+      if (pen > tol)
         out.push({ pieceId: p.id, obstacleId: o.obstacleId, depth: pen, message: `${p.id} interferisce con ${o.obstacle.type} ${o.obstacleId} (${fmt(pen)} mm)` });
     }
   }

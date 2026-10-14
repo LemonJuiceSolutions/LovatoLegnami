@@ -2,3 +2,4 @@
 export * from "./types";
 export * from "./floor";
 export * from "./collisions";
+export * from "./fit";
