@@ -74,18 +74,20 @@ const pose = fromBasis;
 export const alongX = (x0: number, y: number, z: number): Pose => pose(vec3(x0, y, z), vec3(1, 0, 0), vec3(0, 0, 1));
 
 /**
- * Pilastro verticale con piede sul pavimento in (x, y) e testa a quota `top`:
- * lunghezza = top − quotaPavimento(x, y). La base b è lungo X, h lungo Y.
+ * Pilastro verticale con testa a quota `top` (quota d'imposta) e piede
+ * affondato di `ctx.embedment` sotto il pavimento in (x, y):
+ * lunghezza = top − quotaPavimento(x, y) + affondamento. La base b è lungo X,
+ * h lungo Y. Le travi restano alla quota di progetto, qualunque sia il pavimento.
  */
 export function columnStep(ctx: BuildContext, ref: string, x: number, y: number, top: number, section: Section): BuildStep {
-  const floor = ctx.floorHeightAt(x, y);
+  const foot = ctx.floorHeightAt(x, y) - ctx.embedment;
   return {
     kind: "place",
     ref,
     type: "pilastro",
     section,
-    length: top - floor,
-    pose: pose(vec3(x, y, floor), vec3(0, 0, 1), vec3(0, 1, 0)),
+    length: top - foot,
+    pose: pose(vec3(x, y, foot), vec3(0, 0, 1), vec3(0, 1, 0)),
   };
 }
 

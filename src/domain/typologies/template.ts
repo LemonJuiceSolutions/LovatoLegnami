@@ -158,6 +158,8 @@ export interface BuildContext {
   bool(name: string): boolean;
   /** Quota del pavimento in (x, y) (mm); piano a quota 0 se non fornita. */
   floorHeightAt: FloorHeightFn;
+  /** Affondamento dei pilastri sotto la quota del pavimento (mm, ≥ 0; default 0). */
+  embedment: number;
 }
 
 /** Valore costante o funzione pura del contesto. */
@@ -217,12 +219,19 @@ export interface TypologyTemplate {
 export interface BuildOptions {
   /** Quota del pavimento sotto ogni punto (usata dai template per i pilastri). */
   readonly floorHeightAt?: FloorHeightFn;
+  /**
+   * Interramento/affondamento dei pilastri sotto il pavimento (mm, default 0):
+   * si somma alla lunghezza di ogni pilastro e ne abbassa il piede.
+   */
+  readonly embedment?: number;
 }
 
 const resolve = <T>(v: Resolvable<T>, ctx: BuildContext): T =>
   typeof v === "function" ? (v as (c: BuildContext) => T)(ctx) : v;
 
 function createContext(template: TypologyTemplate, params: ResolvedParams, options: BuildOptions): BuildContext {
+  const embedment = options.embedment ?? 0;
+  if (!Number.isFinite(embedment) || embedment < 0) throw new ParamError("affondamento", embedment, "deve essere un numero ≥ 0 (mm)");
   const specs = new Map(template.params.map((p) => [p.name, p]));
   const get = (name: string, kind: ParamSpec["kind"]): ParamValue => {
     const spec = specs.get(name);
@@ -237,6 +246,7 @@ function createContext(template: TypologyTemplate, params: ResolvedParams, optio
     section: (name) => parseSectionLabel(get(name, "section") as string)!,
     bool: (name) => get(name, "boolean") as boolean,
     floorHeightAt: options.floorHeightAt ?? flatFloor,
+    embedment,
   };
 }
 
