@@ -29,8 +29,31 @@ export function faceExtents(piece: Pick<Piece, "section" | "length">, face: Face
 const fmt = (n: number): string => String(Math.round(n * 1000) / 1000);
 const tan = (deg: number): number => Math.tan((Math.abs(deg) * Math.PI) / 180);
 
+/**
+ * Vincoli dei pezzi curvi (E2): perché il solido resti fatto di facce piane e
+ * cilindriche sono ammessi solo fori sulle facce laterali `sinistra`/`destra`
+ * (asse del foro parallelo all'asse di curvatura) e tagli di testa con il solo
+ * angolo nel piano di curvatura. `at` è la coordinata curvilinea lungo l'asse.
+ */
+function curvedPieceProblem(m: MachiningSpec): string | undefined {
+  if (m.type === "foro") {
+    if (m.face !== "sinistra" && m.face !== "destra")
+      return `foro sulla faccia ${m.face} non ammesso su pezzi curvi (solo sinistra/destra, asse parallelo all'asse di curvatura)`;
+    return undefined;
+  }
+  if (m.type === "taglio-testa") {
+    if ((m.angle2 ?? 0) !== 0) return "sui pezzi curvi è ammesso solo l'angolo nel piano di curvatura (angle2 deve essere assente)";
+    return undefined;
+  }
+  return `lavorazione non ammessa su pezzi curvi (ammessi solo foro laterale e taglio di testa)`;
+}
+
 /** Verifica di applicabilità: restituisce il motivo del rifiuto o `undefined`. */
 function applicabilityProblem(piece: Piece, m: MachiningSpec): string | undefined {
+  if (piece.curve) {
+    const problem = curvedPieceProblem(m);
+    if (problem) return problem;
+  }
   const L = piece.length;
   const { b, h } = piece.section;
   const { thickness, across } = faceExtents(piece, m.face);
