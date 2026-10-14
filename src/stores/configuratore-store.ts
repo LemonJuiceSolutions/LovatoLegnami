@@ -1,4 +1,5 @@
-import { createStore, type StoreApi } from "zustand/vanilla";
+import { createJSONStorage, persist, type StateStorage } from "zustand/middleware";
+import { createStore, type Mutate, type StoreApi } from "zustand/vanilla";
 import {
   DEFAULT_LOVATO_RULES,
   ObstacleSchema,
@@ -20,6 +21,7 @@ import {
   type ConfiguratoreConfig,
   type Derived,
 } from "./config";
+import { parseConfigFile } from "./config-file";
 
 /**
  * Store del configuratore (D10) senza React: `createConfiguratoreStore()`
@@ -210,6 +212,47 @@ export function configuratoreSlice(options: ConfiguratoreStoreOptions = {}) {
 /** Store vanilla del configuratore (senza persistenza né kernel). */
 export function createConfiguratoreStore(options: ConfiguratoreStoreOptions = {}): ConfiguratoreStore {
   return createStore<ConfiguratoreState>()(configuratoreSlice(options));
+}
+
+/** Chiave dello storage locale (versionata, D10). */
+export const STORAGE_KEY = "lovato-configuratore-v1";
+
+export interface PersistentStoreOptions extends ConfiguratoreStoreOptions {
+  /** Storage sincrono o asincrono (default `localStorage`). */
+  readonly storage?: StateStorage;
+  /** Se `true` il ripristino avviene solo con `store.persist.rehydrate()`. */
+  readonly skipHydration?: boolean;
+}
+
+export type PersistentConfiguratoreStore = Mutate<ConfiguratoreStore, [["zustand/persist", { config: ConfiguratoreConfig }]]>;
+
+/**
+ * Store con persistenza della sola `config` (chiave `lovato-configuratore-v1`).
+ * Al ripristino la configurazione salvata passa da `parseConfigFile`: se non
+ * è valida (versione non supportata, campi errati) viene ignorata e resta la
+ * configurazione iniziale; `derived` è ricalcolato.
+ */
+export function createPersistentConfiguratoreStore(options: PersistentStoreOptions = {}): PersistentConfiguratoreStore {
+  const ruleSet = options.ruleSet ?? DEFAULT_LOVATO_RULES;
+  return createStore<ConfiguratoreState>()(
+    persist(configuratoreSlice(options), {
+      name: STORAGE_KEY,
+      version: 1,
+      storage: createJSONStorage<{ config: ConfiguratoreConfig }>(() => options.storage ?? localStorage),
+      partialize: (s) => ({ config: s.config }),
+      skipHydration: options.skipHydration,
+      merge: (persisted, current) => {
+        const saved = (persisted as { config?: unknown } | undefined)?.config;
+        if (saved === undefined) return current;
+        try {
+          const config = parseConfigFile(saved);
+          return { ...current, config, derived: computeDerived(config, current.derived, ruleSet) };
+        } catch {
+          return current;
+        }
+      },
+    }),
+  );
 }
 
 // Selettori ----------------------------------------------------------------

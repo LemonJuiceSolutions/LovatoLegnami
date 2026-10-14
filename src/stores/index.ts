@@ -1,3 +1,5 @@
-// Modulo stores – stato client del configuratore (D10). Senza React: l'hook è in `use-configuratore.ts`.
+// Modulo stores – stato client del configuratore (D10). Senza React: l'hook e
+// l'istanza persistita dell'app sono in `use-configuratore.ts`.
 export * from "./config";
+export * from "./config-file";
 export * from "./configuratore-store";
