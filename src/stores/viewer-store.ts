@@ -3,7 +3,7 @@ import { createStore, type StoreApi } from "zustand/vanilla";
 
 /**
  * Stato d'interfaccia del visualizzatore 3D (spec `visualizzatore-3d`):
- * livelli visibili. Separato dallo store del configuratore perché non fa parte
+ * livelli visibili, vista corrente e richieste di inquadratura. Separato dallo store del configuratore perché non fa parte
  * della configurazione e non è persistito né salvato nel JSON.
  */
 
@@ -21,10 +21,21 @@ export type LayerVisibility = Readonly<Record<ViewerLayer, boolean>>;
 
 export const DEFAULT_LAYERS: LayerVisibility = { ingombro: true, ostacoli: true, pavimento: true, quote: false };
 
+/** Viste predefinite: prospettica e (in proiezione ortografica) fronte, lato, pianta. */
+export const VIEWS = ["prospettica", "fronte", "lato", "pianta"] as const;
+export type ViewName = (typeof VIEWS)[number];
+
 export interface ViewerState {
   readonly layers: LayerVisibility;
+  readonly view: ViewName;
+  /** Contatore delle richieste di "inquadra tutto" (la scena reagisce al cambio). */
+  readonly frameRequest: number;
   setLayer(layer: ViewerLayer, visible: boolean): void;
   toggleLayer(layer: ViewerLayer): void;
+  /** Passa alla vista indicata e inquadra pergola + ingombro. */
+  setView(view: ViewName): void;
+  /** Inquadra pergola + ingombro nella vista corrente. */
+  frameAll(): void;
 }
 
 export type ViewerStore = StoreApi<ViewerState>;
@@ -32,12 +43,20 @@ export type ViewerStore = StoreApi<ViewerState>;
 export function createViewerStore(initial: Partial<LayerVisibility> = {}): ViewerStore {
   return createStore<ViewerState>()((set, get) => ({
     layers: { ...DEFAULT_LAYERS, ...initial },
+    view: "prospettica",
+    frameRequest: 0,
     setLayer(layer, visible) {
       if (get().layers[layer] === visible) return;
       set({ layers: { ...get().layers, [layer]: visible } });
     },
     toggleLayer(layer) {
       get().setLayer(layer, !get().layers[layer]);
+    },
+    setView(view) {
+      set({ view, frameRequest: get().frameRequest + 1 });
+    },
+    frameAll() {
+      set({ frameRequest: get().frameRequest + 1 });
     },
   }));
 }

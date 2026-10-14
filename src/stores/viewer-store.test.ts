@@ -21,4 +21,13 @@ describe("viewer store", () => {
     store.getState().setLayer("ingombro", true);
     expect(store.getState().layers).toBe(before);
   });
+
+  it("cambia vista e richiede l'inquadratura", () => {
+    const store = createViewerStore();
+    expect(store.getState().view).toBe("prospettica");
+    store.getState().setView("pianta");
+    expect(store.getState()).toMatchObject({ view: "pianta", frameRequest: 1 });
+    store.getState().frameAll();
+    expect(store.getState()).toMatchObject({ view: "pianta", frameRequest: 2 });
+  });
 });
