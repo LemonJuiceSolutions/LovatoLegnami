@@ -23,6 +23,7 @@ import { exportFileName } from "@/export/filename"
 import { SAT_FILE_MODES, SAT_VERSIONS, compareWithSample, type SatComparison, type SatFileMode } from "@/export/sat"
 import { selectNeedsExportConfirmation, selectSolidsReady } from "@/stores/configuratore-store"
 import { configuratoreStore, useConfiguratore } from "@/stores/use-configuratore"
+import { readFileText } from "./form-helpers"
 import { exportProblems, satFromState, verifySatExport, type SatVerification } from "./export-helpers"
 
 /**
@@ -216,7 +217,7 @@ export function ExportPanel() {
 
   const runCompare = async (file: File) => {
     try {
-      const sample = await file.text()
+      const sample = await readFileText(file)
       const ours = satFromState(configuratoreStore.getState())
       setComparison(compareWithSample(ours.files[0]?.text ?? "", sample))
     } catch (e) {
@@ -237,23 +238,23 @@ export function ExportPanel() {
 
       <div className="grid grid-cols-2 gap-2">
         <Button size="sm" disabled={!ready || busy !== null} onClick={() => requestCad("sat")}>
-          <Download className="mr-1.5 h-4 w-4" />
+          <Download className="mr-1.5 h-4 w-4 shrink-0" />
           Esporta SAT
         </Button>
         <Button size="sm" variant="secondary" disabled={!ready || busy !== null} onClick={() => requestCad("step")}>
-          {busy === "step" ? <Loader2 className="mr-1.5 h-4 w-4 animate-spin" /> : <Download className="mr-1.5 h-4 w-4" />}
+          {busy === "step" ? <Loader2 className="mr-1.5 h-4 w-4 shrink-0 animate-spin" /> : <Download className="mr-1.5 h-4 w-4 shrink-0" />}
           Esporta STEP
         </Button>
         <Button size="sm" variant="outline" className="col-span-2" disabled={!hasAssembly} onClick={runCsv}>
-          <Download className="mr-1.5 h-4 w-4" />
+          <Download className="mr-1.5 h-4 w-4 shrink-0" />
           Esporta distinta CSV
         </Button>
         <Button size="sm" variant="ghost" disabled={!ready} onClick={runVerify}>
-          <FileCheck2 className="mr-1.5 h-4 w-4" />
+          <FileCheck2 className="mr-1.5 h-4 w-4 shrink-0" />
           Verifica file
         </Button>
         <Button size="sm" variant="ghost" disabled={!ready} onClick={() => sampleInput.current?.click()}>
-          <FileSearch className="mr-1.5 h-4 w-4" />
+          <FileSearch className="mr-1.5 h-4 w-4 shrink-0" />
           Confronta campione
         </Button>
         <input

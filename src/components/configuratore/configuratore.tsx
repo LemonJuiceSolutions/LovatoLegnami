@@ -7,6 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { cn } from "@/lib/utils"
 import { configuratoreStore } from "@/stores/use-configuratore"
 import { KernelStatusBadge } from "./kernel-status"
+import { ConfigToolbar } from "./config-toolbar"
 import { EnvelopeForm } from "./envelope-form"
 import { ParamsPanel } from "./params-panel"
 import { ExportPanel } from "./export-panel"
@@ -127,7 +128,7 @@ export function ConfiguratoreLayout({ params, results, exports, toolbar }: Confi
             "lg:col-start-2 lg:row-start-2 min-[1760px]:col-start-3 min-[1760px]:row-start-1"
           )}
         >
-          <div className="grid min-h-0 flex-1 gap-4 lg:grid-cols-2 min-[1760px]:grid-cols-1 min-[1760px]:grid-rows-[minmax(0,1fr)_auto]">
+          <div className="grid min-h-0 flex-1 gap-4 lg:grid-cols-2 min-[1760px]:grid-cols-1 min-[1760px]:grid-rows-[minmax(0,1fr)_minmax(0,1fr)]">
             <Panel title="Esiti" icon={ClipboardList}>
               {results}
             </Panel>
@@ -148,5 +149,12 @@ export function Configuratore() {
     return () => configuratoreStore.getState().stopKernel()
   }, [])
 
-  return <ConfiguratoreLayout params={<ParamsPanel envelope={<EnvelopeForm />} />} results={<ResultsPanel />} exports={<ExportPanel />} />
+  return (
+    <ConfiguratoreLayout
+      params={<ParamsPanel envelope={<EnvelopeForm />} />}
+      results={<ResultsPanel />}
+      exports={<ExportPanel />}
+      toolbar={<ConfigToolbar />}
+    />
+  )
 }

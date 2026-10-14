@@ -185,10 +185,11 @@ export function ResultsPanel() {
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-2 gap-2">
+      <div className="flex flex-wrap gap-2">
         <Button
           variant="outline"
           size="sm"
+          className="flex-1"
           disabled={stale}
           onClick={() =>
             open(() => {
@@ -197,16 +198,17 @@ export function ResultsPanel() {
             })
           }
         >
-          <Wand2 className="mr-1.5 h-4 w-4" />
+          <Wand2 className="mr-1.5 h-4 w-4 shrink-0" />
           Auto-dimensiona
         </Button>
         <Button
           variant="outline"
           size="sm"
+          className="flex-1"
           disabled={stale}
           onClick={() => open(() => reviewFit(configuratoreStore.getState().config))}
         >
-          <Maximize2 className="mr-1.5 h-4 w-4" />
+          <Maximize2 className="mr-1.5 h-4 w-4 shrink-0" />
           Adatta all&apos;ingombro
         </Button>
       </div>

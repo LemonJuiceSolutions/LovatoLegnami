@@ -50,3 +50,14 @@ export function sectionOptions(current: string | undefined): string[] {
   const labels = SECTION_CATALOG.map(sectionLabel)
   return current && !labels.includes(current) ? [current, ...labels] : labels
 }
+
+/** Testo di un file scelto dall'utente (`FileReader` dove `Blob.text` non esiste). */
+export function readFileText(file: Blob): Promise<string> {
+  if (typeof file.text === "function") return file.text()
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = () => resolve(String(reader.result ?? ""))
+    reader.onerror = () => reject(reader.error ?? new Error("lettura del file non riuscita"))
+    reader.readAsText(file)
+  })
+}
