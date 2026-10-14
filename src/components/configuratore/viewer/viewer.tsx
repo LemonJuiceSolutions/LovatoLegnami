@@ -1,12 +1,18 @@
 "use client"
 
 import * as React from "react"
-import { AlertTriangle } from "lucide-react"
+import { AlertTriangle, Layers } from "lucide-react"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { Button } from "@/components/ui/button"
+import { Checkbox } from "@/components/ui/checkbox"
+import { Label } from "@/components/ui/label"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { LAYER_LABELS, VIEWER_LAYERS, useViewer } from "@/stores/viewer-store"
 import { selectAssembly } from "@/stores/configuratore-store"
 import { useConfiguratore } from "@/stores/use-configuratore"
 import { Scene } from "./scene"
-import { FAMILY_COLORS, FAMILY_LABELS } from "./theme-colors"
+import { obstacleTypes } from "./layer-helpers"
+import { FAMILY_COLORS, FAMILY_LABELS, OBSTACLE_LABELS, obstacleColor, type ViewerPalette } from "./theme-colors"
 import { familyLegend, usableKernelMesh } from "./viewer-helpers"
 import { useViewerPalette } from "./use-viewer-palette"
 
@@ -24,10 +30,43 @@ export function Overlay({ className, children }: { className?: string; children:
   )
 }
 
-function Legend() {
+function LayersMenu() {
+  const layers = useViewer((s) => s.layers)
+  const setLayer = useViewer((s) => s.setLayer)
+  return (
+    <Popover>
+      <PopoverTrigger asChild>
+        <Button variant="outline" size="sm" className="h-8 gap-1.5 bg-background/90">
+          <Layers className="h-4 w-4" />
+          Livelli
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent align="start" className="w-48 space-y-2 p-3">
+        <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Livelli visibili</p>
+        {VIEWER_LAYERS.map((layer) => (
+          <div key={layer} className="flex items-center gap-2">
+            <Checkbox
+              id={`livello-${layer}`}
+              checked={layers[layer]}
+              onCheckedChange={(v) => setLayer(layer, v === true)}
+            />
+            <Label htmlFor={`livello-${layer}`} className="cursor-pointer text-sm font-normal">
+              {LAYER_LABELS[layer]}
+            </Label>
+          </div>
+        ))}
+      </PopoverContent>
+    </Popover>
+  )
+}
+
+function Legend({ palette }: { palette: ViewerPalette }) {
   const assembly = useConfiguratore(selectAssembly)
+  const envelope = useConfiguratore((s) => s.config.envelope)
+  const showObstacles = useViewer((s) => s.layers.ostacoli)
   const entries = React.useMemo(() => familyLegend(assembly), [assembly])
-  if (entries.length === 0) return null
+  const obstacles = React.useMemo(() => (showObstacles ? obstacleTypes(envelope) : []), [envelope, showObstacles])
+  if (entries.length === 0 && obstacles.length === 0) return null
   return (
     <Overlay className="px-3 py-2">
       <p className="mb-1 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Legenda</p>
@@ -37,6 +76,15 @@ function Legend() {
             <span className="h-3 w-3 shrink-0 rounded-sm border" style={{ backgroundColor: FAMILY_COLORS[e.family] }} />
             <span className="flex-1">{FAMILY_LABELS[e.family]}</span>
             <span className="tabular-nums text-muted-foreground">{e.count}</span>
+          </li>
+        ))}
+        {obstacles.map((t) => (
+          <li key={t} className="flex items-center gap-2">
+            <span
+              className="h-3 w-3 shrink-0 rounded-sm border"
+              style={{ backgroundColor: obstacleColor(t, palette), opacity: 0.7 }}
+            />
+            <span className="flex-1">{OBSTACLE_LABELS[t]}</span>
           </li>
         ))}
       </ul>
@@ -74,8 +122,13 @@ export default function Viewer() {
           </Alert>
         </div>
       )}
+      <div className="pointer-events-none absolute left-2 top-2 flex flex-wrap gap-2">
+        <div className="pointer-events-auto">
+          <LayersMenu />
+        </div>
+      </div>
       <div className="pointer-events-none absolute bottom-2 left-2 max-w-[45%]">
-        <Legend />
+        <Legend palette={palette} />
       </div>
     </div>
   )

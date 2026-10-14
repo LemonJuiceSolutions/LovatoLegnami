@@ -6,6 +6,10 @@ import { GizmoHelper, GizmoViewport, Grid, OrbitControls, PerspectiveCamera } fr
 import { Object3D } from "three"
 import type { Assembly, Envelope } from "@/domain"
 import type { PieceResult } from "@/geometry/protocol"
+import { useViewer } from "@/stores/viewer-store"
+import { EnvelopeLayer } from "./envelope-layer"
+import { FloorLayer } from "./floor-layer"
+import { ObstaclesLayer } from "./obstacles-layer"
 import { PieceMesh } from "./piece-mesh"
 import { FAMILY_COLORS, type ViewerPalette } from "./theme-colors"
 import { usableKernelMesh } from "./viewer-helpers"
@@ -32,6 +36,9 @@ function initialCamera(envelope: Envelope) {
 
 function SceneContent({ assembly, envelope, palette, results }: SceneProps) {
   const [cam] = React.useState(() => initialCamera(envelope))
+  const layers = useViewer((s) => s.layers)
+  const c = envelope.floor.corners
+  const floorMin = Math.min(0, c.frontLeft, c.frontRight, c.backLeft, c.backRight, ...envelope.floor.points.map((p) => p.z))
   return (
     <>
       <color attach="background" args={[palette.background]} />
@@ -45,7 +52,7 @@ function SceneContent({ assembly, envelope, palette, results }: SceneProps) {
 
       <Grid
         rotation={[Math.PI / 2, 0, 0]}
-        position={[0, 0, -1]}
+        position={[0, 0, floorMin - 2]}
         cellSize={100}
         cellThickness={0.6}
         cellColor={palette.border}
@@ -58,6 +65,10 @@ function SceneContent({ assembly, envelope, palette, results }: SceneProps) {
         followCamera={false}
       />
       <axesHelper args={[1000]} />
+
+      {layers.pavimento && <FloorLayer envelope={envelope} palette={palette} />}
+      {layers.ingombro && <EnvelopeLayer envelope={envelope} palette={palette} />}
+      {layers.ostacoli && <ObstaclesLayer envelope={envelope} palette={palette} />}
 
       <group name="pergola">
         {assembly?.pieces.map((p) => (
