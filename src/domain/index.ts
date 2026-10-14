@@ -14,5 +14,7 @@ export * from "./typologies";
 export * from "./rules";
 // Ingombro cliente: ostacoli, pavimento, collisioni, adattamento
 export * from "./envelope";
+// Ferramenta: catalogo, bulloni passanti, staffe, giunti a N vie, elenco ferramenta
+export * from "./hardware";
 // Matematica di base (vettori, matrici di posa, box)
 export * from "./math";
