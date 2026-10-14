@@ -18,6 +18,9 @@ export interface NumberFieldProps {
   error?: string
   /** Chiamato a ogni modifica con un numero valido (anche fuori limite: decide il chiamante). */
   onValueChange: (value: number) => void
+  /** Campo facoltativo: svuotarlo chiama `onClear` invece di segnalare un errore. */
+  onClear?: () => void
+  placeholder?: string
   className?: string
   disabled?: boolean
 }
@@ -27,7 +30,7 @@ export interface NumberFieldProps {
  * digitato finché corrisponde al valore dello store (così "12," non diventa
  * "12" mentre si scrive). Testo non numerico → errore locale, nessun aggiornamento.
  */
-export function NumberField({ id, label, value, unit, hint, error, onValueChange, className, disabled }: NumberFieldProps) {
+export function NumberField({ id, label, value, unit, hint, error, onValueChange, onClear, placeholder, className, disabled }: NumberFieldProps) {
   const [text, setText] = React.useState(value === undefined ? "" : formatNumberInput(value))
   const [localError, setLocalError] = React.useState<string | null>(null)
 
@@ -54,6 +57,7 @@ export function NumberField({ id, label, value, unit, hint, error, onValueChange
           inputMode="decimal"
           value={text}
           disabled={disabled}
+          placeholder={placeholder}
           aria-invalid={shownError ? true : undefined}
           aria-describedby={describedBy}
           className={cn("h-9", unit && "pr-10", shownError && "border-destructive focus-visible:ring-destructive")}
@@ -61,6 +65,11 @@ export function NumberField({ id, label, value, unit, hint, error, onValueChange
             const next = e.target.value
             setText(next)
             const n = parseNumberInput(next)
+            if (n === undefined && onClear && next.trim() === "") {
+              setLocalError(null)
+              onClear()
+              return
+            }
             if (n === undefined) {
               setLocalError("Inserire un numero")
               return

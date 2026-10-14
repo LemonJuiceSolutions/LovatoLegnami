@@ -7,6 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { cn } from "@/lib/utils"
 import { configuratoreStore } from "@/stores/use-configuratore"
 import { KernelStatusBadge } from "./kernel-status"
+import { EnvelopeForm } from "./envelope-form"
 import { ParamsPanel } from "./params-panel"
 import { ViewerSlot } from "./viewer-slot"
 
@@ -145,5 +146,5 @@ export function Configuratore() {
     return () => configuratoreStore.getState().stopKernel()
   }, [])
 
-  return <ConfiguratoreLayout params={<ParamsPanel />} />
+  return <ConfiguratoreLayout params={<ParamsPanel envelope={<EnvelopeForm />} />} />
 }
