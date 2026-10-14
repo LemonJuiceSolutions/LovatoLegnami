@@ -1,5 +1,7 @@
 import { Matrix4, Quaternion, Vector3 } from "three"
-import { PIECE_FAMILIES, type Assembly, type Mat4, type PieceFamily } from "@/domain"
+import { PIECE_FAMILIES, type Assembly, type Mat4, type Piece, type PieceFamily } from "@/domain"
+import { pieceCacheKey } from "@/geometry/cache"
+import type { PieceMesh as PieceMeshData, PieceResult } from "@/geometry/protocol"
 
 /**
  * Funzioni pure del visualizzatore (nessun React): conversione delle pose,
@@ -43,4 +45,15 @@ export function familyLegend(assembly: Pick<Assembly, "pieces"> | null): LegendE
     const count = counts.get(family)
     return count ? [{ family, count }] : []
   })
+}
+
+/**
+ * Mesh del kernel utilizzabile per il pezzo: solo se il risultato esiste, è
+ * senza errori e la sua chiave di cache corrisponde al pezzo corrente (stessa
+ * sezione, lunghezza e lavorazioni). Altrimenti il pezzo resta un box.
+ */
+export function usableKernelMesh(piece: Piece, result: PieceResult | undefined): PieceMeshData | undefined {
+  if (!result || result.error || !result.mesh) return undefined
+  if (result.mesh.indices.length === 0 || result.mesh.positions.length === 0) return undefined
+  return result.cacheKey === pieceCacheKey(piece) ? result.mesh : undefined
 }

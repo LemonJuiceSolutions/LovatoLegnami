@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest"
 import { Vector3 } from "three"
 import { generate, getTypology, defaultParams, multiply, rotationZ, translation, vec3, applyToPoint } from "@/domain"
-import { familyLegend, poseToMatrix4, poseToTransform } from "./viewer-helpers"
+import { pieceCacheKey } from "@/geometry/cache"
+import { familyLegend, poseToMatrix4, poseToTransform, usableKernelMesh } from "./viewer-helpers"
 
 describe("poseToMatrix4", () => {
   it("rispetta l'ordine per righe del dominio (p' = M·p)", () => {
@@ -42,5 +43,22 @@ describe("familyLegend", () => {
     expect(legend.reduce((n, e) => n + e.count, 0)).toBe(assembly.pieces.length)
     expect(legend.map((e) => e.family)).toContain("PIL")
     expect(familyLegend(null)).toEqual([])
+  })
+})
+
+describe("usableKernelMesh", () => {
+  const t = getTypology("addossata-monofalda")
+  const piece = generate("addossata-monofalda", defaultParams(t)).pieces[0]
+  const mesh = { positions: new Float32Array(9), normals: new Float32Array(9), indices: new Uint32Array([0, 1, 2]) }
+  const base = { pieceId: piece.id, cacheKey: pieceCacheKey(piece), pose: piece.pose, mesh }
+
+  it("usa la mesh se la chiave di cache corrisponde al pezzo corrente", () => {
+    expect(usableKernelMesh(piece, base)).toBe(mesh)
+  })
+  it("torna al box se il risultato manca, ha errori, è vuoto o è di un pezzo diverso", () => {
+    expect(usableKernelMesh(piece, undefined)).toBeUndefined()
+    expect(usableKernelMesh(piece, { ...base, error: { message: "x" } } as never)).toBeUndefined()
+    expect(usableKernelMesh(piece, { ...base, mesh: { ...mesh, indices: new Uint32Array() } })).toBeUndefined()
+    expect(usableKernelMesh({ ...piece, length: piece.length + 10 }, base)).toBeUndefined()
   })
 })

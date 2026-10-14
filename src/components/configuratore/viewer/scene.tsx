@@ -5,8 +5,10 @@ import { Canvas } from "@react-three/fiber"
 import { GizmoHelper, GizmoViewport, Grid, OrbitControls, PerspectiveCamera } from "@react-three/drei"
 import { Object3D } from "three"
 import type { Assembly, Envelope } from "@/domain"
+import type { PieceResult } from "@/geometry/protocol"
 import { PieceMesh } from "./piece-mesh"
 import { FAMILY_COLORS, type ViewerPalette } from "./theme-colors"
+import { usableKernelMesh } from "./viewer-helpers"
 
 // Z verso l'alto in tutta la scena (camere, controlli, luci).
 Object3D.DEFAULT_UP.set(0, 0, 1)
@@ -15,6 +17,8 @@ export interface SceneProps {
   readonly assembly: Assembly | null
   readonly envelope: Envelope
   readonly palette: ViewerPalette
+  /** Risultati del kernel per id pezzo (mesh reali); vuoto = solo box. */
+  readonly results: Readonly<Record<string, PieceResult>>
 }
 
 /** Posizione iniziale della camera: da davanti a sinistra, in alto, a distanza proporzionale all'ingombro. */
@@ -26,13 +30,13 @@ function initialCamera(envelope: Envelope) {
   return { target, position }
 }
 
-function SceneContent({ assembly, envelope, palette }: SceneProps) {
+function SceneContent({ assembly, envelope, palette, results }: SceneProps) {
   const [cam] = React.useState(() => initialCamera(envelope))
   return (
     <>
       <color attach="background" args={[palette.background]} />
       <PerspectiveCamera makeDefault fov={40} near={10} far={200_000} position={cam.position} up={[0, 0, 1]} />
-      <OrbitControls makeDefault target={cam.target} enableDamping={false} />
+      <OrbitControls makeDefault target={cam.target} enableDamping={false} minDistance={200} maxDistance={80_000} />
 
       <hemisphereLight args={[palette.background, palette.mutedForeground, 0.7]} position={[0, 0, 1]} />
       <ambientLight intensity={0.35} />
@@ -56,7 +60,9 @@ function SceneContent({ assembly, envelope, palette }: SceneProps) {
       <axesHelper args={[1000]} />
 
       <group name="pergola">
-        {assembly?.pieces.map((p) => <PieceMesh key={p.id} piece={p} color={FAMILY_COLORS[p.family]} />)}
+        {assembly?.pieces.map((p) => (
+          <PieceMesh key={p.id} piece={p} color={FAMILY_COLORS[p.family]} mesh={usableKernelMesh(p, results[p.id])} />
+        ))}
       </group>
 
       <GizmoHelper alignment="bottom-right" margin={[64, 64]}>

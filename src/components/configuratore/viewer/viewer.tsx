@@ -1,11 +1,13 @@
 "use client"
 
 import * as React from "react"
+import { AlertTriangle } from "lucide-react"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { selectAssembly } from "@/stores/configuratore-store"
 import { useConfiguratore } from "@/stores/use-configuratore"
 import { Scene } from "./scene"
 import { FAMILY_COLORS, FAMILY_LABELS } from "./theme-colors"
-import { familyLegend } from "./viewer-helpers"
+import { familyLegend, usableKernelMesh } from "./viewer-helpers"
 import { useViewerPalette } from "./use-viewer-palette"
 
 /** Riquadro sovrapposto alla scena con lo stile delle card del tema. */
@@ -46,11 +48,32 @@ function Legend() {
 export default function Viewer() {
   const assembly = useConfiguratore(selectAssembly)
   const envelope = useConfiguratore((s) => s.config.envelope)
+  const results = useConfiguratore((s) => s.kernel.results)
+  const unavailable = useConfiguratore((s) => s.kernel.status === "unavailable")
   const palette = useViewerPalette()
+  const solids = React.useMemo(
+    () => assembly?.pieces.filter((p) => usableKernelMesh(p, results[p.id])).length ?? 0,
+    [assembly, results]
+  )
 
   return (
-    <div data-slot="viewer" className="relative h-full w-full overflow-hidden rounded-lg border bg-background">
-      <Scene assembly={assembly} envelope={envelope} palette={palette} />
+    <div
+      data-slot="viewer"
+      data-pieces={assembly?.pieces.length ?? 0}
+      data-solids={solids}
+      className="relative h-full w-full overflow-hidden rounded-lg border bg-background">
+      <Scene assembly={assembly} envelope={envelope} palette={palette} results={results} />
+      {unavailable && (
+        <div className="pointer-events-none absolute right-2 top-2 max-w-xs">
+          <Alert className="pointer-events-auto bg-background/95 py-2 shadow-sm">
+            <AlertTriangle className="h-4 w-4" />
+            <AlertTitle className="text-sm">Modalità semplificata</AlertTitle>
+            <AlertDescription className="text-xs text-muted-foreground">
+              Kernel geometrico non disponibile: i pezzi sono mostrati come box sezione × lunghezza, senza lavorazioni.
+            </AlertDescription>
+          </Alert>
+        </div>
+      )}
       <div className="pointer-events-none absolute bottom-2 left-2 max-w-[45%]">
         <Legend />
       </div>
