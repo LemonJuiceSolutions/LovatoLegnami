@@ -85,9 +85,22 @@ export const maxHeight = (assembly: Pick<Assembly, "pieces">): number => assembl
 
 /**
  * Tipi di pezzo che delimitano l'altezza libera "sotto le travi": tutta la
- * struttura di copertura. Pilastri e controventi (saette) sono esclusi.
+ * struttura di copertura. Pilastri, controventi (saette), archi e grigliati
+ * sono esclusi.
  */
-export const CLEAR_HEIGHT_TYPES: readonly PieceType[] = ["trave", "banchina", "colmo", "puntone", "travetto"];
+export const CLEAR_HEIGHT_TYPES: readonly PieceType[] = [
+  "trave",
+  "banchina",
+  "colmo",
+  "puntone",
+  "travetto",
+  // tipologie-estese (E8)
+  "tavola",
+  "cantonale",
+  "mensola",
+  "fascia",
+  "monaco",
+];
 
 export interface ClearHeight {
   /** Altezza libera minima (mm) tra pavimento e intradosso del pezzo. */

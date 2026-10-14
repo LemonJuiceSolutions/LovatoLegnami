@@ -25,24 +25,30 @@ import { type ClearHeight, type FloorHeightFn, minClearHeight, pieceObb, pieceOb
 
 /** Per ogni tipo di pezzo, i tipi che gli fanno da appoggio. Dati, estendibili. */
 export const SUPPORTERS: Readonly<Record<PieceType, readonly PieceType[]>> = {
-  trave: ["pilastro"],
+  trave: ["pilastro", "tavola", "monaco"],
   colmo: ["puntone", "pilastro"],
-  travetto: ["trave", "banchina", "colmo"],
-  puntone: ["trave", "colmo"],
+  travetto: ["trave", "banchina", "colmo", "tavola", "mensola", "cantonale", "monaco"],
+  puntone: ["trave", "colmo", "monaco", "tavola"],
   banchina: [],
   pilastro: [],
   controvento: [],
-  // nuovi primitivi (tipologie-estese): appoggi completati dal task 3.4 (E8)
-  tavola: [],
+  // nuovi primitivi (tipologie-estese, E8)
+  tavola: ["pilastro", "arco"],
+  cantonale: ["trave", "tavola", "monaco", "pilastro"],
+  fascia: ["travetto", "mensola", "cantonale"],
   arco: [],
-  cantonale: [],
   monaco: [],
   mensola: [],
-  fascia: [],
   grigliato: [],
 };
 
-/** Zona d'appoggio di un supporto lungo l'asse X locale del pezzo (mm). */
+/**
+ * Zona d'appoggio di un supporto lungo l'asse X locale del pezzo (mm). Un
+ * appoggio **laterale** (supporto a fianco del pezzo, es. pilastro serrato
+ * tra le tavole di una sandwich o testa d'arco tra le tavole) vale come
+ * appoggio puntuale nel centro della zona di contatto (il bullone): `from` =
+ * `to` = `at`.
+ */
 export interface SupportContact {
   readonly pieceId: string;
   readonly from: number;
@@ -152,11 +158,12 @@ const obbFrame = (o: OBB): { pose: Mat4; half: Vec3 } => ({ pose: fromBasis(o.ce
  * intersezione; `undefined` se i box non si toccano. Se `s` è curvo si usano i
  * suoi box di segmento (`pieceObbs`) e si uniscono gli intervalli.
  */
-export function contactRange(p: Piece, s: Piece, tol = 0.5): { from: number; to: number } | undefined {
+export function contactRange(p: Piece, s: Piece, tol = 0.5): { from: number; to: number; lateral: boolean } | undefined {
   const toLocal = invertRigid(p.pose);
   const [plo, phi] = localBounds(p);
   let from = Infinity;
   let to = -Infinity;
+  let lateral = true;
   for (const o of pieceObbs(s)) {
     const { pose, half } = obbFrame(o);
     const rel = multiply(toLocal, pose);
@@ -168,20 +175,31 @@ export function contactRange(p: Piece, s: Piece, tol = 0.5): { from: number; to:
     if (!range) continue;
     from = Math.min(from, range.from);
     to = Math.max(to, range.to);
+    // contatto laterale: intersezione sottile lungo Y locale e estesa lungo Z
+    if (!(range.dy <= 2 * tol + 1e-6 && range.dy < range.dz)) lateral = false;
   }
   if (from > to) return undefined;
-  return { from: Math.max(0, from), to: Math.min(p.length, to) };
+  return { from: Math.max(0, from), to: Math.min(p.length, to), lateral };
 }
 
 const scaleBy2 = (v: Vec3): Vec3 => vec3(2 * v.x, 2 * v.y, 2 * v.z);
 
-function vertexRange(plo: Vec3, phi: Vec3, rel: Mat4, slo: Vec3, shi: Vec3, tol: number): { from: number; to: number } | undefined {
+function vertexRange(
+  plo: Vec3,
+  phi: Vec3,
+  rel: Mat4,
+  slo: Vec3,
+  shi: Vec3,
+  tol: number,
+): { from: number; to: number; dy: number; dz: number } | undefined {
   const hs = [
     ...boxHalfSpaces([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1], plo, phi, tol),
     ...boxHalfSpaces(rel, slo, shi, tol),
   ];
   let from = Infinity;
   let to = -Infinity;
+  const lo = [Infinity, Infinity];
+  const hi = [-Infinity, -Infinity];
   for (let i = 0; i < hs.length; i++)
     for (let j = i + 1; j < hs.length; j++)
       for (let k = j + 1; k < hs.length; k++) {
@@ -189,8 +207,12 @@ function vertexRange(plo: Vec3, phi: Vec3, rel: Mat4, slo: Vec3, shi: Vec3, tol:
         if (!q || !hs.every((h) => dot(h.n, q) <= h.d + 1e-7)) continue;
         from = Math.min(from, q.x);
         to = Math.max(to, q.x);
+        lo[0] = Math.min(lo[0], q.y);
+        hi[0] = Math.max(hi[0], q.y);
+        lo[1] = Math.min(lo[1], q.z);
+        hi[1] = Math.max(hi[1], q.z);
       }
-  return from > to ? undefined : { from, to };
+  return from > to ? undefined : { from, to, dy: hi[0] - lo[0], dz: hi[1] - lo[1] };
 }
 
 /** Componente orizzontale dell'asse del pezzo (1 = orizzontale, 0 = verticale). */
@@ -206,7 +228,9 @@ export function measureSpan(p: Piece, pieces: readonly Piece[], tol = 0.5): Span
   for (const s of pieces) {
     if (s.id === p.id || !types.includes(s.type)) continue;
     const r = contactRange(p, s, tol);
-    if (r) supports.push({ pieceId: s.id, from: r.from, to: r.to, at: (r.from + r.to) / 2 });
+    if (!r) continue;
+    const at = (r.from + r.to) / 2;
+    supports.push(r.lateral ? { pieceId: s.id, from: at, to: at, at } : { pieceId: s.id, from: r.from, to: r.to, at });
   }
   supports.sort((a, b) => a.at - b.at || a.pieceId.localeCompare(b.pieceId));
   if (supports.length === 0)
@@ -225,7 +249,7 @@ const round6 = (v: number): number => Math.round(v * 1e6) / 1e6 + 0;
 export function measureJoistGroups(pieces: readonly Piece[]): JoistGroup[] {
   const groups = new Map<string, { dir: { x: number; y: number }; items: { id: string; pos: number }[] }>();
   for (const p of pieces) {
-    if (p.type !== "travetto") continue;
+    if (p.type !== "travetto" || p.curve) continue;
     const ax = axisOf(p.pose, 0);
     const len = Math.hypot(ax.x, ax.y);
     if (len < 1e-9) continue;
@@ -261,7 +285,8 @@ export function pieceSlope(p: Piece): number {
 export function measureAssembly(assembly: Pick<Assembly, "pieces">, options: MeasureOptions = {}): Measures {
   const tol = options.contactTolerance ?? 0.5;
   const pieces = assembly.pieces;
-  const spans = pieces.filter((p) => SUPPORTERS[p.type].length > 0).map((p) => measureSpan(p, pieces, tol));
+  // i pezzi curvi non hanno luce né sbalzo (E8) ma restano appoggi per gli altri
+  const spans = pieces.filter((p) => !p.curve && SUPPORTERS[p.type].length > 0).map((p) => measureSpan(p, pieces, tol));
   const joistGroups = measureJoistGroups(pieces);
   const spacings = joistGroups.flatMap((g) => (g.spacing === undefined ? [] : [g.spacing]));
   let maxOverhang: Measures["maxOverhang"];
