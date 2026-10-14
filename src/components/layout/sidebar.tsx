@@ -58,9 +58,9 @@ export function Sidebar() {
             onClick={() => setMobileOpen(false)}
           >
             <div className="h-6 w-6 rounded-md bg-primary text-primary-foreground flex items-center justify-center text-xs">
-              B
+              L
             </div>
-            <span>BASE</span>
+            <span>LOVATO LEGNAMI</span>
           </Link>
         </div>
 
@@ -95,7 +95,7 @@ export function Sidebar() {
         {/* Footer */}
         <div className="border-t p-4">
           <p className="text-xs text-muted-foreground text-center">
-            Base
+            Lovato Legnami
           </p>
         </div>
       </aside>

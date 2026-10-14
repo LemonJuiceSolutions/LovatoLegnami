@@ -14,8 +14,8 @@ function AppLayoutContent({ children }: { children: React.ReactNode }) {
       const detail = (e as CustomEvent).detail
       setAiPanelOpen(!!detail?.open)
     }
-    window.addEventListener("base-ai-panel-toggle", handler)
-    return () => window.removeEventListener("base-ai-panel-toggle", handler)
+    window.addEventListener("lovato-ai-panel-toggle", handler)
+    return () => window.removeEventListener("lovato-ai-panel-toggle", handler)
   }, [])
 
   return (

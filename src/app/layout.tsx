@@ -5,9 +5,9 @@ import "@/app/globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "BASE",
-  description: "Base",
-  applicationName: "BASE",
+  title: "LOVATO LEGNAMI",
+  description: "Lovato Legnami",
+  applicationName: "LOVATO LEGNAMI",
 };
 
 export const viewport: Viewport = {
