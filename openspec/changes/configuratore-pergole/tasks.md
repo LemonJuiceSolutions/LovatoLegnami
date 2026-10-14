@@ -65,7 +65,7 @@ Riferimenti: `specs/*/spec.md` per il comportamento atteso, `design.md` per arch
 - [x] 8.4 Implementare `src/export/sat/validate.ts` (parser del formato prodotto: header, record, `$ref` → entità esistente di tipo compatibile, raggiungibilità dal body, coerenza next/prev/partner dei coedge, conteggi); verificare con test che il validatore passa sui file del writer e fallisce su fixture volutamente corrotte (ref a indice inesistente, loop aperto).
 - [x] 8.5 Implementare `src/export/sat/compare.ts` `compareWithSample(oursText, sampleText)` che estrae versione, unità, tipi di entità, attributi e produce differenze con suggerimenti sulle opzioni; verificare con test: campione 7.0 vs nostro 21.0 → differenza di versione e suggerimento.
 - [x] 8.6 Implementare `src/export/sat/index.ts` `exportSat(pieces, results, options)` con modalità `assieme-unico` e `un-file-per-pezzo` (ZIP via `fflate`, file `<id>.sat`), header con campo "produttore/CAM"; aggiungere `fflate`; verificare con test: 20 pezzi → 1 file con 20 body oppure ZIP con 20 voci ciascuna con 1 body.
-- [ ] 8.7 Scrivere `src/export/sat/README.md` con: struttura del file prodotto, opzioni, procedura di validazione contro SAT campione della CNC (import nel CAM, confronto con `compareWithSample`), limiti MVP (solo piane e cilindriche); verificare che i comandi/snippet citati esistono nel codice.
+- [x] 8.7 Scrivere `src/export/sat/README.md` con: struttura del file prodotto, opzioni, procedura di validazione contro SAT campione della CNC (import nel CAM, confronto con `compareWithSample`), limiti MVP (solo piane e cilindriche); verificare che i comandi/snippet citati esistono nel codice.
 
 ## 9. Export STEP, distinta CSV, nomi file
 
