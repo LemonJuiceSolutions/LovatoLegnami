@@ -25,7 +25,7 @@ import { type ClearHeight, type FloorHeightFn, minClearHeight, pieceObb, pieceOb
 
 /** Per ogni tipo di pezzo, i tipi che gli fanno da appoggio. Dati, estendibili. */
 export const SUPPORTERS: Readonly<Record<PieceType, readonly PieceType[]>> = {
-  trave: ["pilastro", "tavola", "monaco", "banchina"],
+  trave: ["pilastro", "tavola", "monaco", "banchina", "trave"],
   colmo: ["puntone", "pilastro"],
   travetto: ["trave", "banchina", "colmo", "tavola", "mensola", "cantonale", "monaco"],
   puntone: ["trave", "colmo", "monaco", "tavola"],
@@ -35,7 +35,7 @@ export const SUPPORTERS: Readonly<Record<PieceType, readonly PieceType[]>> = {
   // nuovi primitivi (tipologie-estese, E8)
   tavola: ["pilastro", "arco", "banchina"],
   cantonale: ["trave", "tavola", "monaco", "pilastro"],
-  fascia: ["travetto", "mensola", "cantonale"],
+  fascia: ["travetto", "mensola", "cantonale", "trave"],
   arco: [],
   monaco: [],
   mensola: [],
@@ -172,12 +172,17 @@ const obbFrame = (o: OBB): { pose: Mat4; half: Vec3 } => ({ pose: fromBasis(o.ce
  * intersezione; `undefined` se i box non si toccano. Se `s` è curvo si usano i
  * suoi box di segmento (`pieceObbs`) e si uniscono gli intervalli.
  */
-export function contactRange(p: Piece, s: Piece, tol = 0.5): { from: number; to: number; lateral: boolean } | undefined {
+export function contactRange(
+  p: Piece,
+  s: Piece,
+  tol = 0.5,
+): { from: number; to: number; lateral: boolean; zMin: number } | undefined {
   const toLocal = invertRigid(p.pose);
   const [plo, phi] = localBounds(p);
   let from = Infinity;
   let to = -Infinity;
   let lateral = true;
+  let zMin = Infinity;
   for (const o of pieceObbs(s)) {
     const { pose, half } = obbFrame(o);
     const rel = multiply(toLocal, pose);
@@ -191,9 +196,10 @@ export function contactRange(p: Piece, s: Piece, tol = 0.5): { from: number; to:
     to = Math.max(to, range.to);
     // contatto laterale: intersezione sottile lungo Y locale e estesa lungo Z
     if (!(range.dy <= 2 * tol + 1e-6 && range.dy < range.dz)) lateral = false;
+    zMin = Math.min(zMin, range.zMin);
   }
   if (from > to) return undefined;
-  return { from: Math.max(0, from), to: Math.min(p.length, to), lateral };
+  return { from: Math.max(0, from), to: Math.min(p.length, to), lateral, zMin };
 }
 
 const scaleBy2 = (v: Vec3): Vec3 => vec3(2 * v.x, 2 * v.y, 2 * v.z);
@@ -205,7 +211,7 @@ function vertexRange(
   slo: Vec3,
   shi: Vec3,
   tol: number,
-): { from: number; to: number; dy: number; dz: number } | undefined {
+): { from: number; to: number; dy: number; dz: number; zMin: number } | undefined {
   const hs = [
     ...boxHalfSpaces([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1], plo, phi, tol),
     ...boxHalfSpaces(rel, slo, shi, tol),
@@ -226,7 +232,7 @@ function vertexRange(
         lo[1] = Math.min(lo[1], q.z);
         hi[1] = Math.max(hi[1], q.z);
       }
-  return from > to ? undefined : { from, to, dy: hi[0] - lo[0], dz: hi[1] - lo[1] };
+  return from > to ? undefined : { from, to, dy: hi[0] - lo[0], dz: hi[1] - lo[1], zMin: lo[1] };
 }
 
 /** Componente orizzontale dell'asse del pezzo (1 = orizzontale, 0 = verticale). */
@@ -243,6 +249,8 @@ export function measureSpan(p: Piece, pieces: readonly Piece[], tol = 0.5, hardw
     if (s.id === p.id || !types.includes(s.type)) continue;
     const r = contactRange(p, s, tol);
     if (!r) continue;
+    // un supporto appoggiato sulla faccia superiore del pezzo non lo sostiene (es. corrente sul traverso)
+    if (!r.lateral && r.zMin >= p.section.h / 2 - 2 * tol - 1e-6) continue;
     const at = (r.from + r.to) / 2;
     supports.push(r.lateral ? { pieceId: s.id, from: at, to: at, at } : { pieceId: s.id, from: r.from, to: r.to, at });
   }

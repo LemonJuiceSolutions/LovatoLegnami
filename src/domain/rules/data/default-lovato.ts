@@ -117,9 +117,9 @@ export const DEFAULT_SPAN_TABLE = {
     "140×140": 1600,
     "160×200": 2300,
   },
-  // fasce di gronda tra le teste dei travetti
+  // fasce di gronda/frontali fissate alle teste di travetti o correnti (portano solo sé stesse e la gronda)
   fascia: {
-    "38×300": 1200,
+    "38×300": 4000,
     "45×145": 900,
     "45×120": 800,
   },

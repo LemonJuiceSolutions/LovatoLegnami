@@ -18,7 +18,7 @@ describe("appoggi dei nuovi tipi (E8)", () => {
     expect(SUPPORTERS.tavola).toEqual(["pilastro", "arco", "banchina"]);
     expect(SUPPORTERS.travetto).toEqual(expect.arrayContaining(["tavola", "mensola", "cantonale", "monaco"]));
     expect(SUPPORTERS.cantonale).toEqual(["trave", "tavola", "monaco", "pilastro"]);
-    expect(SUPPORTERS.fascia).toEqual(["travetto", "mensola", "cantonale"]);
+    expect(SUPPORTERS.fascia).toEqual(["travetto", "mensola", "cantonale", "trave"]);
     expect(SUPPORTERS.arco).toEqual([]);
   });
 

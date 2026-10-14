@@ -13,6 +13,7 @@ const FIXTURES = [
   { slug: "addossata-monofalda", file: "monofalda-default.json" },
   { slug: "autoportante-bifalda", file: "bifalda-default.json" },
   { slug: "portale-sandwich", file: "portale-sandwich-default.json" },
+  { slug: "monofalda-scalare", file: "monofalda-scalare-default.json" },
 ] as const;
 
 const fixturePath = (file: string) => fileURLToPath(new URL(`../__fixtures__/${file}`, import.meta.url));

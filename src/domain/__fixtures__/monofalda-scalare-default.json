@@ -1,0 +1,3310 @@
+{
+  "hardware": [
+    {
+      "code": "bullone-m12x240",
+      "description": "Bullone passante M12×240",
+      "dims": {
+        "x": 240,
+        "y": 24,
+        "z": 24
+      },
+      "id": "BUL-01",
+      "kind": "bullone",
+      "machiningIds": [
+        "TAV-01-L01",
+        "PIL-01-L01",
+        "TAV-02-L01"
+      ],
+      "params": {
+        "diameter": 12,
+        "grip": 210,
+        "length": 240
+      },
+      "pieceIds": [
+        "TAV-01",
+        "PIL-01",
+        "TAV-02"
+      ],
+      "pose": [
+        0,
+        -1,
+        0,
+        500,
+        1,
+        0,
+        0,
+        195,
+        0,
+        0,
+        1,
+        3584.7535532645807,
+        0,
+        0,
+        0,
+        1
+      ],
+      "quantity": 1
+    },
+    {
+      "code": "bullone-m12x240",
+      "description": "Bullone passante M12×240",
+      "dims": {
+        "x": 240,
+        "y": 24,
+        "z": 24
+      },
+      "id": "BUL-02",
+      "kind": "bullone",
+      "machiningIds": [
+        "TAV-01-L02",
+        "PIL-01-L02",
+        "TAV-02-L02"
+      ],
+      "params": {
+        "diameter": 12,
+        "grip": 210,
+        "length": 240
+      },
+      "pieceIds": [
+        "TAV-01",
+        "PIL-01",
+        "TAV-02"
+      ],
+      "pose": [
+        0,
+        -1,
+        0,
+        500,
+        1,
+        0,
+        0,
+        195,
+        0,
+        0,
+        1,
+        3657.2535532645807,
+        0,
+        0,
+        0,
+        1
+      ],
+      "quantity": 1
+    },
+    {
+      "code": "bullone-m12x240",
+      "description": "Bullone passante M12×240",
+      "dims": {
+        "x": 240,
+        "y": 24,
+        "z": 24
+      },
+      "id": "BUL-03",
+      "kind": "bullone",
+      "machiningIds": [
+        "TAV-01-L03",
+        "PIL-02-L01",
+        "TAV-02-L03"
+      ],
+      "params": {
+        "diameter": 12,
+        "grip": 210,
+        "length": 240
+      },
+      "pieceIds": [
+        "TAV-01",
+        "PIL-02",
+        "TAV-02"
+      ],
+      "pose": [
+        0,
+        -1,
+        0,
+        3540,
+        1,
+        0,
+        0,
+        195,
+        0,
+        0,
+        1,
+        3584.7535532645807,
+        0,
+        0,
+        0,
+        1
+      ],
+      "quantity": 1
+    },
+    {
+      "code": "bullone-m12x240",
+      "description": "Bullone passante M12×240",
+      "dims": {
+        "x": 240,
+        "y": 24,
+        "z": 24
+      },
+      "id": "BUL-04",
+      "kind": "bullone",
+      "machiningIds": [
+        "TAV-01-L04",
+        "PIL-02-L02",
+        "TAV-02-L04"
+      ],
+      "params": {
+        "diameter": 12,
+        "grip": 210,
+        "length": 240
+      },
+      "pieceIds": [
+        "TAV-01",
+        "PIL-02",
+        "TAV-02"
+      ],
+      "pose": [
+        0,
+        -1,
+        0,
+        3540,
+        1,
+        0,
+        0,
+        195,
+        0,
+        0,
+        1,
+        3657.2535532645807,
+        0,
+        0,
+        0,
+        1
+      ],
+      "quantity": 1
+    },
+    {
+      "code": "bullone-m12x240",
+      "description": "Bullone passante M12×240",
+      "dims": {
+        "x": 240,
+        "y": 24,
+        "z": 24
+      },
+      "id": "BUL-05",
+      "kind": "bullone",
+      "machiningIds": [
+        "TAV-01-L05",
+        "CTV-01-L03",
+        "TAV-02-L05"
+      ],
+      "params": {
+        "diameter": 12,
+        "grip": 210,
+        "length": 240
+      },
+      "pieceIds": [
+        "TAV-01",
+        "CTV-01",
+        "TAV-02"
+      ],
+      "pose": [
+        0,
+        -1,
+        0,
+        968.3326112068521,
+        1,
+        0,
+        0,
+        195,
+        0,
+        0,
+        1,
+        3621.0035532645807,
+        0,
+        0,
+        0,
+        1
+      ],
+      "quantity": 1
+    },
+    {
+      "code": "vite-6x160",
+      "description": "Vite TORX 6×160",
+      "id": "VIT-01",
+      "kind": "vite",
+      "machiningIds": [],
+      "params": {},
+      "pieceIds": [
+        "CTV-01",
+        "PIL-01",
+        "CTV-02",
+        "PIL-02",
+        "CTV-03",
+        "PIL-03",
+        "CTV-04",
+        "PIL-04",
+        "CTV-05",
+        "PIL-05",
+        "CTV-06",
+        "PIL-06",
+        "CTV-07",
+        "PIL-07",
+        "CTV-08",
+        "PIL-08"
+      ],
+      "quantity": 16
+    },
+    {
+      "code": "bullone-m12x240",
+      "description": "Bullone passante M12×240",
+      "dims": {
+        "x": 240,
+        "y": 24,
+        "z": 24
+      },
+      "id": "BUL-06",
+      "kind": "bullone",
+      "machiningIds": [
+        "TAV-01-L06",
+        "CTV-02-L03",
+        "TAV-02-L06"
+      ],
+      "params": {
+        "diameter": 12,
+        "grip": 210,
+        "length": 240
+      },
+      "pieceIds": [
+        "TAV-01",
+        "CTV-02",
+        "TAV-02"
+      ],
+      "pose": [
+        0,
+        -1,
+        0,
+        3071.667388793148,
+        1,
+        0,
+        0,
+        195,
+        0,
+        0,
+        1,
+        3621.0035532645807,
+        0,
+        0,
+        0,
+        1
+      ],
+      "quantity": 1
+    },
+    {
+      "code": "bullone-m12x240",
+      "description": "Bullone passante M12×240",
+      "dims": {
+        "x": 240,
+        "y": 24,
+        "z": 24
+      },
+      "id": "BUL-07",
+      "kind": "bullone",
+      "machiningIds": [
+        "TAV-03-L01",
+        "PIL-03-L01",
+        "TAV-04-L01"
+      ],
+      "params": {
+        "diameter": 12,
+        "grip": 210,
+        "length": 240
+      },
+      "pieceIds": [
+        "TAV-03",
+        "PIL-03",
+        "TAV-04"
+      ],
+      "pose": [
+        0,
+        -1,
+        0,
+        500,
+        1,
+        0,
+        0,
+        2658.3333333333335,
+        0,
+        0,
+        1,
+        3468.5857021763873,
+        0,
+        0,
+        0,
+        1
+      ],
+      "quantity": 1
+    },
+    {
+      "code": "bullone-m12x240",
+      "description": "Bullone passante M12×240",
+      "dims": {
+        "x": 240,
+        "y": 24,
+        "z": 24
+      },
+      "id": "BUL-08",
+      "kind": "bullone",
+      "machiningIds": [
+        "TAV-03-L02",
+        "PIL-03-L02",
+        "TAV-04-L02"
+      ],
+      "params": {
+        "diameter": 12,
+        "grip": 210,
+        "length": 240
+      },
+      "pieceIds": [
+        "TAV-03",
+        "PIL-03",
+        "TAV-04"
+      ],
+      "pose": [
+        0,
+        -1,
+        0,
+        500,
+        1,
+        0,
+        0,
+        2658.3333333333335,
+        0,
+        0,
+        1,
+        3541.0857021763873,
+        0,
+        0,
+        0,
+        1
+      ],
+      "quantity": 1
+    },
+    {
+      "code": "bullone-m12x240",
+      "description": "Bullone passante M12×240",
+      "dims": {
+        "x": 240,
+        "y": 24,
+        "z": 24
+      },
+      "id": "BUL-09",
+      "kind": "bullone",
+      "machiningIds": [
+        "TAV-03-L03",
+        "PIL-04-L01",
+        "TAV-04-L03"
+      ],
+      "params": {
+        "diameter": 12,
+        "grip": 210,
+        "length": 240
+      },
+      "pieceIds": [
+        "TAV-03",
+        "PIL-04",
+        "TAV-04"
+      ],
+      "pose": [
+        0,
+        -1,
+        0,
+        3540,
+        1,
+        0,
+        0,
+        2658.3333333333335,
+        0,
+        0,
+        1,
+        3468.5857021763873,
+        0,
+        0,
+        0,
+        1
+      ],
+      "quantity": 1
+    },
+    {
+      "code": "bullone-m12x240",
+      "description": "Bullone passante M12×240",
+      "dims": {
+        "x": 240,
+        "y": 24,
+        "z": 24
+      },
+      "id": "BUL-10",
+      "kind": "bullone",
+      "machiningIds": [
+        "TAV-03-L04",
+        "PIL-04-L02",
+        "TAV-04-L04"
+      ],
+      "params": {
+        "diameter": 12,
+        "grip": 210,
+        "length": 240
+      },
+      "pieceIds": [
+        "TAV-03",
+        "PIL-04",
+        "TAV-04"
+      ],
+      "pose": [
+        0,
+        -1,
+        0,
+        3540,
+        1,
+        0,
+        0,
+        2658.3333333333335,
+        0,
+        0,
+        1,
+        3541.0857021763873,
+        0,
+        0,
+        0,
+        1
+      ],
+      "quantity": 1
+    },
+    {
+      "code": "bullone-m12x240",
+      "description": "Bullone passante M12×240",
+      "dims": {
+        "x": 240,
+        "y": 24,
+        "z": 24
+      },
+      "id": "BUL-11",
+      "kind": "bullone",
+      "machiningIds": [
+        "TAV-03-L05",
+        "CTV-03-L03",
+        "TAV-04-L05"
+      ],
+      "params": {
+        "diameter": 12,
+        "grip": 210,
+        "length": 240
+      },
+      "pieceIds": [
+        "TAV-03",
+        "CTV-03",
+        "TAV-04"
+      ],
+      "pose": [
+        0,
+        -1,
+        0,
+        968.3326112068521,
+        1,
+        0,
+        0,
+        2658.3333333333335,
+        0,
+        0,
+        1,
+        3504.8357021763873,
+        0,
+        0,
+        0,
+        1
+      ],
+      "quantity": 1
+    },
+    {
+      "code": "bullone-m12x240",
+      "description": "Bullone passante M12×240",
+      "dims": {
+        "x": 240,
+        "y": 24,
+        "z": 24
+      },
+      "id": "BUL-12",
+      "kind": "bullone",
+      "machiningIds": [
+        "TAV-03-L06",
+        "CTV-04-L03",
+        "TAV-04-L06"
+      ],
+      "params": {
+        "diameter": 12,
+        "grip": 210,
+        "length": 240
+      },
+      "pieceIds": [
+        "TAV-03",
+        "CTV-04",
+        "TAV-04"
+      ],
+      "pose": [
+        0,
+        -1,
+        0,
+        3071.667388793148,
+        1,
+        0,
+        0,
+        2658.3333333333335,
+        0,
+        0,
+        1,
+        3504.8357021763873,
+        0,
+        0,
+        0,
+        1
+      ],
+      "quantity": 1
+    },
+    {
+      "code": "bullone-m12x240",
+      "description": "Bullone passante M12×240",
+      "dims": {
+        "x": 240,
+        "y": 24,
+        "z": 24
+      },
+      "id": "BUL-13",
+      "kind": "bullone",
+      "machiningIds": [
+        "TAV-05-L01",
+        "PIL-05-L01",
+        "TAV-06-L01"
+      ],
+      "params": {
+        "diameter": 12,
+        "grip": 210,
+        "length": 240
+      },
+      "pieceIds": [
+        "TAV-05",
+        "PIL-05",
+        "TAV-06"
+      ],
+      "pose": [
+        0,
+        -1,
+        0,
+        500,
+        1,
+        0,
+        0,
+        5121.666666666667,
+        0,
+        0,
+        1,
+        3352.4178510881934,
+        0,
+        0,
+        0,
+        1
+      ],
+      "quantity": 1
+    },
+    {
+      "code": "bullone-m12x240",
+      "description": "Bullone passante M12×240",
+      "dims": {
+        "x": 240,
+        "y": 24,
+        "z": 24
+      },
+      "id": "BUL-14",
+      "kind": "bullone",
+      "machiningIds": [
+        "TAV-05-L02",
+        "PIL-05-L02",
+        "TAV-06-L02"
+      ],
+      "params": {
+        "diameter": 12,
+        "grip": 210,
+        "length": 240
+      },
+      "pieceIds": [
+        "TAV-05",
+        "PIL-05",
+        "TAV-06"
+      ],
+      "pose": [
+        0,
+        -1,
+        0,
+        500,
+        1,
+        0,
+        0,
+        5121.666666666667,
+        0,
+        0,
+        1,
+        3424.9178510881934,
+        0,
+        0,
+        0,
+        1
+      ],
+      "quantity": 1
+    },
+    {
+      "code": "bullone-m12x240",
+      "description": "Bullone passante M12×240",
+      "dims": {
+        "x": 240,
+        "y": 24,
+        "z": 24
+      },
+      "id": "BUL-15",
+      "kind": "bullone",
+      "machiningIds": [
+        "TAV-05-L03",
+        "PIL-06-L01",
+        "TAV-06-L03"
+      ],
+      "params": {
+        "diameter": 12,
+        "grip": 210,
+        "length": 240
+      },
+      "pieceIds": [
+        "TAV-05",
+        "PIL-06",
+        "TAV-06"
+      ],
+      "pose": [
+        0,
+        -1,
+        0,
+        3540,
+        1,
+        0,
+        0,
+        5121.666666666667,
+        0,
+        0,
+        1,
+        3352.4178510881934,
+        0,
+        0,
+        0,
+        1
+      ],
+      "quantity": 1
+    },
+    {
+      "code": "bullone-m12x240",
+      "description": "Bullone passante M12×240",
+      "dims": {
+        "x": 240,
+        "y": 24,
+        "z": 24
+      },
+      "id": "BUL-16",
+      "kind": "bullone",
+      "machiningIds": [
+        "TAV-05-L04",
+        "PIL-06-L02",
+        "TAV-06-L04"
+      ],
+      "params": {
+        "diameter": 12,
+        "grip": 210,
+        "length": 240
+      },
+      "pieceIds": [
+        "TAV-05",
+        "PIL-06",
+        "TAV-06"
+      ],
+      "pose": [
+        0,
+        -1,
+        0,
+        3540,
+        1,
+        0,
+        0,
+        5121.666666666667,
+        0,
+        0,
+        1,
+        3424.9178510881934,
+        0,
+        0,
+        0,
+        1
+      ],
+      "quantity": 1
+    },
+    {
+      "code": "bullone-m12x240",
+      "description": "Bullone passante M12×240",
+      "dims": {
+        "x": 240,
+        "y": 24,
+        "z": 24
+      },
+      "id": "BUL-17",
+      "kind": "bullone",
+      "machiningIds": [
+        "TAV-05-L05",
+        "CTV-05-L03",
+        "TAV-06-L05"
+      ],
+      "params": {
+        "diameter": 12,
+        "grip": 210,
+        "length": 240
+      },
+      "pieceIds": [
+        "TAV-05",
+        "CTV-05",
+        "TAV-06"
+      ],
+      "pose": [
+        0,
+        -1,
+        0,
+        968.3326112068521,
+        1,
+        0,
+        0,
+        5121.666666666667,
+        0,
+        0,
+        1,
+        3388.6678510881934,
+        0,
+        0,
+        0,
+        1
+      ],
+      "quantity": 1
+    },
+    {
+      "code": "bullone-m12x240",
+      "description": "Bullone passante M12×240",
+      "dims": {
+        "x": 240,
+        "y": 24,
+        "z": 24
+      },
+      "id": "BUL-18",
+      "kind": "bullone",
+      "machiningIds": [
+        "TAV-05-L06",
+        "CTV-06-L03",
+        "TAV-06-L06"
+      ],
+      "params": {
+        "diameter": 12,
+        "grip": 210,
+        "length": 240
+      },
+      "pieceIds": [
+        "TAV-05",
+        "CTV-06",
+        "TAV-06"
+      ],
+      "pose": [
+        0,
+        -1,
+        0,
+        3071.667388793148,
+        1,
+        0,
+        0,
+        5121.666666666667,
+        0,
+        0,
+        1,
+        3388.6678510881934,
+        0,
+        0,
+        0,
+        1
+      ],
+      "quantity": 1
+    },
+    {
+      "code": "bullone-m12x240",
+      "description": "Bullone passante M12×240",
+      "dims": {
+        "x": 240,
+        "y": 24,
+        "z": 24
+      },
+      "id": "BUL-19",
+      "kind": "bullone",
+      "machiningIds": [
+        "TAV-07-L01",
+        "PIL-07-L01",
+        "TAV-08-L01"
+      ],
+      "params": {
+        "diameter": 12,
+        "grip": 210,
+        "length": 240
+      },
+      "pieceIds": [
+        "TAV-07",
+        "PIL-07",
+        "TAV-08"
+      ],
+      "pose": [
+        0,
+        -1,
+        0,
+        500,
+        1,
+        0,
+        0,
+        7585,
+        0,
+        0,
+        1,
+        3236.25,
+        0,
+        0,
+        0,
+        1
+      ],
+      "quantity": 1
+    },
+    {
+      "code": "bullone-m12x240",
+      "description": "Bullone passante M12×240",
+      "dims": {
+        "x": 240,
+        "y": 24,
+        "z": 24
+      },
+      "id": "BUL-20",
+      "kind": "bullone",
+      "machiningIds": [
+        "TAV-07-L02",
+        "PIL-07-L02",
+        "TAV-08-L02"
+      ],
+      "params": {
+        "diameter": 12,
+        "grip": 210,
+        "length": 240
+      },
+      "pieceIds": [
+        "TAV-07",
+        "PIL-07",
+        "TAV-08"
+      ],
+      "pose": [
+        0,
+        -1,
+        0,
+        500,
+        1,
+        0,
+        0,
+        7585,
+        0,
+        0,
+        1,
+        3308.75,
+        0,
+        0,
+        0,
+        1
+      ],
+      "quantity": 1
+    },
+    {
+      "code": "bullone-m12x240",
+      "description": "Bullone passante M12×240",
+      "dims": {
+        "x": 240,
+        "y": 24,
+        "z": 24
+      },
+      "id": "BUL-21",
+      "kind": "bullone",
+      "machiningIds": [
+        "TAV-07-L03",
+        "PIL-08-L01",
+        "TAV-08-L03"
+      ],
+      "params": {
+        "diameter": 12,
+        "grip": 210,
+        "length": 240
+      },
+      "pieceIds": [
+        "TAV-07",
+        "PIL-08",
+        "TAV-08"
+      ],
+      "pose": [
+        0,
+        -1,
+        0,
+        3540,
+        1,
+        0,
+        0,
+        7585,
+        0,
+        0,
+        1,
+        3236.25,
+        0,
+        0,
+        0,
+        1
+      ],
+      "quantity": 1
+    },
+    {
+      "code": "bullone-m12x240",
+      "description": "Bullone passante M12×240",
+      "dims": {
+        "x": 240,
+        "y": 24,
+        "z": 24
+      },
+      "id": "BUL-22",
+      "kind": "bullone",
+      "machiningIds": [
+        "TAV-07-L04",
+        "PIL-08-L02",
+        "TAV-08-L04"
+      ],
+      "params": {
+        "diameter": 12,
+        "grip": 210,
+        "length": 240
+      },
+      "pieceIds": [
+        "TAV-07",
+        "PIL-08",
+        "TAV-08"
+      ],
+      "pose": [
+        0,
+        -1,
+        0,
+        3540,
+        1,
+        0,
+        0,
+        7585,
+        0,
+        0,
+        1,
+        3308.75,
+        0,
+        0,
+        0,
+        1
+      ],
+      "quantity": 1
+    },
+    {
+      "code": "bullone-m12x240",
+      "description": "Bullone passante M12×240",
+      "dims": {
+        "x": 240,
+        "y": 24,
+        "z": 24
+      },
+      "id": "BUL-23",
+      "kind": "bullone",
+      "machiningIds": [
+        "TAV-07-L05",
+        "CTV-07-L03",
+        "TAV-08-L05"
+      ],
+      "params": {
+        "diameter": 12,
+        "grip": 210,
+        "length": 240
+      },
+      "pieceIds": [
+        "TAV-07",
+        "CTV-07",
+        "TAV-08"
+      ],
+      "pose": [
+        0,
+        -1,
+        0,
+        968.3326112068521,
+        1,
+        0,
+        0,
+        7585,
+        0,
+        0,
+        1,
+        3272.5,
+        0,
+        0,
+        0,
+        1
+      ],
+      "quantity": 1
+    },
+    {
+      "code": "bullone-m12x240",
+      "description": "Bullone passante M12×240",
+      "dims": {
+        "x": 240,
+        "y": 24,
+        "z": 24
+      },
+      "id": "BUL-24",
+      "kind": "bullone",
+      "machiningIds": [
+        "TAV-07-L06",
+        "CTV-08-L03",
+        "TAV-08-L06"
+      ],
+      "params": {
+        "diameter": 12,
+        "grip": 210,
+        "length": 240
+      },
+      "pieceIds": [
+        "TAV-07",
+        "CTV-08",
+        "TAV-08"
+      ],
+      "pose": [
+        0,
+        -1,
+        0,
+        3071.667388793148,
+        1,
+        0,
+        0,
+        7585,
+        0,
+        0,
+        1,
+        3272.5,
+        0,
+        0,
+        0,
+        1
+      ],
+      "quantity": 1
+    },
+    {
+      "code": "vite-8x240",
+      "description": "Vite TORX 8×240",
+      "id": "VIT-02",
+      "kind": "vite",
+      "machiningIds": [],
+      "params": {},
+      "pieceIds": [
+        "TRV-01",
+        "TAV-01",
+        "TAV-02",
+        "TAV-03",
+        "TAV-04",
+        "TRV-02",
+        "TRV-03",
+        "TAV-05",
+        "TAV-06",
+        "TRV-04",
+        "TRV-05",
+        "TAV-07",
+        "TAV-08",
+        "TRV-06"
+      ],
+      "quantity": 20
+    },
+    {
+      "code": "staffa-terra-bicchiere-120",
+      "description": "Staffa a bicchiere 120×120",
+      "dims": {
+        "x": 150,
+        "y": 130,
+        "z": 130
+      },
+      "id": "STT-01",
+      "kind": "staffa-terra",
+      "machiningIds": [],
+      "params": {
+        "anchor": "piede"
+      },
+      "pieceIds": [
+        "PIL-01"
+      ],
+      "pose": [
+        0,
+        0,
+        1,
+        500,
+        0,
+        -1,
+        0,
+        300,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1
+      ],
+      "quantity": 1
+    },
+    {
+      "code": "vite-8x40",
+      "description": "Vite 8×40",
+      "id": "VIT-03",
+      "kind": "vite",
+      "machiningIds": [],
+      "params": {},
+      "pieceIds": [
+        "PIL-01",
+        "PIL-02",
+        "PIL-03",
+        "PIL-04",
+        "PIL-05",
+        "PIL-06",
+        "PIL-07",
+        "PIL-08"
+      ],
+      "quantity": 32
+    },
+    {
+      "code": "staffa-terra-bicchiere-120",
+      "description": "Staffa a bicchiere 120×120",
+      "dims": {
+        "x": 150,
+        "y": 130,
+        "z": 130
+      },
+      "id": "STT-02",
+      "kind": "staffa-terra",
+      "machiningIds": [],
+      "params": {
+        "anchor": "piede"
+      },
+      "pieceIds": [
+        "PIL-02"
+      ],
+      "pose": [
+        0,
+        0,
+        1,
+        3540,
+        0,
+        -1,
+        0,
+        300,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1
+      ],
+      "quantity": 1
+    },
+    {
+      "code": "staffa-terra-bicchiere-120",
+      "description": "Staffa a bicchiere 120×120",
+      "dims": {
+        "x": 150,
+        "y": 130,
+        "z": 130
+      },
+      "id": "STT-03",
+      "kind": "staffa-terra",
+      "machiningIds": [],
+      "params": {
+        "anchor": "piede"
+      },
+      "pieceIds": [
+        "PIL-03"
+      ],
+      "pose": [
+        0,
+        0,
+        1,
+        500,
+        0,
+        -1,
+        0,
+        2763.3333333333335,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1
+      ],
+      "quantity": 1
+    },
+    {
+      "code": "staffa-terra-bicchiere-120",
+      "description": "Staffa a bicchiere 120×120",
+      "dims": {
+        "x": 150,
+        "y": 130,
+        "z": 130
+      },
+      "id": "STT-04",
+      "kind": "staffa-terra",
+      "machiningIds": [],
+      "params": {
+        "anchor": "piede"
+      },
+      "pieceIds": [
+        "PIL-04"
+      ],
+      "pose": [
+        0,
+        0,
+        1,
+        3540,
+        0,
+        -1,
+        0,
+        2763.3333333333335,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1
+      ],
+      "quantity": 1
+    },
+    {
+      "code": "staffa-terra-bicchiere-120",
+      "description": "Staffa a bicchiere 120×120",
+      "dims": {
+        "x": 150,
+        "y": 130,
+        "z": 130
+      },
+      "id": "STT-05",
+      "kind": "staffa-terra",
+      "machiningIds": [],
+      "params": {
+        "anchor": "piede"
+      },
+      "pieceIds": [
+        "PIL-05"
+      ],
+      "pose": [
+        0,
+        0,
+        1,
+        500,
+        0,
+        -1,
+        0,
+        5226.666666666667,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1
+      ],
+      "quantity": 1
+    },
+    {
+      "code": "staffa-terra-bicchiere-120",
+      "description": "Staffa a bicchiere 120×120",
+      "dims": {
+        "x": 150,
+        "y": 130,
+        "z": 130
+      },
+      "id": "STT-06",
+      "kind": "staffa-terra",
+      "machiningIds": [],
+      "params": {
+        "anchor": "piede"
+      },
+      "pieceIds": [
+        "PIL-06"
+      ],
+      "pose": [
+        0,
+        0,
+        1,
+        3540,
+        0,
+        -1,
+        0,
+        5226.666666666667,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1
+      ],
+      "quantity": 1
+    },
+    {
+      "code": "staffa-terra-bicchiere-120",
+      "description": "Staffa a bicchiere 120×120",
+      "dims": {
+        "x": 150,
+        "y": 130,
+        "z": 130
+      },
+      "id": "STT-07",
+      "kind": "staffa-terra",
+      "machiningIds": [],
+      "params": {
+        "anchor": "piede"
+      },
+      "pieceIds": [
+        "PIL-07"
+      ],
+      "pose": [
+        0,
+        0,
+        1,
+        500,
+        0,
+        -1,
+        0,
+        7690,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1
+      ],
+      "quantity": 1
+    },
+    {
+      "code": "staffa-terra-bicchiere-120",
+      "description": "Staffa a bicchiere 120×120",
+      "dims": {
+        "x": 150,
+        "y": 130,
+        "z": 130
+      },
+      "id": "STT-08",
+      "kind": "staffa-terra",
+      "machiningIds": [],
+      "params": {
+        "anchor": "piede"
+      },
+      "pieceIds": [
+        "PIL-08"
+      ],
+      "pose": [
+        0,
+        0,
+        1,
+        3540,
+        0,
+        -1,
+        0,
+        7690,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1
+      ],
+      "quantity": 1
+    }
+  ],
+  "joints": [],
+  "meta": {
+    "campata": 2463.3333333333335,
+    "costruzione": "bullonata",
+    "giunzione": "dritta",
+    "intradossoFila1": 3548.5035532645807,
+    "intradossoFila2": 3432.3357021763873,
+    "intradossoFila3": 3316.1678510881934,
+    "intradossoFila4": 3200,
+    "pendenza": 2.7,
+    "salto": 116.16785108819356
+  },
+  "params": {
+    "altezza": 3200,
+    "ancoraggioTerra": "bicchiere",
+    "controventi": true,
+    "costruzione": "bullonata",
+    "file": 4,
+    "giunzione": "dritta",
+    "interasse": 800,
+    "larghezza": 4040,
+    "lunghezzaGiunto": 300,
+    "pendenza": 2.7,
+    "pilastriPerFila": 2,
+    "profondita": 7990,
+    "sbalzo": 300,
+    "sbalzoLaterale": 500,
+    "sezioneControvento": "120×120",
+    "sezioneCorrente": "45×145",
+    "sezioneFascia": "38×300",
+    "sezionePilastro": "120×120",
+    "sezioneTavola": "45×145",
+    "sezioneTrave": "120×200",
+    "sezioneTravetto": "45×120",
+    "travetti": false
+  },
+  "pieces": [
+    {
+      "family": "TAV",
+      "id": "TAV-01",
+      "label": "TAV-01",
+      "length": 4040,
+      "machinings": [
+        {
+          "at": 500,
+          "diameter": 13,
+          "face": "destra",
+          "id": "TAV-01-L01",
+          "jointId": "BUL-01",
+          "offset": -36.25,
+          "pieceId": "TAV-01",
+          "type": "foro"
+        },
+        {
+          "at": 500,
+          "diameter": 13,
+          "face": "destra",
+          "id": "TAV-01-L02",
+          "jointId": "BUL-02",
+          "offset": 36.25,
+          "pieceId": "TAV-01",
+          "type": "foro"
+        },
+        {
+          "at": 3540,
+          "diameter": 13,
+          "face": "destra",
+          "id": "TAV-01-L03",
+          "jointId": "BUL-03",
+          "offset": -36.25,
+          "pieceId": "TAV-01",
+          "type": "foro"
+        },
+        {
+          "at": 3540,
+          "diameter": 13,
+          "face": "destra",
+          "id": "TAV-01-L04",
+          "jointId": "BUL-04",
+          "offset": 36.25,
+          "pieceId": "TAV-01",
+          "type": "foro"
+        },
+        {
+          "at": 968.3326112068521,
+          "diameter": 13,
+          "face": "destra",
+          "id": "TAV-01-L05",
+          "jointId": "BUL-05",
+          "offset": 0,
+          "pieceId": "TAV-01",
+          "type": "foro"
+        },
+        {
+          "at": 3071.667388793148,
+          "diameter": 13,
+          "face": "destra",
+          "id": "TAV-01-L06",
+          "jointId": "BUL-06",
+          "offset": 0,
+          "pieceId": "TAV-01",
+          "type": "foro"
+        }
+      ],
+      "pose": [
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        217.5,
+        0,
+        0,
+        1,
+        3621.0035532645807,
+        0,
+        0,
+        0,
+        1
+      ],
+      "section": {
+        "b": 45,
+        "h": 145
+      },
+      "type": "tavola"
+    },
+    {
+      "family": "TAV",
+      "id": "TAV-02",
+      "label": "TAV-02",
+      "length": 4040,
+      "machinings": [
+        {
+          "at": 500,
+          "diameter": 13,
+          "face": "destra",
+          "id": "TAV-02-L01",
+          "jointId": "BUL-01",
+          "offset": -36.25,
+          "pieceId": "TAV-02",
+          "type": "foro"
+        },
+        {
+          "at": 500,
+          "diameter": 13,
+          "face": "destra",
+          "id": "TAV-02-L02",
+          "jointId": "BUL-02",
+          "offset": 36.25,
+          "pieceId": "TAV-02",
+          "type": "foro"
+        },
+        {
+          "at": 3540,
+          "diameter": 13,
+          "face": "destra",
+          "id": "TAV-02-L03",
+          "jointId": "BUL-03",
+          "offset": -36.25,
+          "pieceId": "TAV-02",
+          "type": "foro"
+        },
+        {
+          "at": 3540,
+          "diameter": 13,
+          "face": "destra",
+          "id": "TAV-02-L04",
+          "jointId": "BUL-04",
+          "offset": 36.25,
+          "pieceId": "TAV-02",
+          "type": "foro"
+        },
+        {
+          "at": 968.3326112068521,
+          "diameter": 13,
+          "face": "destra",
+          "id": "TAV-02-L05",
+          "jointId": "BUL-05",
+          "offset": 0,
+          "pieceId": "TAV-02",
+          "type": "foro"
+        },
+        {
+          "at": 3071.667388793148,
+          "diameter": 13,
+          "face": "destra",
+          "id": "TAV-02-L06",
+          "jointId": "BUL-06",
+          "offset": 0,
+          "pieceId": "TAV-02",
+          "type": "foro"
+        }
+      ],
+      "pose": [
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        382.5,
+        0,
+        0,
+        1,
+        3621.0035532645807,
+        0,
+        0,
+        0,
+        1
+      ],
+      "section": {
+        "b": 45,
+        "h": 145
+      },
+      "type": "tavola"
+    },
+    {
+      "family": "PIL",
+      "id": "PIL-01",
+      "label": "PIL-01",
+      "length": 3693.5035532645807,
+      "machinings": [
+        {
+          "at": 3584.7535532645807,
+          "diameter": 13,
+          "face": "sinistra",
+          "id": "PIL-01-L01",
+          "jointId": "BUL-01",
+          "offset": 0,
+          "pieceId": "PIL-01",
+          "type": "foro"
+        },
+        {
+          "at": 3657.2535532645807,
+          "diameter": 13,
+          "face": "sinistra",
+          "id": "PIL-01-L02",
+          "jointId": "BUL-02",
+          "offset": 0,
+          "pieceId": "PIL-01",
+          "type": "foro"
+        }
+      ],
+      "pose": [
+        0,
+        0,
+        1,
+        500,
+        0,
+        -1,
+        0,
+        300,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1
+      ],
+      "section": {
+        "b": 120,
+        "h": 120
+      },
+      "type": "pilastro"
+    },
+    {
+      "family": "PIL",
+      "id": "PIL-02",
+      "label": "PIL-02",
+      "length": 3693.5035532645807,
+      "machinings": [
+        {
+          "at": 3584.7535532645807,
+          "diameter": 13,
+          "face": "sinistra",
+          "id": "PIL-02-L01",
+          "jointId": "BUL-03",
+          "offset": 0,
+          "pieceId": "PIL-02",
+          "type": "foro"
+        },
+        {
+          "at": 3657.2535532645807,
+          "diameter": 13,
+          "face": "sinistra",
+          "id": "PIL-02-L02",
+          "jointId": "BUL-04",
+          "offset": 0,
+          "pieceId": "PIL-02",
+          "type": "foro"
+        }
+      ],
+      "pose": [
+        0,
+        0,
+        1,
+        3540,
+        0,
+        -1,
+        0,
+        300,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1
+      ],
+      "section": {
+        "b": 120,
+        "h": 120
+      },
+      "type": "pilastro"
+    },
+    {
+      "family": "CTV",
+      "id": "CTV-01",
+      "label": "CTV-01",
+      "length": 799.9999999999998,
+      "machinings": [
+        {
+          "angle": 45,
+          "at": 59.999999999999844,
+          "face": "testa-inizio",
+          "id": "CTV-01-L01",
+          "pieceId": "CTV-01",
+          "type": "taglio-testa"
+        },
+        {
+          "angle": -45,
+          "at": 739.9999999999991,
+          "face": "testa-fine",
+          "id": "CTV-01-L02",
+          "pieceId": "CTV-01",
+          "type": "taglio-testa"
+        },
+        {
+          "at": 637.4695167279501,
+          "diameter": 13,
+          "face": "destra",
+          "id": "CTV-01-L03",
+          "jointId": "BUL-05",
+          "offset": -2.2737367544323206e-13,
+          "pieceId": "CTV-01",
+          "type": "foro"
+        }
+      ],
+      "pose": [
+        0.7071067811865475,
+        0,
+        -0.7071067811865475,
+        517.5735931288071,
+        0,
+        0.9999999999999998,
+        0,
+        300,
+        0.7071067811865475,
+        0,
+        0.7071067811865475,
+        3170.244535186536,
+        0,
+        0,
+        0,
+        1
+      ],
+      "section": {
+        "b": 120,
+        "h": 120
+      },
+      "type": "controvento"
+    },
+    {
+      "family": "CTV",
+      "id": "CTV-02",
+      "label": "CTV-02",
+      "length": 799.9999999999998,
+      "machinings": [
+        {
+          "angle": 45,
+          "at": 59.999999999999844,
+          "face": "testa-inizio",
+          "id": "CTV-02-L01",
+          "pieceId": "CTV-02",
+          "type": "taglio-testa"
+        },
+        {
+          "angle": -45,
+          "at": 739.999999999999,
+          "face": "testa-fine",
+          "id": "CTV-02-L02",
+          "pieceId": "CTV-02",
+          "type": "taglio-testa"
+        },
+        {
+          "at": 637.4695167279501,
+          "diameter": 13,
+          "face": "sinistra",
+          "id": "CTV-02-L03",
+          "jointId": "BUL-06",
+          "offset": 0,
+          "pieceId": "CTV-02",
+          "type": "foro"
+        }
+      ],
+      "pose": [
+        -0.7071067811865475,
+        0,
+        0.7071067811865475,
+        3522.4264068711927,
+        0,
+        -0.9999999999999998,
+        0,
+        300,
+        0.7071067811865475,
+        0,
+        0.7071067811865475,
+        3170.244535186536,
+        0,
+        0,
+        0,
+        1
+      ],
+      "section": {
+        "b": 120,
+        "h": 120
+      },
+      "type": "controvento"
+    },
+    {
+      "family": "TAV",
+      "id": "TAV-03",
+      "label": "TAV-03",
+      "length": 4040,
+      "machinings": [
+        {
+          "at": 500,
+          "diameter": 13,
+          "face": "destra",
+          "id": "TAV-03-L01",
+          "jointId": "BUL-07",
+          "offset": -36.25,
+          "pieceId": "TAV-03",
+          "type": "foro"
+        },
+        {
+          "at": 500,
+          "diameter": 13,
+          "face": "destra",
+          "id": "TAV-03-L02",
+          "jointId": "BUL-08",
+          "offset": 36.25,
+          "pieceId": "TAV-03",
+          "type": "foro"
+        },
+        {
+          "at": 3540,
+          "diameter": 13,
+          "face": "destra",
+          "id": "TAV-03-L03",
+          "jointId": "BUL-09",
+          "offset": -36.25,
+          "pieceId": "TAV-03",
+          "type": "foro"
+        },
+        {
+          "at": 3540,
+          "diameter": 13,
+          "face": "destra",
+          "id": "TAV-03-L04",
+          "jointId": "BUL-10",
+          "offset": 36.25,
+          "pieceId": "TAV-03",
+          "type": "foro"
+        },
+        {
+          "at": 968.3326112068521,
+          "diameter": 13,
+          "face": "destra",
+          "id": "TAV-03-L05",
+          "jointId": "BUL-11",
+          "offset": 0,
+          "pieceId": "TAV-03",
+          "type": "foro"
+        },
+        {
+          "at": 3071.667388793148,
+          "diameter": 13,
+          "face": "destra",
+          "id": "TAV-03-L06",
+          "jointId": "BUL-12",
+          "offset": 0,
+          "pieceId": "TAV-03",
+          "type": "foro"
+        }
+      ],
+      "pose": [
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        2680.8333333333335,
+        0,
+        0,
+        1,
+        3504.8357021763873,
+        0,
+        0,
+        0,
+        1
+      ],
+      "section": {
+        "b": 45,
+        "h": 145
+      },
+      "type": "tavola"
+    },
+    {
+      "family": "TAV",
+      "id": "TAV-04",
+      "label": "TAV-04",
+      "length": 4040,
+      "machinings": [
+        {
+          "at": 500,
+          "diameter": 13,
+          "face": "destra",
+          "id": "TAV-04-L01",
+          "jointId": "BUL-07",
+          "offset": -36.25,
+          "pieceId": "TAV-04",
+          "type": "foro"
+        },
+        {
+          "at": 500,
+          "diameter": 13,
+          "face": "destra",
+          "id": "TAV-04-L02",
+          "jointId": "BUL-08",
+          "offset": 36.25,
+          "pieceId": "TAV-04",
+          "type": "foro"
+        },
+        {
+          "at": 3540,
+          "diameter": 13,
+          "face": "destra",
+          "id": "TAV-04-L03",
+          "jointId": "BUL-09",
+          "offset": -36.25,
+          "pieceId": "TAV-04",
+          "type": "foro"
+        },
+        {
+          "at": 3540,
+          "diameter": 13,
+          "face": "destra",
+          "id": "TAV-04-L04",
+          "jointId": "BUL-10",
+          "offset": 36.25,
+          "pieceId": "TAV-04",
+          "type": "foro"
+        },
+        {
+          "at": 968.3326112068521,
+          "diameter": 13,
+          "face": "destra",
+          "id": "TAV-04-L05",
+          "jointId": "BUL-11",
+          "offset": 0,
+          "pieceId": "TAV-04",
+          "type": "foro"
+        },
+        {
+          "at": 3071.667388793148,
+          "diameter": 13,
+          "face": "destra",
+          "id": "TAV-04-L06",
+          "jointId": "BUL-12",
+          "offset": 0,
+          "pieceId": "TAV-04",
+          "type": "foro"
+        }
+      ],
+      "pose": [
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        2845.8333333333335,
+        0,
+        0,
+        1,
+        3504.8357021763873,
+        0,
+        0,
+        0,
+        1
+      ],
+      "section": {
+        "b": 45,
+        "h": 145
+      },
+      "type": "tavola"
+    },
+    {
+      "family": "PIL",
+      "id": "PIL-03",
+      "label": "PIL-03",
+      "length": 3577.3357021763873,
+      "machinings": [
+        {
+          "at": 3468.5857021763873,
+          "diameter": 13,
+          "face": "sinistra",
+          "id": "PIL-03-L01",
+          "jointId": "BUL-07",
+          "offset": 0,
+          "pieceId": "PIL-03",
+          "type": "foro"
+        },
+        {
+          "at": 3541.0857021763873,
+          "diameter": 13,
+          "face": "sinistra",
+          "id": "PIL-03-L02",
+          "jointId": "BUL-08",
+          "offset": 0,
+          "pieceId": "PIL-03",
+          "type": "foro"
+        }
+      ],
+      "pose": [
+        0,
+        0,
+        1,
+        500,
+        0,
+        -1,
+        0,
+        2763.3333333333335,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1
+      ],
+      "section": {
+        "b": 120,
+        "h": 120
+      },
+      "type": "pilastro"
+    },
+    {
+      "family": "PIL",
+      "id": "PIL-04",
+      "label": "PIL-04",
+      "length": 3577.3357021763873,
+      "machinings": [
+        {
+          "at": 3468.5857021763873,
+          "diameter": 13,
+          "face": "sinistra",
+          "id": "PIL-04-L01",
+          "jointId": "BUL-09",
+          "offset": 0,
+          "pieceId": "PIL-04",
+          "type": "foro"
+        },
+        {
+          "at": 3541.0857021763873,
+          "diameter": 13,
+          "face": "sinistra",
+          "id": "PIL-04-L02",
+          "jointId": "BUL-10",
+          "offset": 0,
+          "pieceId": "PIL-04",
+          "type": "foro"
+        }
+      ],
+      "pose": [
+        0,
+        0,
+        1,
+        3540,
+        0,
+        -1,
+        0,
+        2763.3333333333335,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1
+      ],
+      "section": {
+        "b": 120,
+        "h": 120
+      },
+      "type": "pilastro"
+    },
+    {
+      "family": "CTV",
+      "id": "CTV-03",
+      "label": "CTV-03",
+      "length": 799.9999999999998,
+      "machinings": [
+        {
+          "angle": 45,
+          "at": 59.999999999999844,
+          "face": "testa-inizio",
+          "id": "CTV-03-L01",
+          "pieceId": "CTV-03",
+          "type": "taglio-testa"
+        },
+        {
+          "angle": -45,
+          "at": 739.9999999999991,
+          "face": "testa-fine",
+          "id": "CTV-03-L02",
+          "pieceId": "CTV-03",
+          "type": "taglio-testa"
+        },
+        {
+          "at": 637.4695167279497,
+          "diameter": 13,
+          "face": "destra",
+          "id": "CTV-03-L03",
+          "jointId": "BUL-11",
+          "offset": -2.2737367544323206e-13,
+          "pieceId": "CTV-03",
+          "type": "foro"
+        }
+      ],
+      "pose": [
+        0.7071067811865475,
+        0,
+        -0.7071067811865475,
+        517.5735931288071,
+        0,
+        0.9999999999999998,
+        0,
+        2763.3333333333335,
+        0.7071067811865475,
+        0,
+        0.7071067811865475,
+        3054.0766840983424,
+        0,
+        0,
+        0,
+        1
+      ],
+      "section": {
+        "b": 120,
+        "h": 120
+      },
+      "type": "controvento"
+    },
+    {
+      "family": "CTV",
+      "id": "CTV-04",
+      "label": "CTV-04",
+      "length": 799.9999999999998,
+      "machinings": [
+        {
+          "angle": 45,
+          "at": 60.00000000000049,
+          "face": "testa-inizio",
+          "id": "CTV-04-L01",
+          "pieceId": "CTV-04",
+          "type": "taglio-testa"
+        },
+        {
+          "angle": -45,
+          "at": 739.9999999999986,
+          "face": "testa-fine",
+          "id": "CTV-04-L02",
+          "pieceId": "CTV-04",
+          "type": "taglio-testa"
+        },
+        {
+          "at": 637.4695167279501,
+          "diameter": 13,
+          "face": "sinistra",
+          "id": "CTV-04-L03",
+          "jointId": "BUL-12",
+          "offset": -9.094947017729282e-13,
+          "pieceId": "CTV-04",
+          "type": "foro"
+        }
+      ],
+      "pose": [
+        -0.7071067811865475,
+        0,
+        0.7071067811865475,
+        3522.4264068711927,
+        0,
+        -0.9999999999999998,
+        0,
+        2763.3333333333335,
+        0.7071067811865475,
+        0,
+        0.7071067811865475,
+        3054.0766840983424,
+        0,
+        0,
+        0,
+        1
+      ],
+      "section": {
+        "b": 120,
+        "h": 120
+      },
+      "type": "controvento"
+    },
+    {
+      "family": "TAV",
+      "id": "TAV-05",
+      "label": "TAV-05",
+      "length": 4040,
+      "machinings": [
+        {
+          "at": 500,
+          "diameter": 13,
+          "face": "destra",
+          "id": "TAV-05-L01",
+          "jointId": "BUL-13",
+          "offset": -36.25,
+          "pieceId": "TAV-05",
+          "type": "foro"
+        },
+        {
+          "at": 500,
+          "diameter": 13,
+          "face": "destra",
+          "id": "TAV-05-L02",
+          "jointId": "BUL-14",
+          "offset": 36.25,
+          "pieceId": "TAV-05",
+          "type": "foro"
+        },
+        {
+          "at": 3540,
+          "diameter": 13,
+          "face": "destra",
+          "id": "TAV-05-L03",
+          "jointId": "BUL-15",
+          "offset": -36.25,
+          "pieceId": "TAV-05",
+          "type": "foro"
+        },
+        {
+          "at": 3540,
+          "diameter": 13,
+          "face": "destra",
+          "id": "TAV-05-L04",
+          "jointId": "BUL-16",
+          "offset": 36.25,
+          "pieceId": "TAV-05",
+          "type": "foro"
+        },
+        {
+          "at": 968.3326112068521,
+          "diameter": 13,
+          "face": "destra",
+          "id": "TAV-05-L05",
+          "jointId": "BUL-17",
+          "offset": 0,
+          "pieceId": "TAV-05",
+          "type": "foro"
+        },
+        {
+          "at": 3071.667388793148,
+          "diameter": 13,
+          "face": "destra",
+          "id": "TAV-05-L06",
+          "jointId": "BUL-18",
+          "offset": 0,
+          "pieceId": "TAV-05",
+          "type": "foro"
+        }
+      ],
+      "pose": [
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        5144.166666666667,
+        0,
+        0,
+        1,
+        3388.6678510881934,
+        0,
+        0,
+        0,
+        1
+      ],
+      "section": {
+        "b": 45,
+        "h": 145
+      },
+      "type": "tavola"
+    },
+    {
+      "family": "TAV",
+      "id": "TAV-06",
+      "label": "TAV-06",
+      "length": 4040,
+      "machinings": [
+        {
+          "at": 500,
+          "diameter": 13,
+          "face": "destra",
+          "id": "TAV-06-L01",
+          "jointId": "BUL-13",
+          "offset": -36.25,
+          "pieceId": "TAV-06",
+          "type": "foro"
+        },
+        {
+          "at": 500,
+          "diameter": 13,
+          "face": "destra",
+          "id": "TAV-06-L02",
+          "jointId": "BUL-14",
+          "offset": 36.25,
+          "pieceId": "TAV-06",
+          "type": "foro"
+        },
+        {
+          "at": 3540,
+          "diameter": 13,
+          "face": "destra",
+          "id": "TAV-06-L03",
+          "jointId": "BUL-15",
+          "offset": -36.25,
+          "pieceId": "TAV-06",
+          "type": "foro"
+        },
+        {
+          "at": 3540,
+          "diameter": 13,
+          "face": "destra",
+          "id": "TAV-06-L04",
+          "jointId": "BUL-16",
+          "offset": 36.25,
+          "pieceId": "TAV-06",
+          "type": "foro"
+        },
+        {
+          "at": 968.3326112068521,
+          "diameter": 13,
+          "face": "destra",
+          "id": "TAV-06-L05",
+          "jointId": "BUL-17",
+          "offset": 0,
+          "pieceId": "TAV-06",
+          "type": "foro"
+        },
+        {
+          "at": 3071.667388793148,
+          "diameter": 13,
+          "face": "destra",
+          "id": "TAV-06-L06",
+          "jointId": "BUL-18",
+          "offset": 0,
+          "pieceId": "TAV-06",
+          "type": "foro"
+        }
+      ],
+      "pose": [
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        5309.166666666667,
+        0,
+        0,
+        1,
+        3388.6678510881934,
+        0,
+        0,
+        0,
+        1
+      ],
+      "section": {
+        "b": 45,
+        "h": 145
+      },
+      "type": "tavola"
+    },
+    {
+      "family": "PIL",
+      "id": "PIL-05",
+      "label": "PIL-05",
+      "length": 3461.1678510881934,
+      "machinings": [
+        {
+          "at": 3352.4178510881934,
+          "diameter": 13,
+          "face": "sinistra",
+          "id": "PIL-05-L01",
+          "jointId": "BUL-13",
+          "offset": 0,
+          "pieceId": "PIL-05",
+          "type": "foro"
+        },
+        {
+          "at": 3424.9178510881934,
+          "diameter": 13,
+          "face": "sinistra",
+          "id": "PIL-05-L02",
+          "jointId": "BUL-14",
+          "offset": 0,
+          "pieceId": "PIL-05",
+          "type": "foro"
+        }
+      ],
+      "pose": [
+        0,
+        0,
+        1,
+        500,
+        0,
+        -1,
+        0,
+        5226.666666666667,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1
+      ],
+      "section": {
+        "b": 120,
+        "h": 120
+      },
+      "type": "pilastro"
+    },
+    {
+      "family": "PIL",
+      "id": "PIL-06",
+      "label": "PIL-06",
+      "length": 3461.1678510881934,
+      "machinings": [
+        {
+          "at": 3352.4178510881934,
+          "diameter": 13,
+          "face": "sinistra",
+          "id": "PIL-06-L01",
+          "jointId": "BUL-15",
+          "offset": 0,
+          "pieceId": "PIL-06",
+          "type": "foro"
+        },
+        {
+          "at": 3424.9178510881934,
+          "diameter": 13,
+          "face": "sinistra",
+          "id": "PIL-06-L02",
+          "jointId": "BUL-16",
+          "offset": 0,
+          "pieceId": "PIL-06",
+          "type": "foro"
+        }
+      ],
+      "pose": [
+        0,
+        0,
+        1,
+        3540,
+        0,
+        -1,
+        0,
+        5226.666666666667,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1
+      ],
+      "section": {
+        "b": 120,
+        "h": 120
+      },
+      "type": "pilastro"
+    },
+    {
+      "family": "CTV",
+      "id": "CTV-05",
+      "label": "CTV-05",
+      "length": 799.9999999999998,
+      "machinings": [
+        {
+          "angle": 45,
+          "at": 59.999999999999844,
+          "face": "testa-inizio",
+          "id": "CTV-05-L01",
+          "pieceId": "CTV-05",
+          "type": "taglio-testa"
+        },
+        {
+          "angle": -45,
+          "at": 739.9999999999991,
+          "face": "testa-fine",
+          "id": "CTV-05-L02",
+          "pieceId": "CTV-05",
+          "type": "taglio-testa"
+        },
+        {
+          "at": 637.4695167279497,
+          "diameter": 13,
+          "face": "destra",
+          "id": "CTV-05-L03",
+          "jointId": "BUL-17",
+          "offset": -2.2737367544323206e-13,
+          "pieceId": "CTV-05",
+          "type": "foro"
+        }
+      ],
+      "pose": [
+        0.7071067811865475,
+        0,
+        -0.7071067811865475,
+        517.5735931288071,
+        0,
+        0.9999999999999998,
+        0,
+        5226.666666666667,
+        0.7071067811865475,
+        0,
+        0.7071067811865475,
+        2937.9088330101486,
+        0,
+        0,
+        0,
+        1
+      ],
+      "section": {
+        "b": 120,
+        "h": 120
+      },
+      "type": "controvento"
+    },
+    {
+      "family": "CTV",
+      "id": "CTV-06",
+      "label": "CTV-06",
+      "length": 799.9999999999998,
+      "machinings": [
+        {
+          "angle": 45,
+          "at": 59.999999999999524,
+          "face": "testa-inizio",
+          "id": "CTV-06-L01",
+          "pieceId": "CTV-06",
+          "type": "taglio-testa"
+        },
+        {
+          "angle": -45,
+          "at": 739.9999999999993,
+          "face": "testa-fine",
+          "id": "CTV-06-L02",
+          "pieceId": "CTV-06",
+          "type": "taglio-testa"
+        },
+        {
+          "at": 637.4695167279501,
+          "diameter": 13,
+          "face": "sinistra",
+          "id": "CTV-06-L03",
+          "jointId": "BUL-18",
+          "offset": 0,
+          "pieceId": "CTV-06",
+          "type": "foro"
+        }
+      ],
+      "pose": [
+        -0.7071067811865475,
+        0,
+        0.7071067811865475,
+        3522.4264068711927,
+        0,
+        -0.9999999999999998,
+        0,
+        5226.666666666667,
+        0.7071067811865475,
+        0,
+        0.7071067811865475,
+        2937.9088330101486,
+        0,
+        0,
+        0,
+        1
+      ],
+      "section": {
+        "b": 120,
+        "h": 120
+      },
+      "type": "controvento"
+    },
+    {
+      "family": "TAV",
+      "id": "TAV-07",
+      "label": "TAV-07",
+      "length": 4040,
+      "machinings": [
+        {
+          "at": 500,
+          "diameter": 13,
+          "face": "destra",
+          "id": "TAV-07-L01",
+          "jointId": "BUL-19",
+          "offset": -36.25,
+          "pieceId": "TAV-07",
+          "type": "foro"
+        },
+        {
+          "at": 500,
+          "diameter": 13,
+          "face": "destra",
+          "id": "TAV-07-L02",
+          "jointId": "BUL-20",
+          "offset": 36.25,
+          "pieceId": "TAV-07",
+          "type": "foro"
+        },
+        {
+          "at": 3540,
+          "diameter": 13,
+          "face": "destra",
+          "id": "TAV-07-L03",
+          "jointId": "BUL-21",
+          "offset": -36.25,
+          "pieceId": "TAV-07",
+          "type": "foro"
+        },
+        {
+          "at": 3540,
+          "diameter": 13,
+          "face": "destra",
+          "id": "TAV-07-L04",
+          "jointId": "BUL-22",
+          "offset": 36.25,
+          "pieceId": "TAV-07",
+          "type": "foro"
+        },
+        {
+          "at": 968.3326112068521,
+          "diameter": 13,
+          "face": "destra",
+          "id": "TAV-07-L05",
+          "jointId": "BUL-23",
+          "offset": 0,
+          "pieceId": "TAV-07",
+          "type": "foro"
+        },
+        {
+          "at": 3071.667388793148,
+          "diameter": 13,
+          "face": "destra",
+          "id": "TAV-07-L06",
+          "jointId": "BUL-24",
+          "offset": 0,
+          "pieceId": "TAV-07",
+          "type": "foro"
+        }
+      ],
+      "pose": [
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        7607.5,
+        0,
+        0,
+        1,
+        3272.5,
+        0,
+        0,
+        0,
+        1
+      ],
+      "section": {
+        "b": 45,
+        "h": 145
+      },
+      "type": "tavola"
+    },
+    {
+      "family": "TAV",
+      "id": "TAV-08",
+      "label": "TAV-08",
+      "length": 4040,
+      "machinings": [
+        {
+          "at": 500,
+          "diameter": 13,
+          "face": "destra",
+          "id": "TAV-08-L01",
+          "jointId": "BUL-19",
+          "offset": -36.25,
+          "pieceId": "TAV-08",
+          "type": "foro"
+        },
+        {
+          "at": 500,
+          "diameter": 13,
+          "face": "destra",
+          "id": "TAV-08-L02",
+          "jointId": "BUL-20",
+          "offset": 36.25,
+          "pieceId": "TAV-08",
+          "type": "foro"
+        },
+        {
+          "at": 3540,
+          "diameter": 13,
+          "face": "destra",
+          "id": "TAV-08-L03",
+          "jointId": "BUL-21",
+          "offset": -36.25,
+          "pieceId": "TAV-08",
+          "type": "foro"
+        },
+        {
+          "at": 3540,
+          "diameter": 13,
+          "face": "destra",
+          "id": "TAV-08-L04",
+          "jointId": "BUL-22",
+          "offset": 36.25,
+          "pieceId": "TAV-08",
+          "type": "foro"
+        },
+        {
+          "at": 968.3326112068521,
+          "diameter": 13,
+          "face": "destra",
+          "id": "TAV-08-L05",
+          "jointId": "BUL-23",
+          "offset": 0,
+          "pieceId": "TAV-08",
+          "type": "foro"
+        },
+        {
+          "at": 3071.667388793148,
+          "diameter": 13,
+          "face": "destra",
+          "id": "TAV-08-L06",
+          "jointId": "BUL-24",
+          "offset": 0,
+          "pieceId": "TAV-08",
+          "type": "foro"
+        }
+      ],
+      "pose": [
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        7772.5,
+        0,
+        0,
+        1,
+        3272.5,
+        0,
+        0,
+        0,
+        1
+      ],
+      "section": {
+        "b": 45,
+        "h": 145
+      },
+      "type": "tavola"
+    },
+    {
+      "family": "PIL",
+      "id": "PIL-07",
+      "label": "PIL-07",
+      "length": 3345,
+      "machinings": [
+        {
+          "at": 3236.25,
+          "diameter": 13,
+          "face": "sinistra",
+          "id": "PIL-07-L01",
+          "jointId": "BUL-19",
+          "offset": 0,
+          "pieceId": "PIL-07",
+          "type": "foro"
+        },
+        {
+          "at": 3308.75,
+          "diameter": 13,
+          "face": "sinistra",
+          "id": "PIL-07-L02",
+          "jointId": "BUL-20",
+          "offset": 0,
+          "pieceId": "PIL-07",
+          "type": "foro"
+        }
+      ],
+      "pose": [
+        0,
+        0,
+        1,
+        500,
+        0,
+        -1,
+        0,
+        7690,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1
+      ],
+      "section": {
+        "b": 120,
+        "h": 120
+      },
+      "type": "pilastro"
+    },
+    {
+      "family": "PIL",
+      "id": "PIL-08",
+      "label": "PIL-08",
+      "length": 3345,
+      "machinings": [
+        {
+          "at": 3236.25,
+          "diameter": 13,
+          "face": "sinistra",
+          "id": "PIL-08-L01",
+          "jointId": "BUL-21",
+          "offset": 0,
+          "pieceId": "PIL-08",
+          "type": "foro"
+        },
+        {
+          "at": 3308.75,
+          "diameter": 13,
+          "face": "sinistra",
+          "id": "PIL-08-L02",
+          "jointId": "BUL-22",
+          "offset": 0,
+          "pieceId": "PIL-08",
+          "type": "foro"
+        }
+      ],
+      "pose": [
+        0,
+        0,
+        1,
+        3540,
+        0,
+        -1,
+        0,
+        7690,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1
+      ],
+      "section": {
+        "b": 120,
+        "h": 120
+      },
+      "type": "pilastro"
+    },
+    {
+      "family": "CTV",
+      "id": "CTV-07",
+      "label": "CTV-07",
+      "length": 799.9999999999998,
+      "machinings": [
+        {
+          "angle": 45,
+          "at": 59.999999999999844,
+          "face": "testa-inizio",
+          "id": "CTV-07-L01",
+          "pieceId": "CTV-07",
+          "type": "taglio-testa"
+        },
+        {
+          "angle": -45,
+          "at": 739.9999999999991,
+          "face": "testa-fine",
+          "id": "CTV-07-L02",
+          "pieceId": "CTV-07",
+          "type": "taglio-testa"
+        },
+        {
+          "at": 637.4695167279501,
+          "diameter": 13,
+          "face": "destra",
+          "id": "CTV-07-L03",
+          "jointId": "BUL-23",
+          "offset": -2.2737367544323206e-13,
+          "pieceId": "CTV-07",
+          "type": "foro"
+        }
+      ],
+      "pose": [
+        0.7071067811865475,
+        0,
+        -0.7071067811865475,
+        517.5735931288071,
+        0,
+        0.9999999999999998,
+        0,
+        7690,
+        0.7071067811865475,
+        0,
+        0.7071067811865475,
+        2821.740981921955,
+        0,
+        0,
+        0,
+        1
+      ],
+      "section": {
+        "b": 120,
+        "h": 120
+      },
+      "type": "controvento"
+    },
+    {
+      "family": "CTV",
+      "id": "CTV-08",
+      "label": "CTV-08",
+      "length": 799.9999999999998,
+      "machinings": [
+        {
+          "angle": 45,
+          "at": 59.999999999999844,
+          "face": "testa-inizio",
+          "id": "CTV-08-L01",
+          "pieceId": "CTV-08",
+          "type": "taglio-testa"
+        },
+        {
+          "angle": -45,
+          "at": 739.999999999999,
+          "face": "testa-fine",
+          "id": "CTV-08-L02",
+          "pieceId": "CTV-08",
+          "type": "taglio-testa"
+        },
+        {
+          "at": 637.4695167279501,
+          "diameter": 13,
+          "face": "sinistra",
+          "id": "CTV-08-L03",
+          "jointId": "BUL-24",
+          "offset": 0,
+          "pieceId": "CTV-08",
+          "type": "foro"
+        }
+      ],
+      "pose": [
+        -0.7071067811865475,
+        0,
+        0.7071067811865475,
+        3522.4264068711927,
+        0,
+        -0.9999999999999998,
+        0,
+        7690,
+        0.7071067811865475,
+        0,
+        0.7071067811865475,
+        2821.740981921955,
+        0,
+        0,
+        0,
+        1
+      ],
+      "section": {
+        "b": 120,
+        "h": 120
+      },
+      "type": "controvento"
+    },
+    {
+      "family": "TRV",
+      "id": "TRV-01",
+      "label": "TRV-01",
+      "length": 2871.521080782341,
+      "machinings": [
+        {
+          "angle": 2.6999999999999993,
+          "at": 2868.102067573724,
+          "face": "testa-fine",
+          "id": "TRV-01-L01",
+          "pieceId": "TRV-01",
+          "type": "taglio-testa"
+        }
+      ],
+      "pose": [
+        0,
+        1,
+        0,
+        500,
+        -0.99888987496197,
+        0,
+        0.04710645070964265,
+        2871.7485510097827,
+        0.04710645070964265,
+        0,
+        0.9988898749619699,
+        3649.75521811113,
+        0,
+        0,
+        0,
+        1
+      ],
+      "section": {
+        "b": 45,
+        "h": 145
+      },
+      "type": "trave"
+    },
+    {
+      "family": "TRV",
+      "id": "TRV-02",
+      "label": "TRV-02",
+      "length": 2871.521080782341,
+      "machinings": [
+        {
+          "angle": 2.6999999999999993,
+          "at": 2868.102067573724,
+          "face": "testa-fine",
+          "id": "TRV-02-L01",
+          "pieceId": "TRV-02",
+          "type": "taglio-testa"
+        }
+      ],
+      "pose": [
+        0,
+        1,
+        0,
+        3540,
+        -0.99888987496197,
+        0,
+        0.04710645070964265,
+        2871.7485510097827,
+        0.04710645070964265,
+        0,
+        0.9988898749619699,
+        3649.75521811113,
+        0,
+        0,
+        0,
+        1
+      ],
+      "section": {
+        "b": 45,
+        "h": 145
+      },
+      "type": "trave"
+    },
+    {
+      "family": "TRV",
+      "id": "TRV-03",
+      "label": "TRV-03",
+      "length": 2466.0709804743174,
+      "machinings": [],
+      "pose": [
+        0,
+        0.9999999999999999,
+        0,
+        500,
+        -0.9988898749619699,
+        0,
+        0.04710645070964265,
+        5335.081884343116,
+        0.04710645070964277,
+        0,
+        0.9988898749619699,
+        3533.587367022936,
+        0,
+        0,
+        0,
+        1
+      ],
+      "section": {
+        "b": 45,
+        "h": 145
+      },
+      "type": "trave"
+    },
+    {
+      "family": "TRV",
+      "id": "TRV-04",
+      "label": "TRV-04",
+      "length": 2466.0709804743174,
+      "machinings": [],
+      "pose": [
+        0,
+        0.9999999999999999,
+        0,
+        3540,
+        -0.9988898749619699,
+        0,
+        0.04710645070964265,
+        5335.081884343116,
+        0.04710645070964277,
+        0,
+        0.9988898749619699,
+        3533.587367022936,
+        0,
+        0,
+        0,
+        1
+      ],
+      "section": {
+        "b": 45,
+        "h": 145
+      },
+      "type": "trave"
+    },
+    {
+      "family": "TRV",
+      "id": "TRV-05",
+      "label": "TRV-05",
+      "length": 2661.2876954374397,
+      "machinings": [],
+      "pose": [
+        0,
+        0.9999999999999998,
+        0,
+        500,
+        -0.9988898749619698,
+        0,
+        0.04710645070964265,
+        7993.415217676449,
+        0.04710645070964267,
+        0,
+        0.9988898749619699,
+        3408.223549373634,
+        0,
+        0,
+        0,
+        1
+      ],
+      "section": {
+        "b": 45,
+        "h": 145
+      },
+      "type": "trave"
+    },
+    {
+      "family": "TRV",
+      "id": "TRV-06",
+      "label": "TRV-06",
+      "length": 2661.2876954374397,
+      "machinings": [],
+      "pose": [
+        0,
+        0.9999999999999998,
+        0,
+        3540,
+        -0.9988898749619698,
+        0,
+        0.04710645070964265,
+        7993.415217676449,
+        0.04710645070964267,
+        0,
+        0.9988898749619699,
+        3408.223549373634,
+        0,
+        0,
+        0,
+        1
+      ],
+      "section": {
+        "b": 45,
+        "h": 145
+      },
+      "type": "trave"
+    },
+    {
+      "family": "FAS",
+      "id": "FAS-01",
+      "label": "FAS-01",
+      "length": 4040,
+      "machinings": [],
+      "pose": [
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        -12.169564647101652,
+        0,
+        0,
+        1,
+        3707.441900299446,
+        0,
+        0,
+        0,
+        1
+      ],
+      "section": {
+        "b": 38,
+        "h": 300
+      },
+      "type": "fascia"
+    }
+  ],
+  "typologySlug": "monofalda-scalare"
+}

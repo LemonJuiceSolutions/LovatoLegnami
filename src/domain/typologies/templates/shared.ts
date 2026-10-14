@@ -544,6 +544,8 @@ export interface JoistOptions {
   readonly supports: readonly Placed[];
   /** Codice della vite d'appoggio (default `joistScrewFor`). */
   readonly screw?: string;
+  /** Tipo dei pezzi posati (default `travetto`; `trave` per i correnti). */
+  readonly type?: PieceType;
 }
 
 export interface JoistResult {
@@ -600,7 +602,7 @@ export function joistsOnBeams(_ctx: BuildContext, mode: Construction, o: JoistOp
     const X = normalize(sub(B, A));
     const length = norm(sub(B, A));
     const h = j.section.h;
-    const resting: Placed = { ref: j.ref, type: "travetto", section: j.section, length, pose: fromBasis(add(A, scale(n, h / 2)), X, n) };
+    const resting: Placed = { ref: j.ref, type: o.type ?? "travetto", section: j.section, length, pose: fromBasis(add(A, scale(n, h / 2)), X, n) };
     const touched = o.supports.filter((s) => contactRange(probe(resting), probe(s)) !== undefined);
     if (touched.length === 0) throw new TemplateError(_ctx.slug, `il travetto ${j.ref} non appoggia su alcun supporto`);
     if (mode === "bullonata") {
