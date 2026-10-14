@@ -3,7 +3,7 @@
 import * as React from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { LayoutDashboard, Sparkles, Menu, X } from "lucide-react"
+import { LayoutDashboard, Sparkles, Ruler, Menu, X } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
@@ -16,6 +16,7 @@ interface NavItem {
 
 const navItems: NavItem[] = [
   { label: "DASHBOARD", href: "/dashboard", icon: LayoutDashboard },
+  { label: "CONFIGURATORE", href: "/configuratore", icon: Ruler },
   { label: "AI ASSISTANT", href: "/ai", icon: Sparkles },
 ]
 
