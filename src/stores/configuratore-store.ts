@@ -265,7 +265,8 @@ export type PersistentConfiguratoreStore = Mutate<ConfiguratoreStore, [["zustand
  * Store con persistenza della sola `config` (chiave `lovato-configuratore-v1`).
  * Al ripristino la configurazione salvata passa da `parseConfigFile`: se non
  * è valida (versione non supportata, campi errati) viene ignorata e resta la
- * configurazione iniziale; `derived` è ricalcolato.
+ * configurazione iniziale; i parametri fuori limite sono invece mantenuti
+ * (errore inline come prima del ricaricamento); `derived` è ricalcolato.
  */
 export function createPersistentConfiguratoreStore(options: PersistentStoreOptions = {}): PersistentConfiguratoreStore {
   const ruleSet = options.ruleSet ?? DEFAULT_LOVATO_RULES;
@@ -280,7 +281,7 @@ export function createPersistentConfiguratoreStore(options: PersistentStoreOptio
         const saved = (persisted as { config?: unknown } | undefined)?.config;
         if (saved === undefined) return current;
         try {
-          const config = parseConfigFile(saved);
+          const config = parseConfigFile(saved, { keepInvalidParams: true });
           return { ...current, config, derived: computeDerived(config, current.derived, ruleSet) };
         } catch {
           return current;

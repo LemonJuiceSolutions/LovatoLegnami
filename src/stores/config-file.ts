@@ -85,7 +85,17 @@ function migrate(data: Record<string, unknown>): Record<string, unknown> {
  * versione, struttura, tipologia esistente e parametri ammessi dal template
  * (i mancanti prendono il default). Lancia `ConfigFileError` con il dettaglio.
  */
-export function parseConfigFile(input: string | unknown): ConfiguratoreConfig {
+export interface ParseConfigOptions {
+  /**
+   * Mantiene i parametri noti con valori fuori limite o di tipo errato (e
+   * scarta quelli sconosciuti) invece di rifiutare il file: serve al ripristino
+   * da `localStorage`, dove lo stato salvato può contenere un valore appena
+   * digitato e segnalato inline. `computeDerived` li evidenzia come sempre.
+   */
+  readonly keepInvalidParams?: boolean;
+}
+
+export function parseConfigFile(input: string | unknown, options: ParseConfigOptions = {}): ConfiguratoreConfig {
   let data: unknown = input;
   if (typeof input === "string") {
     try {
@@ -105,14 +115,20 @@ export function parseConfigFile(input: string | unknown): ConfiguratoreConfig {
   } catch (e) {
     return fail("typology", e instanceof TypologyNotFoundError ? e.message : String(e));
   }
-  const errors = paramErrorsOf(template, file.params);
-  const issues = Object.entries(errors).map(([name, message]) => ({ path: `params.${name}`, message }));
-  if (issues.length > 0) throw new ConfigFileError(issues);
+  let params = file.params;
+  if (options.keepInvalidParams) {
+    const known = new Set(template.params.map((p) => p.name));
+    params = Object.fromEntries(Object.entries(params).filter(([name]) => known.has(name)));
+  } else {
+    const errors = paramErrorsOf(template, params);
+    const issues = Object.entries(errors).map(([name, message]) => ({ path: `params.${name}`, message }));
+    if (issues.length > 0) throw new ConfigFileError(issues);
+  }
 
   return {
     schemaVersion: CONFIG_SCHEMA_VERSION,
     typology: file.typology,
-    params: { ...defaultParams(template), ...file.params },
+    params: { ...defaultParams(template), ...params },
     envelope: file.envelope as Envelope,
     embedment: file.embedment,
     exportOptions: file.exportOptions,

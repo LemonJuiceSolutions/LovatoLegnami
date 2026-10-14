@@ -97,6 +97,30 @@ describe("persistenza dello store", () => {
     expect(store.getState().config).toEqual(defaultConfig());
   });
 
+  it("parametro fuori limite non perde la configurazione salvata al ricaricamento", () => {
+    const storage = memoryStorage();
+    const a = createPersistentConfiguratoreStore({ storage });
+    a.getState().setParam("larghezza", 4800);
+    a.getState().setBox({ depth: 4000 });
+    a.getState().setParam("pendenza", 50); // fuori limite (3–45°): errore inline
+    expect(a.getState().derived.paramErrors.pendenza).toBeDefined();
+
+    const b = createPersistentConfiguratoreStore({ storage });
+    const { config, derived } = b.getState();
+    expect(config.params.larghezza).toBe(4800);
+    expect(config.params.pendenza).toBe(50);
+    expect(config.envelope.box.depth).toBe(4000);
+    expect(derived.paramErrors.pendenza).toBeDefined();
+  });
+
+  it("parametri sconosciuti nello stato salvato sono scartati, il file JSON resta rigoroso", () => {
+    const bad = { ...defaultConfig(), params: { ...defaultConfig().params, inesistente: 1, pendenza: 50 } };
+    expect(issuesOf(() => parseConfigFile(bad)).map((i) => i.path).sort()).toEqual(["params.inesistente", "params.pendenza"]);
+    const kept = parseConfigFile(bad, { keepInvalidParams: true });
+    expect(kept.params.pendenza).toBe(50);
+    expect("inesistente" in kept.params).toBe(false);
+  });
+
   it("skipHydration: ripristino solo su richiesta", async () => {
     const storage = memoryStorage();
     createPersistentConfiguratoreStore({ storage }).getState().setParam("larghezza", 4500);
