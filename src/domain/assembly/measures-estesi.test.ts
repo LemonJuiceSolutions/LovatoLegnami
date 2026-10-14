@@ -17,7 +17,7 @@ describe("appoggi dei nuovi tipi (E8)", () => {
     for (const t of PIECE_TYPES) expect(SUPPORTERS[t], t).toBeDefined();
     expect(SUPPORTERS.tavola).toEqual(["pilastro", "arco", "banchina"]);
     expect(SUPPORTERS.travetto).toEqual(expect.arrayContaining(["tavola", "mensola", "cantonale", "monaco"]));
-    expect(SUPPORTERS.cantonale).toEqual(["trave", "tavola", "monaco", "pilastro"]);
+    expect(SUPPORTERS.cantonale).toEqual(["trave", "tavola", "monaco", "pilastro", "banchina"]); // banchina: compluvio della L (6.3)
     expect(SUPPORTERS.fascia).toEqual(["travetto", "mensola", "cantonale", "trave"]);
     expect(SUPPORTERS.arco).toEqual([]);
   });

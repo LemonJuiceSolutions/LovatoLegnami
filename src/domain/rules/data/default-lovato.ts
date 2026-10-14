@@ -47,6 +47,8 @@ export const DEFAULT_SPAN_TABLE = {
     "70×70": 2000,
     "90×90": 3200,
     "38×300": 3000,
+    // trave di gronda della tipologia a L (appoggio a muro con scarpa 120×160)
+    "120×160": 3200,
   },
   colmo: {
     "60×80": 1000,
@@ -106,6 +108,8 @@ export const DEFAULT_SPAN_TABLE = {
     "120×200": 4200,
     "120×240": 4800,
     "140×140": 3700,
+    // compluvio della tipologia a L (stessa altezza dei travetti 80×160)
+    "120×160": 4500,
   },
   // mensole a sbalzo senza appoggi: la "luce" misurata è la lunghezza, quindi il valore è lo sbalzo massimo
   mensola: {

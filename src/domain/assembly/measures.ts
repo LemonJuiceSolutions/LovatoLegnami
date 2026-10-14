@@ -34,7 +34,7 @@ export const SUPPORTERS: Readonly<Record<PieceType, readonly PieceType[]>> = {
   controvento: [],
   // nuovi primitivi (tipologie-estese, E8)
   tavola: ["pilastro", "arco", "banchina"],
-  cantonale: ["trave", "tavola", "monaco", "pilastro"],
+  cantonale: ["trave", "tavola", "monaco", "pilastro", "banchina"],
   fascia: ["travetto", "mensola", "cantonale", "trave"],
   arco: [],
   monaco: [],
