@@ -1,5 +1,5 @@
 import { applyToPoint, applyToVector, type Mat4 } from "@/domain/math/mat4";
-import { normalize, type Vec3 } from "@/domain/math/vec3";
+import { normalize, scale, type Vec3 } from "@/domain/math/vec3";
 import type { BrepCoedge, BrepEdge, BrepFace, NeutralBrep } from "@/geometry/neutral-brep";
 import { formatSatNumber } from "./number";
 import {
@@ -16,7 +16,7 @@ import {
 /**
  * Writer SAT (ACIS testuale, D7). Per ogni pezzo scrive un body completo
  * (body → lump → shell → face → loop → coedge → edge → vertex → point con
- * `plane-surface`, `straight-curve`) con le coordinate **già trasformate**
+ * `plane-surface`/`cone-surface` e `straight-curve`/`ellipse-curve`) con le coordinate **già trasformate**
  * nel sistema dell'assieme (posa applicata alla geometria, `transform` del
  * body = `$-1`) e, opzionalmente, l'attributo nome = id del pezzo.
  */
@@ -138,29 +138,60 @@ const coedgeTo = (brep: NeutralBrep, c: BrepCoedge) => (c.sense === "forward" ? 
 const coedgeFrom = (brep: NeutralBrep, c: BrepCoedge) =>
   c.sense === "forward" ? brep.edges[c.edge].start : brep.edges[c.edge].end;
 
-/** Loop delle facce pronti per la scrittura (controlla i tipi supportati). */
+const kindName = (x: BrepFace | BrepEdge) =>
+  x.kind === "altro" ? ("surfaceType" in x ? x.surfaceType : x.curveType) : x.kind;
+
+/**
+ * Loop delle facce pronti per la scrittura (controlla i tipi supportati).
+ * Le cuciture delle facce cilindriche sono scartate: il loop unico
+ * `cerchio, cucitura, cerchio, cucitura⁻¹` diventa due loop di un solo coedge
+ * ciascuno (rappresentazione ACIS di una faccia periodica senza cucitura). Se
+ * i tratti rimasti non si chiudono (faccia cilindrica tagliata in modo
+ * irregolare) la cucitura è mantenuta: spigolo usato due volte, con versi
+ * opposti, dallo stesso loop, ammesso da ACIS.
+ */
 function faceLoops(body: SatBodyInput): FaceLoops[] {
   const { brep, id } = body;
-  return brep.faces.map((face) => {
-    if (face.kind !== "piana")
-      throw new SatBodyError(
-        id,
-        "superficie",
-        face.kind === "altro" ? face.surfaceType : face.kind,
-        `superficie non supportata nel SAT (${face.kind === "altro" ? face.surfaceType : face.kind})`,
-      );
-    return { face, loops: face.loops.map((l) => l.coedges) };
+  const facesOfEdge = new Map<number, Set<number>>();
+  brep.faces.forEach((f, fi) =>
+    f.loops.forEach((l) =>
+      l.coedges.forEach((c) => facesOfEdge.set(c.edge, (facesOfEdge.get(c.edge) ?? new Set()).add(fi))),
+    ),
+  );
+  return brep.faces.map((face, fi) => {
+    if (face.kind === "altro")
+      throw new SatBodyError(id, "superficie", kindName(face), `superficie non supportata nel SAT (${kindName(face)})`);
+    const loops = face.loops.map((l) => l.coedges);
+    if (face.kind !== "cilindrica") return { face, loops };
+    const isSeam = (c: BrepCoedge) => brep.edges[c.edge].seam && facesOfEdge.get(c.edge)!.size === 1;
+    return { face, loops: loops.flatMap((coedges) => splitAtSeams(brep, coedges, isSeam)) };
   });
 }
 
+function splitAtSeams(
+  brep: NeutralBrep,
+  coedges: readonly BrepCoedge[],
+  isSeam: (c: BrepCoedge) => boolean,
+): (readonly BrepCoedge[])[] {
+  const first = coedges.findIndex(isSeam);
+  if (first < 0) return [coedges];
+  const segments: BrepCoedge[][] = [];
+  let current: BrepCoedge[] = [];
+  for (let k = 1; k <= coedges.length; k++) {
+    const c = coedges[(first + k) % coedges.length];
+    if (!isSeam(c)) current.push(c);
+    else if (current.length > 0) {
+      segments.push(current);
+      current = [];
+    }
+  }
+  const closed = segments.every((s) => coedgeFrom(brep, s[0]) === coedgeTo(brep, s[s.length - 1]));
+  return closed && segments.length > 0 ? segments : [coedges];
+}
+
 function checkEdge(id: string, e: BrepEdge): void {
-  if (e.kind !== "retta")
-    throw new SatBodyError(
-      id,
-      "curva",
-      e.kind === "altro" ? e.curveType : e.kind,
-      `curva non supportata nel SAT (${e.kind === "altro" ? e.curveType : e.kind})`,
-    );
+  if (e.kind === "altro")
+    throw new SatBodyError(id, "curva", kindName(e), `curva non supportata nel SAT (${kindName(e)})`);
 }
 
 interface BodyContext {
@@ -321,17 +352,55 @@ function bodyRecords(body: SatBodyInput, base: number, ctx: BodyContext): SatRec
   return records;
 }
 
+/**
+ * Superficie della faccia. Cilindro = `cone-surface` con semiangolo 0
+ * (`sin 0`, `cos 1`: normale radiale uscente, come nella B-rep neutra),
+ * ellisse di base di raggio `radius` con rapporto 1 e scala u = raggio.
+ */
 function surfaceRecord(face: BrepFace, P: (p: Vec3) => Vec3, V: (v: Vec3) => Vec3): SatRecord {
-  if (face.kind !== "piana") throw new Error(`SAT: superficie non gestita ${face.kind}`);
-  return {
-    type: "plane-surface",
-    fields: { root: P(face.origin), normal: V(face.normal), uDir: V(face.xAxis), reverseV: "forward_v" },
-  };
+  switch (face.kind) {
+    case "piana":
+      return {
+        type: "plane-surface",
+        fields: { root: P(face.origin), normal: V(face.normal), uDir: V(face.xAxis), reverseV: "forward_v" },
+      };
+    case "cilindrica":
+      return {
+        type: "cone-surface",
+        fields: {
+          center: P(face.origin),
+          normal: V(face.axis),
+          major: scale(V(face.xAxis), face.radius),
+          ratio: 1,
+          sinHalfAngle: 0,
+          cosHalfAngle: 1,
+          uScale: face.radius,
+          reverseU: "forward",
+        },
+      };
+    default:
+      throw new Error(`SAT: superficie non gestita ${face.kind}`);
+  }
 }
 
+/** Curva dello spigolo: retta = `straight-curve`, cerchio = `ellipse-curve` con rapporto 1. */
 function curveRecord(edge: BrepEdge, P: (p: Vec3) => Vec3, V: (v: Vec3) => Vec3): SatRecord {
-  if (edge.kind !== "retta") throw new Error(`SAT: curva non gestita ${edge.kind}`);
-  return { type: "straight-curve", fields: { root: P(edge.origin), direction: V(edge.direction) } };
+  switch (edge.kind) {
+    case "retta":
+      return { type: "straight-curve", fields: { root: P(edge.origin), direction: V(edge.direction) } };
+    case "cerchio":
+      return {
+        type: "ellipse-curve",
+        fields: {
+          center: P(edge.center),
+          normal: V(edge.axis),
+          major: scale(V(edge.xAxis), edge.radius),
+          ratio: 1,
+        },
+      };
+    default:
+      throw new Error(`SAT: curva non gestita ${edge.kind}`);
+  }
 }
 
 // ---------------------------------------------------------------------------

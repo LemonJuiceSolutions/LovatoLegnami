@@ -1,7 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { identity, multiply, rotationZ, translation, type Mat4 } from "@/domain/math/mat4";
 import { vec3 } from "@/domain/math/vec3";
+import { checkBrepTopology } from "@/geometry/neutral-brep";
 import { boxBrep, pieceBoxBrep } from "@/geometry/neutral-brep-box";
+import { boxWithOtherFace, holeBoxBrep } from "./__fixtures__/breps";
 import { writeSat } from "./writer";
 
 const date = new Date(2026, 9, 14, 9, 30, 0);
@@ -139,5 +141,68 @@ describe("writeSat – facce piane", () => {
     expect(errors).toHaveLength(1);
     expect(errors[0].pieceId).toBe("A");
     expect(errors[0].entity).toBe("posa");
+  });
+});
+
+describe("writeSat – facce cilindriche e superfici non supportate", () => {
+  it("la fixture del foro è una B-rep topologicamente valida", () => {
+    expect(checkBrepTopology(holeBoxBrep())).toEqual([]);
+  });
+
+  it("pezzo con foro → 1 cone-surface (semiangolo 0) + 2 ellipse-curve, cucitura scartata", () => {
+    const { text, errors } = writeSat([{ id: "PIL-01", brep: holeBoxBrep(), pose: identity() }], { date });
+    expect(errors).toEqual([]);
+    const c = countTypes(text);
+    expect(c["cone-surface"]).toBe(1);
+    expect(c["ellipse-curve"]).toBe(2);
+    expect(c["plane-surface"]).toBe(6);
+    expect(c["straight-curve"]).toBe(12);
+    expect(c.face).toBe(7);
+    expect(c.edge).toBe(14);
+    expect(c.vertex).toBe(10);
+    // 6 loop esterni + 2 interni + 2 della faccia cilindrica (uno per cerchio)
+    expect(c.loop).toBe(10);
+    expect(c.coedge).toBe(24 + 2 + 2);
+    const recs = recordLines(text);
+    expect(recs.find((l) => l.startsWith("cone-surface "))).toBe(
+      "cone-surface $-1 -1 $-1 50 50 0 0 0 1 10 0 0 1 I I 0 1 10 forward I I I I #",
+    );
+    expect(recs.filter((l) => l.startsWith("ellipse-curve "))).toEqual([
+      "ellipse-curve $-1 -1 $-1 50 50 0 0 0 1 10 0 0 1 I I #",
+      "ellipse-curve $-1 -1 $-1 50 50 50 0 0 1 10 0 0 1 I I #",
+    ]);
+    // spigoli circolari chiusi: stesso vertice, parametri 0 e 2π
+    expect(recs.filter((l) => l.startsWith("edge ") && l.includes(" 6.28318530717959 "))).toHaveLength(2);
+    expect(recs.find((l) => l.startsWith("face ") && l.includes(" reversed single"))).toBeDefined();
+  });
+
+  it("faccia di tipo `altro` → errore con id e tipo, gli altri pezzi sono nel file", () => {
+    const { text, written, errors } = writeSat(
+      [
+        { id: "TVT-01", brep: box, pose: identity() },
+        { id: "TVT-02", brep: boxWithOtherFace(), pose: identity() },
+        { id: "TVT-03", brep: holeBoxBrep(), pose: identity() },
+      ],
+      { date },
+    );
+    expect(written).toEqual(["TVT-01", "TVT-03"]);
+    expect(errors).toHaveLength(1);
+    expect(errors[0]).toMatchObject({ pieceId: "TVT-02", entity: "superficie", entityType: "GeomAbs_BSplineSurface" });
+    expect(errors[0].message).toContain("TVT-02");
+    expect(errors[0].message).toContain("GeomAbs_BSplineSurface");
+    expect(text.split("\n")[0]).toBe("700 0 2 0");
+    expect(countTypes(text).body).toBe(2);
+    expect(text).toContain("@6 TVT-01");
+    expect(text).toContain("@6 TVT-03");
+    expect(text).not.toContain("TVT-02");
+  });
+
+  it("curva di tipo `altro` → errore di curva", () => {
+    const b = holeBoxBrep();
+    const edges = b.edges.map((e) =>
+      e.kind === "cerchio" ? { ...e, kind: "altro" as const, curveType: "GeomAbs_BSplineCurve" } : e,
+    );
+    const { errors } = writeSat([{ id: "X", brep: { ...b, edges: edges as never }, pose: identity() }], { date });
+    expect(errors[0]).toMatchObject({ pieceId: "X", entity: "curva", entityType: "GeomAbs_BSplineCurve" });
   });
 });
