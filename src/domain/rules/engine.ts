@@ -13,6 +13,7 @@ import type {
   SlopeRangeRule,
   Violation,
 } from "./types";
+import { FLAT_SLOPE_TOLERANCE } from "./types";
 
 /**
  * Motore delle regole costruttive (D4): valuta ogni regola del set sulle
@@ -148,7 +149,8 @@ function minClearHeight(rule: MinClearHeightRule, c: Ctx): Violation[] {
 }
 
 function slopeRange(rule: SlopeRangeRule, c: Ctx): Violation[] {
-  const out = c.measures.slopes.filter((s) => s.deg < rule.min - TOL || s.deg > rule.max + TOL);
+  const flat = (deg: number) => rule.allowFlat === true && deg <= FLAT_SLOPE_TOLERANCE + TOL;
+  const out = c.measures.slopes.filter((s) => !flat(s.deg) && (s.deg < rule.min - TOL || s.deg > rule.max + TOL));
   if (out.length === 0) return [];
   const low = out.filter((s) => s.deg < rule.min - TOL);
   const measured = low.length ? Math.min(...low.map((s) => s.deg)) : Math.max(...out.map((s) => s.deg));
@@ -157,7 +159,7 @@ function slopeRange(rule: SlopeRangeRule, c: Ctx): Violation[] {
       ruleId: rule.id,
       kind: rule.kind,
       severity: rule.severity,
-      message: `Pendenza di ${formatNumber(measured)}° fuori dall'intervallo ammesso ${formatNumber(rule.min)}°–${formatNumber(rule.max)}°.`,
+      message: `Pendenza di ${formatNumber(measured)}° fuori dall'intervallo ammesso ${formatNumber(rule.min)}°–${formatNumber(rule.max)}°${rule.allowFlat ? " (copertura piana ammessa)" : ""}.`,
       pieceIds: out.map((s) => s.pieceId),
       measured,
       limit: low.length ? rule.min : rule.max,

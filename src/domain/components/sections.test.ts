@@ -30,12 +30,12 @@ describe("catalogo sezioni", () => {
       const [a, b] = [all[i - 1], all[i]];
       expect(a.h < b.h || (a.h === b.h && a.b <= b.b)).toBe(true);
     }
-    expect(all.slice(0, 3).map(sectionLabel)).toEqual(["60×80", "100×100", "60×120"]);
+    expect(all.slice(0, 4).map(sectionLabel)).toEqual(["70×70", "60×80", "45×90", "90×90"]);
   });
 
   it("filtro per altezza minima", () => {
     const s = sectionsByBendingHeight(200);
-    expect(s.map(sectionLabel)).toEqual(["100×200", "120×200", "160×200", "120×240"]);
+    expect(s.map(sectionLabel)).toEqual(["100×200", "120×200", "160×200", "120×240", "38×300"]);
     expect(sectionsByBendingHeight(1000)).toEqual([]);
   });
 });

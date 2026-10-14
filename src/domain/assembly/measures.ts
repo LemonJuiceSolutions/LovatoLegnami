@@ -43,6 +43,12 @@ export const SUPPORTERS: Readonly<Record<PieceType, readonly PieceType[]>> = {
 };
 
 /**
+ * Tipi misurati anche senza appoggi nel modello (incastrati a muro): la luce
+ * senza appoggi è la lunghezza, quindi la tabella luci ne limita lo sbalzo (E8).
+ */
+export const CANTILEVER_TYPES: readonly PieceType[] = ["mensola"];
+
+/**
  * Zona d'appoggio di un supporto lungo l'asse X locale del pezzo (mm). Un
  * appoggio **laterale** (supporto a fianco del pezzo, es. pilastro serrato
  * tra le tavole di una sandwich o testa d'arco tra le tavole) vale come
@@ -286,7 +292,9 @@ export function measureAssembly(assembly: Pick<Assembly, "pieces">, options: Mea
   const tol = options.contactTolerance ?? 0.5;
   const pieces = assembly.pieces;
   // i pezzi curvi non hanno luce né sbalzo (E8) ma restano appoggi per gli altri
-  const spans = pieces.filter((p) => !p.curve && SUPPORTERS[p.type].length > 0).map((p) => measureSpan(p, pieces, tol));
+  const spans = pieces
+    .filter((p) => !p.curve && (SUPPORTERS[p.type].length > 0 || CANTILEVER_TYPES.includes(p.type)))
+    .map((p) => measureSpan(p, pieces, tol));
   const joistGroups = measureJoistGroups(pieces);
   const spacings = joistGroups.flatMap((g) => (g.spacing === undefined ? [] : [g.spacing]));
   let maxOverhang: Measures["maxOverhang"];

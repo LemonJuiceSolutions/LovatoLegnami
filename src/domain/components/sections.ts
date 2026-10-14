@@ -17,6 +17,14 @@ export const SECTION_CATALOG: readonly Section[] = [
   { b: 140, h: 140 },
   { b: 160, h: 160 },
   { b: 160, h: 200 },
+  // sezioni del riferimento commerciale (ricerca-chepergola.md §4 "Riepilogo sezioni standard"):
+  // tavole sandwich e travetti 45×…, aste 70×70 e 90×90, fasce 38×300
+  { b: 45, h: 90 },
+  { b: 45, h: 120 },
+  { b: 45, h: 145 },
+  { b: 70, h: 70 },
+  { b: 90, h: 90 },
+  { b: 38, h: 300 },
 ];
 
 /** Etichetta canonica `"<b>×<h>"`. */

@@ -10,7 +10,8 @@ const ruleOf = <K extends string>(kind: K) => DEFAULT_LOVATO_RULES.rules.find((r
 
 describe("set di regole di default Lovato", () => {
   it("contiene i valori iniziali della spec", () => {
-    expect(ruleOf("slope-range")).toMatchObject({ min: 5, max: 35 });
+    expect(ruleOf("slope-range")).toMatchObject({ min: 5, max: 35, allowFlat: true });
+    expect(ruleOf("min-section")).toMatchObject({ pieceType: "pilastro", section: "120×120", severity: "avviso" });
     expect(ruleOf("min-clear-height")).toMatchObject({ min: 2100 });
     expect(ruleOf("max-overhang")).toMatchObject({ max: 800 });
     expect(ruleOf("max-joist-spacing")).toMatchObject({ max: 800 });

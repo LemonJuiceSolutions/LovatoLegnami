@@ -66,12 +66,20 @@ export interface MinClearHeightRule extends RuleBase {
   readonly min: number;
 }
 
-/** Intervallo ammesso della pendenza effettiva dei travetti (gradi). */
+/**
+ * Intervallo ammesso della pendenza effettiva dei travetti (gradi). Con
+ * `allowFlat` la copertura piana è ammessa: pendenze fino a
+ * `FLAT_SLOPE_TOLERANCE` (0,5°) non violano la regola anche se sotto `min`.
+ */
 export interface SlopeRangeRule extends RuleBase {
   readonly kind: "slope-range";
   readonly min: number;
   readonly max: number;
+  readonly allowFlat?: boolean;
 }
+
+/** Pendenza (gradi) entro cui una copertura è considerata piana. */
+export const FLAT_SLOPE_TOLERANCE = 0.5;
 
 /** Sezione minima (base e altezza) per un tipo di pezzo, come `"b×h"`. */
 export interface MinSectionRule extends RuleBase {
@@ -157,7 +165,7 @@ export const RuleSchema = z.discriminatedUnion("kind", [
   z.object({ ...base, kind: z.literal("max-joist-spacing"), max: positive() }).strict(),
   z.object({ ...base, kind: z.literal("max-overhang"), max: nonNegative(), pieceTypes: z.array(pieceType).optional() }).strict(),
   z.object({ ...base, kind: z.literal("min-clear-height"), min: positive() }).strict(),
-  z.object({ ...base, kind: z.literal("slope-range"), min: nonNegative(), max: positive() }).strict(),
+  z.object({ ...base, kind: z.literal("slope-range"), min: nonNegative(), max: positive(), allowFlat: z.boolean().optional() }).strict(),
   z.object({ ...base, kind: z.literal("min-section"), pieceType, section: sectionString }).strict(),
 ]).superRefine((r, ctx) => {
   if (r.kind === "slope-range" && r.min > r.max)

@@ -5,7 +5,8 @@ import { type RuleSet, loadRuleSet } from "../types";
 
 /**
  * Tabella luci massime (mm) per tipo di pezzo e sezione `b×h`.
- * Copre tutte le sezioni di `SECTION_CATALOG` per trave, travetto, colmo e puntone.
+ * Copre tutte le sezioni di `SECTION_CATALOG` per trave, travetto, colmo e puntone; tavola,
+ * cantonale, mensola e fascia (tipologie-estese) coprono le sezioni d'uso di quei pezzi.
  * DA VALIDARE CON UFFICIO TECNICO.
  */
 export const DEFAULT_SPAN_TABLE = {
@@ -21,6 +22,12 @@ export const DEFAULT_SPAN_TABLE = {
     "140×140": 3000,
     "160×160": 3500,
     "160×200": 4800,
+    "45×90": 3000,
+    "45×120": 4000,
+    "45×145": 5000,
+    "70×70": 1800,
+    "90×90": 2500,
+    "38×300": 3500,
   },
   trave: {
     "60×80": 1000,
@@ -34,6 +41,12 @@ export const DEFAULT_SPAN_TABLE = {
     "140×140": 2400,
     "160×160": 2800,
     "160×200": 3800,
+    "45×90": 1500,
+    "45×120": 2200,
+    "45×145": 3000,
+    "70×70": 2000,
+    "90×90": 3200,
+    "38×300": 3000,
   },
   colmo: {
     "60×80": 1000,
@@ -47,6 +60,12 @@ export const DEFAULT_SPAN_TABLE = {
     "140×140": 2400,
     "160×160": 2800,
     "160×200": 3800,
+    "45×90": 1500,
+    "45×120": 2200,
+    "45×145": 3000,
+    "70×70": 2000,
+    "90×90": 3200,
+    "38×300": 3000,
   },
   puntone: {
     "60×80": 1200,
@@ -60,6 +79,48 @@ export const DEFAULT_SPAN_TABLE = {
     "140×140": 2900,
     "160×160": 3300,
     "160×200": 4100,
+    "45×90": 1800,
+    "45×120": 2600,
+    "45×145": 3300,
+    "70×70": 2200,
+    "90×90": 2800,
+    "38×300": 3200,
+  },
+  // tipologie-estese (E8). Tavola: luce della trave sandwich, valore per la COPPIA di tavole ai lati
+  // dei pilastri (la regola misura ogni tavola, con gli appoggi nel bullone); valori dalle distinte
+  // T-A/T-C/T-E della ricerca (45×120 su ~3,4 m, 45×145 su ~4,4 m). DA VALIDARE CON UFFICIO TECNICO.
+  tavola: {
+    "45×90": 2500,
+    "45×120": 3600,
+    "45×145": 4500,
+  },
+  // cantonali di padiglione/compluvio (gazebo T-H: 70×70 da ~2 m) e sezioni di carpenteria
+  cantonale: {
+    "70×70": 2200,
+    "90×90": 2800,
+    "45×120": 2600,
+    "45×145": 3300,
+    "100×100": 2900,
+    "120×120": 3300,
+    "120×200": 4200,
+    "120×240": 4800,
+    "140×140": 3700,
+  },
+  // mensole a sbalzo senza appoggi: la "luce" misurata è la lunghezza, quindi il valore è lo sbalzo massimo
+  mensola: {
+    "90×140": 1500,
+    "90×90": 1000,
+    "100×200": 2000,
+    "120×200": 2200,
+    "120×240": 2500,
+    "140×140": 1600,
+    "160×200": 2300,
+  },
+  // fasce di gronda tra le teste dei travetti
+  fascia: {
+    "38×300": 1200,
+    "45×145": 900,
+    "45×120": 800,
   },
 } as const;
 
@@ -104,11 +165,13 @@ export const DEFAULT_LOVATO_DATA = {
       kind: "slope-range",
       min: 5, // DA VALIDARE CON UFFICIO TECNICO
       max: 35,
+      allowFlat: true, // coperture piane (portali sandwich, telai a giunti) ammesse. DA VALIDARE CON UFFICIO TECNICO
     },
     {
       id: "sezione-min-pilastri",
       name: "Sezione minima pilastri",
-      severity: "errore",
+      // avviso: il riferimento commerciale usa pilastri 90×90 e 70×70 (E8). DA VALIDARE CON UFFICIO TECNICO
+      severity: "avviso",
       kind: "min-section",
       pieceType: "pilastro",
       section: "120×120", // DA VALIDARE CON UFFICIO TECNICO
