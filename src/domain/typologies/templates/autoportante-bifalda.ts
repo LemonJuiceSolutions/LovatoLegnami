@@ -80,6 +80,9 @@ export const autoportanteBifalda: TypologyTemplate = {
   name: "Autoportante bifalda",
   description:
     "Pergola autoportante a due falde: due travi su due file di pilastri, colmo su puntoni a tenone e mortasa, travetti speculari con sbalzo e saette.",
+  category: "autoportante",
+  tags: ["bifalda", "capanna", "colmo", "carpenteria"],
+  reference: "§3 estensioni (autoportante bifalda)",
   params: [
     ...commonParams({
       larghezza: 5000,

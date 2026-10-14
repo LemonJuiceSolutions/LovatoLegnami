@@ -7,6 +7,8 @@ import {
   TemplateError,
   buildAssembly,
   type ParamSpec,
+  TYPOLOGY_CATEGORIES,
+  type TypologyCategory,
   type TypologyTemplate,
 } from "./template";
 
@@ -26,6 +28,9 @@ export interface TypologyInfo {
   readonly slug: string;
   readonly name: string;
   readonly description: string;
+  readonly category: TypologyCategory;
+  readonly tags: readonly string[];
+  readonly reference?: string;
   readonly params: readonly ParamSpec[];
 }
 
@@ -44,6 +49,13 @@ function paramSpecProblems(params: readonly ParamSpec[]): string[] {
     } else if (p.kind === "section") {
       if (!isPieceType(p.pieceType)) problems.push(`parametro ${p.name}: primitivo fuori catalogo ${JSON.stringify(p.pieceType)}`);
       if (!parseSectionLabel(p.default)) problems.push(`parametro ${p.name}: sezione di default non valida ${JSON.stringify(p.default)}`);
+    } else if (p.kind === "enum") {
+      const values = p.options.map((o) => o.value);
+      if (values.length === 0) problems.push(`parametro ${p.name}: nessuna opzione`);
+      if (new Set(values).size !== values.length) problems.push(`parametro ${p.name}: opzioni duplicate`);
+      if (values.some((v) => typeof v !== "string" || !v)) problems.push(`parametro ${p.name}: valori delle opzioni non validi`);
+      if (!values.includes(p.default))
+        problems.push(`parametro ${p.name}: default ${JSON.stringify(p.default)} non tra le opzioni (${values.join(", ")})`);
     }
   }
   return problems;
@@ -59,6 +71,10 @@ export function validateTemplate(template: TypologyTemplate): void {
   if (!/^[a-z0-9]+(-[a-z0-9]+)*$/.test(slug ?? ""))
     throw new TemplateError(String(slug), "slug non valido (minuscole, cifre e trattini)");
   if (!template.name) throw new TemplateError(slug, "nome mancante");
+  if (!(TYPOLOGY_CATEGORIES as readonly string[]).includes(template.category))
+    throw new TemplateError(slug, `categoria non ammessa ${JSON.stringify(template.category)} (ammesse: ${TYPOLOGY_CATEGORIES.join(", ")})`);
+  if (!Array.isArray(template.tags) || template.tags.some((t) => typeof t !== "string" || !t))
+    throw new TemplateError(slug, "tag non validi (elenco di stringhe non vuote)");
   const paramProblems = paramSpecProblems(template.params);
   if (paramProblems.length) throw new TemplateError(slug, paramProblems.join("; "));
   try {
@@ -97,7 +113,15 @@ export class TypologyRegistry {
   }
 
   list(): TypologyInfo[] {
-    return [...this.templates.values()].map(({ slug, name, description, params }) => ({ slug, name, description, params }));
+    return [...this.templates.values()].map(({ slug, name, description, category, tags, reference, params }) => ({
+      slug,
+      name,
+      description,
+      category,
+      tags,
+      ...(reference !== undefined ? { reference } : {}),
+      params,
+    }));
   }
 
   /** Genera l'assieme della tipologia con i parametri (default per quelli mancanti). */

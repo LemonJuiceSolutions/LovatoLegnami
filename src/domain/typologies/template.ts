@@ -30,6 +30,11 @@ interface ParamSpecBase {
   /** Etichetta leggibile in italiano. */
   readonly label: string;
   readonly description?: string;
+  /**
+   * Visibilità condizionata (E4): `false` → la UI nasconde il campo. Il
+   * parametro è comunque risolto al proprio valore o default (mai "assente").
+   */
+  readonly visibleWhen?: (params: ResolvedParams) => boolean;
 }
 
 /** Parametro numerico con unità e limiti (inclusi). */
@@ -59,7 +64,35 @@ export interface BooleanParamSpec extends ParamSpecBase {
   readonly default: boolean;
 }
 
-export type ParamSpec = NumberParamSpec | SectionParamSpec | BooleanParamSpec;
+/** Opzione nominata di un parametro a scelta. */
+export interface EnumOption {
+  readonly value: string;
+  readonly label: string;
+  readonly description?: string;
+}
+
+/** Parametro a scelta tra opzioni nominate (valori stringa); il default è tra le opzioni. */
+export interface EnumParamSpec extends ParamSpecBase {
+  readonly kind: "enum";
+  readonly options: readonly EnumOption[];
+  readonly default: string;
+}
+
+export type ParamSpec = NumberParamSpec | SectionParamSpec | BooleanParamSpec | EnumParamSpec;
+
+/** `true` se il parametro va mostrato con i parametri dati (sempre, senza `visibleWhen`). */
+export function isParamVisible(spec: ParamSpec, params: ResolvedParams): boolean {
+  if (!spec.visibleWhen) return true;
+  try {
+    return spec.visibleWhen(params);
+  } catch {
+    return true;
+  }
+}
+
+/** Categorie di catalogo delle tipologie (spec "Metadati di catalogo delle tipologie"). */
+export const TYPOLOGY_CATEGORIES = ["addossata", "autoportante", "carport", "gazebo", "pensilina"] as const;
+export type TypologyCategory = (typeof TYPOLOGY_CATEGORIES)[number];
 
 /** Parametri risolti (default applicati, sezioni in forma canonica). */
 export type ResolvedParams = Readonly<Record<string, ParamValue>>;
@@ -118,6 +151,10 @@ function resolveOne(spec: ParamSpec, value: ParamValue | undefined): ParamValue 
     case "boolean":
       if (typeof value !== "boolean") throw new ParamError(spec.name, value, "deve essere vero o falso");
       return value;
+    case "enum":
+      if (typeof value !== "string" || !spec.options.some((o) => o.value === value))
+        throw new ParamError(spec.name, value, `valore non ammesso (ammessi: ${spec.options.map((o) => o.value).join(", ")})`);
+      return value;
   }
 }
 
@@ -156,6 +193,8 @@ export interface BuildContext {
   section(name: string): Section;
   /** Valore di un parametro booleano. */
   bool(name: string): boolean;
+  /** Valore (stringa) di un parametro a scelta. */
+  enum(name: string): string;
   /** Quota del pavimento in (x, y) (mm); piano a quota 0 se non fornita. */
   floorHeightAt: FloorHeightFn;
   /** Affondamento dei pilastri sotto la quota del pavimento (mm, ≥ 0; default 0). */
@@ -210,6 +249,12 @@ export interface TypologyTemplate {
   readonly slug: string;
   readonly name: string;
   readonly description: string;
+  /** Categoria di catalogo (selettore delle tipologie). */
+  readonly category: TypologyCategory;
+  /** Tag di ricerca. */
+  readonly tags: readonly string[];
+  /** Riferimento alla scheda della ricerca commerciale (es. `"T-A/T-C/T-G"`). */
+  readonly reference?: string;
   readonly params: readonly ParamSpec[];
   build(ctx: BuildContext): readonly BuildStep[];
   /** Metadati opzionali dell'assieme (es. quota d'imposta). */
@@ -245,6 +290,7 @@ function createContext(template: TypologyTemplate, params: ResolvedParams, optio
     num: (name) => get(name, "number") as number,
     section: (name) => parseSectionLabel(get(name, "section") as string)!,
     bool: (name) => get(name, "boolean") as boolean,
+    enum: (name) => get(name, "enum") as string,
     floorHeightAt: options.floorHeightAt ?? flatFloor,
     embedment,
   };

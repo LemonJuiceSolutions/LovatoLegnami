@@ -10,6 +10,8 @@ export const pianaTest: TypologyTemplate = {
   slug: "piana-test",
   name: "Piana (test)",
   description: "Due file di pilastri con trave: template minimale per i test.",
+  category: "autoportante",
+  tags: ["test"],
   params: [
     { kind: "number", name: "larghezza", label: "Larghezza", unit: "mm", min: 2000, max: 8000, default: 4000 },
     { kind: "number", name: "profondita", label: "Profondità", unit: "mm", min: 1500, max: 5000, default: 3000 },

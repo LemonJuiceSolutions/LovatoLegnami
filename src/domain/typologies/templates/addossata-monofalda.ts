@@ -61,6 +61,8 @@ export const addossataMonofalda: TypologyTemplate = {
   name: "Addossata monofalda",
   description:
     "Pergola addossata a un muro: banchina a muro, trave di fronte su pilastri, travetti inclinati con sbalzo di gronda e saette.",
+  category: "addossata",
+  tags: ["monofalda", "banchina", "carpenteria", "travetti inclinati"],
   params: [
     ...commonParams({
       larghezza: 6000,
