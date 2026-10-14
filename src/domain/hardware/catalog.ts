@@ -149,6 +149,10 @@ const DATA: HardwareSpec[] = [
   bolt(12, 240, "ricerca-chepergola.md §1 T-C, T-G (MAXI)"),
   bolt(8, 120, "ricerca-chepergola.md §1 T-E (testa dell'arco)"),
   bolt(8, 140, "ricerca-chepergola.md §1 T-E (testa dell'arco, MAXI)"),
+  // tavola + arco + tavola (45 + 90/120 + 45): i bulloni 8×120/140 del riferimento non serrano la sandwich
+  // con l'arco infilato tra le tavole, lunghezze aggiunte [dedotto]
+  bolt(8, 200, "ricerca-chepergola.md §1 T-E (testa dell'arco tra le tavole 45×145, pilastro/arco 90) [dedotto]"),
+  bolt(8, 240, "ricerca-chepergola.md §1 T-E (testa dell'arco tra le tavole 45×145, MAXI 120) [dedotto]"),
 
   // --- Viti e tasselli (conteggi) ------------------------------------------ DA VALIDARE CON UFFICIO TECNICO
   fastener("vite", 6, 40, "Vite nera", "ricerca-chepergola.md §1 T-D (giunti JOINT)"),

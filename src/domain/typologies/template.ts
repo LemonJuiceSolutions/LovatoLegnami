@@ -16,6 +16,7 @@ import {
   isMachiningType,
   isPieceType,
   type Assembly,
+  type Curve,
   type DardoDiGioveJoint,
   type HardwareItem,
   type Joint,
@@ -225,6 +226,8 @@ export interface PlaceStep {
   readonly length: Resolvable<number>;
   readonly pose: Resolvable<Pose>;
   readonly label?: string;
+  /** Asse curvo (solo `arco`, E1). */
+  readonly curve?: Resolvable<Curve>;
 }
 
 /** Ripete gli step prodotti da `each(i)` per i = 0..count−1. */
@@ -432,6 +435,7 @@ export function buildAssembly(
           length: resolve(s.length, ctx),
           pose: resolve(s.pose, ctx),
           label: s.label,
+          ...(s.curve !== undefined ? { curve: resolve(s.curve, ctx) } : {}),
         });
         byRef.set(s.ref, id);
         index.set(id, pieces.length);

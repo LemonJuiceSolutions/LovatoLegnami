@@ -2,7 +2,7 @@ import { contactRange } from "../../assembly/measures";
 import { headCutFromPlane } from "../../components/head-cut";
 import { createPiece } from "../../components/schemas";
 import { sectionLabel } from "../../components/sections";
-import { FAMILY_OF, type HeadFace, type MachiningSpec, type Piece, type PieceType, type Pose, type Section } from "../../components/types";
+import { FAMILY_OF, type Curve, type HeadFace, type MachiningSpec, type Piece, type PieceType, type Pose, type Section } from "../../components/types";
 import { hardwareFor } from "../../hardware/catalog";
 import { applyToPoint, axisOf, degToRad, fromBasis, invertRigid, radToDeg } from "../../math/mat4";
 import { type Plane, intersectLinePlane, plane, transformPlane } from "../../math/plane";
@@ -309,6 +309,8 @@ export interface Placed {
   readonly section: Section;
   readonly length: number;
   readonly pose: Pose;
+  /** Asse curvo (solo `arco`). */
+  readonly curve?: Curve;
 }
 
 export const placeStep = (p: Placed, label?: string): PlaceStep => ({
@@ -319,10 +321,12 @@ export const placeStep = (p: Placed, label?: string): PlaceStep => ({
   length: p.length,
   pose: p.pose,
   ...(label !== undefined ? { label } : {}),
+  ...(p.curve !== undefined ? { curve: p.curve } : {}),
 });
 
 /** Pezzo provvisorio (id fittizio della famiglia) per le misure di contatto durante la costruzione. */
-const probe = (p: Placed): Piece => createPiece({ id: `${FAMILY_OF[p.type]}-99`, type: p.type, section: p.section, length: p.length, pose: p.pose });
+const probe = (p: Placed): Piece =>
+  createPiece({ id: `${FAMILY_OF[p.type]}-99`, type: p.type, section: p.section, length: p.length, pose: p.pose, ...(p.curve ? { curve: p.curve } : {}) });
 
 /** Taglio di testa sul piano dato, calcolato dal pezzo posizionato (`headCutFromPlane`). */
 export const headCutOnPlane = (ref: string, pl: Plane, face: HeadFace): BuildStep => ({
@@ -377,7 +381,12 @@ export interface PortalOptions {
   /** Testa dei pilastri sotto una trave inclinata: a squadra (default) o tagliata sul piano della trave. */
   readonly postHead?: "squadra" | "inclinata";
   /** Saette nel piano del portale (nessuna se omesso). */
-  readonly braces?: { readonly section: Section; readonly length?: number };
+  readonly braces?: {
+    readonly section: Section;
+    readonly length?: number;
+    /** Lati ammessi per pilastro (`side` −1 verso la testa iniziale, +1 verso la finale); default tutti. */
+    readonly sides?: (postIndex: number, side: -1 | 1) => boolean;
+  };
   /** Diametro dei bulloni passanti (default 12). */
   readonly boltDiameter?: number;
 }
@@ -484,6 +493,7 @@ export function beamOnPosts(ctx: BuildContext, mode: Construction, o: PortalOpti
   const braces: Placed[] = [];
   if (o.braces) {
     const sc = o.braces.section;
+    const sides = o.braces.sides;
     if (bolted && sc.b > sp.b + 1e-9)
       throw new ParamError("sezioneControvento", sectionLabel(sc), `la saetta deve stare tra le tavole: base ≤ ${sp.b} mm (base del pilastro)`);
     const L = o.braces.length ?? BRACE_LENGTH;
@@ -497,7 +507,7 @@ export function beamOnPosts(ctx: BuildContext, mode: Construction, o: PortalOpti
         const room = Math.min(side > 0 ? sEnds[1] - flank : flank - sEnds[0], ...neighbours);
         const postTop = zOn(headPlane, s) - (sp.h / 2) * Math.abs(t); // spalla (carpenteria) o testa a squadra
         const foot = ctx.floorHeightAt(at(s).x, at(s).y) - ctx.embedment;
-        if (room < reach || rise > (postTop - foot) / 2) continue;
+        if (room < reach || rise > (postTop - foot) / 2 || (sides && !sides(i, side))) continue;
         const ref = `${o.prefix}-saetta-${i}-${side < 0 ? "s" : "d"}`;
         const ax = normalize(add(scale(u, side * Math.SQRT1_2), vec3(0, 0, Math.SQRT1_2)));
         const az = normalize(add(scale(u, -side * Math.SQRT1_2), vec3(0, 0, Math.SQRT1_2)));

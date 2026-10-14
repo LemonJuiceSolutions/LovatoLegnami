@@ -55,3 +55,31 @@ describe("taglio composto da un piano (1.7)", () => {
     expect(planeOfHeadCut(trave, spec).normal.x).toBeLessThan(0);
   });
 });
+
+describe("taglio radiale sui pezzi curvi (5.2)", () => {
+  const R = 1000;
+  const arco = createPiece({
+    id: "ARC-01",
+    type: "arco",
+    section: { b: 90, h: 90 },
+    length: (R * Math.PI) / 2,
+    pose: translation(vec3(0, 0, 0)),
+    curve: { radius: R, sweep: 90 },
+  });
+
+  it("piano verticale x = 500 su arco R1000 90° → at = R·30°, angle 30, nessun angle2, piano ricostruito", () => {
+    const pl = plane(vec3(500, 0, 0), vec3(1, 0, 0));
+    const spec = headCutFromPlane(arco, pl, "testa-inizio");
+    expect(spec.at).toBeCloseTo((R * Math.PI) / 6, 9);
+    expect(spec.angle).toBeCloseTo(30, 9);
+    expect(spec.angle2).toBeUndefined();
+    expect(createMachining(arco, spec).type).toBe("taglio-testa");
+    const back = planeOfHeadCut(arco, spec);
+    expect(norm(cross(back.normal, pl.normal))).toBeLessThan(1e-9);
+    expect(Math.abs(signedDistance(pl, back.point))).toBeLessThan(1e-9);
+  });
+
+  it("piano che non contiene Y → errore (taglio obliquo non ammesso sui curvi)", () => {
+    expect(() => headCutFromPlane(arco, plane(vec3(500, 0, 0), normalize(vec3(1, 0.3, 0))), "testa-fine")).toThrow(GeometryError);
+  });
+});

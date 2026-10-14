@@ -87,8 +87,8 @@ describe("bullone passante (2.3)", () => {
 
   it("spessore oltre il catalogo → errore; testa di un arco tra due tavole → foro con at curvilineo", () => {
     expect(() =>
-      expandBolt({ id: "BUL-01", pieces: ["TAV-01", "PIL-01", "TAV-02"], face: "sinistra", at: 500, offset: 0, diameter: 8 }, sandwich(90, { b: 45, h: 120 })),
-    ).toThrow(/nessun bullone M8 a catalogo per uno spessore di 180 mm/);
+      expandBolt({ id: "BUL-01", pieces: ["TAV-01", "PIL-01", "TAV-02"], face: "sinistra", at: 500, offset: 0, diameter: 8 }, sandwich(200, { b: 45, h: 120 })),
+    ).toThrow(/nessun bullone M8 a catalogo per uno spessore di 290 mm/);
 
     // arco nel piano X–Z (sezione 90, b lungo Y) e due tavole 45 ai lati della testa
     const R = 2400;
