@@ -1,2 +1,4 @@
-// Modulo domain/assembly – API pubblica (vuoto finché non implementato).
-export {};
+// Modulo domain/assembly – API pubblica.
+export * from "./types";
+export * from "./ids";
+export * from "./bounds";
