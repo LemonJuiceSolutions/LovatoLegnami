@@ -1,10 +1,10 @@
 import { aabb } from "../math/aabb";
 import { applyToPoint, applyToVector, invertRigid, multiply, type Mat4 } from "../math/mat4";
 import { obbAabbPenetration, obbFromPose, obbVertices } from "../math/obb";
-import { EPS, add, dot, norm, normalize, scale, sub, vec3, type Vec3 } from "../math/vec3";
+import { EPS, add, cross, dot, norm, normalize, scale, sub, vec3, type Vec3 } from "../math/vec3";
 import { JointError, MachiningError } from "./errors";
 import { addMachining } from "./machinings";
-import type { Joint, LateralFace, MezzoLegnoJoint, Piece, TenoneMortasaJoint } from "./types";
+import type { DardoDiGioveJoint, HeadFace, Joint, LateralFace, MezzoLegnoJoint, Piece, TenoneMortasaJoint } from "./types";
 
 /** Facce laterali con normale uscente nel sistema locale del pezzo. */
 const LATERAL_FACES: readonly { face: LateralFace; normal: Vec3 }[] = [
@@ -129,6 +129,62 @@ function expandMezzoLegno(joint: MezzoLegnoJoint, a: Piece, b: Piece): [Piece, P
   return [halfLapOn(joint, a, b, true), halfLapOn(joint, b, a, false)];
 }
 
+/** Tolleranze di collinearità del dardo di Giove (rad, mm). */
+export const COLLINEAR_ANGLE_TOL = 1e-3;
+export const COLLINEAR_DISTANCE_TOL = 1;
+
+const fmt1 = (n: number): string => String(Math.round(n * 10) / 10).replace(".", ",");
+
+/**
+ * Dardo di Giove: verifica che gli assi siano collineari (angolo ≤ 1e-3 rad,
+ * distanza ≤ 1 mm) e le facce superiori parallele, che le teste si
+ * sovrappongano di `length` (± 1 mm) e mette su ciascuna testa affacciata il
+ * profilo complementare: A con `angle` positivo, B specchiato.
+ */
+function expandDardo(joint: DardoDiGioveJoint, a: Piece, b: Piece): [Piece, Piece] {
+  const { length, angle, step } = joint.params;
+  const rel = relativePose(a, b); // B nel sistema di A
+  const xB = applyToVector(rel, vec3(1, 0, 0));
+  const zB = applyToVector(rel, vec3(0, 0, 1));
+  const p0 = applyToPoint(rel, vec3(0, 0, 0));
+  const p1 = applyToPoint(rel, vec3(b.length, 0, 0));
+  const offAxis = Math.max(Math.hypot(p0.y, p0.z), Math.hypot(p1.y, p1.z));
+  if (norm(cross(xB, vec3(1, 0, 0))) > COLLINEAR_ANGLE_TOL || offAxis > COLLINEAR_DISTANCE_TOL)
+    throw new JointError(joint.id, `gli assi di ${a.id} e ${b.id} non sono collineari (scarto ${fmt1(offAxis)} mm)`);
+  if (norm(cross(zB, vec3(0, 0, 1))) > COLLINEAR_ANGLE_TOL)
+    throw new JointError(joint.id, `le facce superiori di ${a.id} e ${b.id} non sono parallele: il profilo non è complementare`);
+
+  const lo = Math.max(0, Math.min(p0.x, p1.x));
+  const hi = Math.min(a.length, Math.max(p0.x, p1.x));
+  if (hi - lo <= EPS) throw new JointError(joint.id, `le teste di ${a.id} e ${b.id} non si sovrappongono`);
+  const headOfA = (x: number): HeadFace | undefined =>
+    Math.abs(x - a.length) <= COLLINEAR_DISTANCE_TOL ? "testa-fine" : Math.abs(x) <= COLLINEAR_DISTANCE_TOL ? "testa-inizio" : undefined;
+  // la testa di A sta a un estremo della sovrapposizione, quella di B all'altro
+  const aFace = lo > COLLINEAR_DISTANCE_TOL ? headOfA(hi) : hi < a.length - COLLINEAR_DISTANCE_TOL ? headOfA(lo) : undefined;
+  if (!aFace) throw new JointError(joint.id, `la sovrapposizione di ${a.id} e ${b.id} non è tra due teste affacciate`);
+  if (Math.abs(hi - lo - length) > COLLINEAR_DISTANCE_TOL)
+    throw new JointError(
+      joint.id,
+      `sovrapposizione delle teste ${fmt1(hi - lo)} mm diversa dalla lunghezza del giunto (${fmt1(length)} mm)`,
+    );
+  const bEnd = aFace === "testa-fine" ? lo : hi; // estremo della sovrapposizione dove sta la testa di B
+  const bFace: HeadFace = Math.abs(p0.x - bEnd) <= Math.abs(p1.x - bEnd) ? "testa-inizio" : "testa-fine";
+  const bAngle = dot(zB, vec3(0, 0, 1)) > 0 ? -angle : angle;
+
+  return withJointContext(joint, () => [
+    addMachining(a, { type: "dardo-di-giove", face: aFace, at: aFace === "testa-fine" ? a.length : 0, length, angle, step, jointId: joint.id }),
+    addMachining(b, {
+      type: "dardo-di-giove",
+      face: bFace,
+      at: bFace === "testa-fine" ? b.length : 0,
+      length,
+      angle: bAngle,
+      step,
+      jointId: joint.id,
+    }),
+  ]);
+}
+
 /**
  * Espande un giunto in lavorazioni complementari sui due pezzi, calcolando la
  * posizione di incrocio dalle pose. Restituisce un nuovo elenco di pezzi (stesso
@@ -139,10 +195,17 @@ function expandMezzoLegno(joint: MezzoLegnoJoint, a: Piece, b: Piece): [Piece, P
  * - `mezzo-legno`: su ciascun pezzo, tasca profonda metà della propria altezza
  *   lungo la zona occupata dall'altro; faccia verso l'altro pezzo (a parità di
  *   quota A è intagliato sopra e B sotto).
+ * - `dardo-di-giove`: pezzi collineari con le teste sovrapposte di `length`;
+ *   profili complementari sulle teste affacciate (vedi `expandDardo`).
  */
 export function expandJoint(joint: Joint, pieces: readonly Piece[]): Piece[] {
   const [a, b] = findPieces(joint, pieces);
-  const [na, nb] = joint.type === "tenone-mortasa" ? expandTenoneMortasa(joint, a, b) : expandMezzoLegno(joint, a, b);
+  const [na, nb] =
+    joint.type === "tenone-mortasa"
+      ? expandTenoneMortasa(joint, a, b)
+      : joint.type === "dardo-di-giove"
+        ? expandDardo(joint, a, b)
+        : expandMezzoLegno(joint, a, b);
   return pieces.map((p) => (p.id === a.id ? na : p.id === b.id ? nb : p));
 }
 

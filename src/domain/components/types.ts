@@ -106,6 +106,7 @@ export const MACHINING_TYPES = [
   "taglio-testa",
   // estensione `tipologie-estese` (E2)
   "asola-lama",
+  "dardo-di-giove",
 ] as const;
 export type MachiningType = (typeof MACHINING_TYPES)[number];
 
@@ -221,7 +222,28 @@ export interface AsolaLama extends MachiningBase {
   readonly offset?: number;
 }
 
-export type Machining = MezzoLegno | Tenone | Mortasa | BeccoUccello | Foro | TaglioTesta | AsolaLama;
+/**
+ * Dardo di Giove (E2): giunzione obliqua di testa a dente, profilo nel piano
+ * locale X–Z estruso su tutta la base. Con ξ = distanza dalla testa verso
+ * l'interno (0..`length`) e e = (h − length·tan|angle| − step)/2, la linea di
+ * taglio parte in ξ = 0 a z = ∓(h/2 − e), sale (o scende) con inclinazione
+ * |angle| fino a ξ = length/2, fa un dente verticale alto `step` centrato
+ * sull'asse, prosegue con la stessa inclinazione fino a ξ = length e chiude con
+ * una battuta verticale fino alla faccia. `angle > 0`: la punta conserva il
+ * legno dal lato −Z (materiale rimosso sopra la linea); `angle < 0`: profilo
+ * specchiato in Z (legno conservato dal lato +Z). Il pezzo complementare ha
+ * il profilo specchiato. `at` coincide con la testa, come per il tenone.
+ * Approssimazione dichiarata: senza chiave centrale.
+ */
+export interface DardoDiGiove extends MachiningBase {
+  readonly type: "dardo-di-giove";
+  readonly face: HeadFace;
+  readonly length: number;
+  readonly angle: number;
+  readonly step: number;
+}
+
+export type Machining = MezzoLegno | Tenone | Mortasa | BeccoUccello | Foro | TaglioTesta | AsolaLama | DardoDiGiove;
 
 /** Lavorazione richiesta, senza `id`/`pieceId` (assegnati da `createMachining`). */
 type DistributiveOmit<T, K extends PropertyKey> = T extends unknown ? Omit<T, K> : never;
@@ -252,7 +274,7 @@ export interface Piece {
   readonly curve?: Curve;
 }
 
-export const JOINT_TYPES = ["tenone-mortasa", "mezzo-legno"] as const;
+export const JOINT_TYPES = ["tenone-mortasa", "mezzo-legno", "dardo-di-giove"] as const;
 export type JointType = (typeof JOINT_TYPES)[number];
 
 interface JointBase {
@@ -278,7 +300,22 @@ export interface MezzoLegnoJoint extends JointBase {
   readonly params: Readonly<Record<string, never>>;
 }
 
-export type Joint = TenoneMortasaJoint | MezzoLegnoJoint;
+/**
+ * Dardo di Giove tra due pezzi collineari le cui teste si sovrappongono di
+ * `length` (E2): due lavorazioni `dardo-di-giove` complementari sulle teste
+ * affacciate, con la sovrapposizione centrata sul punto di giunzione.
+ * `angle` in gradi (0, 45], `step` altezza del dente (mm).
+ */
+export interface DardoDiGioveJoint extends JointBase {
+  readonly type: "dardo-di-giove";
+  readonly params: {
+    readonly length: number;
+    readonly angle: number;
+    readonly step: number;
+  };
+}
+
+export type Joint = TenoneMortasaJoint | MezzoLegnoJoint | DardoDiGioveJoint;
 
 /** Valore di un parametro di tipologia (numeri in mm/gradi, sezioni come etichetta "b×h"). */
 export type ParamValue = number | string | boolean;

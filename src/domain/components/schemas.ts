@@ -96,6 +96,13 @@ const specShapes = {
     depth: positive(),
     offset: finite().optional(),
   },
+  "dardo-di-giove": {
+    type: z.literal("dardo-di-giove"),
+    face: headFace,
+    length: positive(),
+    angle: finite(),
+    step: positive(),
+  },
 } as const;
 
 const machiningTypeErrorMap: z.ZodErrorMap = (issue, ctx) =>
@@ -116,6 +123,7 @@ export const MachiningSpecSchema = z.discriminatedUnion(
     z.object({ ...base, ...specShapes.foro }).strict(),
     z.object({ ...base, ...specShapes["taglio-testa"] }).strict(),
     z.object({ ...base, ...specShapes["asola-lama"] }).strict(),
+    z.object({ ...base, ...specShapes["dardo-di-giove"] }).strict(),
   ],
   { errorMap: machiningTypeErrorMap },
 ) as unknown as z.ZodType<MachiningSpec>;
@@ -132,6 +140,7 @@ export const MachiningSchema = z.discriminatedUnion(
     z.object({ ...idFields, ...base, ...specShapes.foro }).strict(),
     z.object({ ...idFields, ...base, ...specShapes["taglio-testa"] }).strict(),
     z.object({ ...idFields, ...base, ...specShapes["asola-lama"] }).strict(),
+    z.object({ ...idFields, ...base, ...specShapes["dardo-di-giove"] }).strict(),
   ],
   { errorMap: machiningTypeErrorMap },
 ) as unknown as z.ZodType<Machining>;
@@ -207,6 +216,15 @@ export const JointSchema = z.discriminatedUnion(
       })
       .strict(),
     z.object({ ...jointBase, type: z.literal("mezzo-legno"), params: z.object({}).strict() }).strict(),
+    z
+      .object({
+        ...jointBase,
+        type: z.literal("dardo-di-giove"),
+        params: z
+          .object({ length: positive(), angle: positive().max(45, "deve essere al massimo 45°"), step: positive() })
+          .strict(),
+      })
+      .strict(),
   ],
   {
     errorMap: (issue, ctx) =>

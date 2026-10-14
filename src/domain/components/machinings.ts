@@ -93,6 +93,18 @@ function applicabilityProblem(piece: Piece, m: MachiningSpec): string | undefine
         return `offset ${fmt(off)}: l'asola (alta ${fmt(m.height)}) esce dalla sezione (altezza ${fmt(h)})`;
       return undefined;
     }
+    case "dardo-di-giove": {
+      const head = m.face === "testa-inizio" ? 0 : L;
+      if (Math.abs(m.at - head) > EPS) return `il dardo di Giove deve stare sulla testa (${m.face} ⇒ at=${fmt(head)})`;
+      const a = Math.abs(m.angle);
+      if (a <= EPS || a > 45 + EPS) return `angle ${fmt(m.angle)}° non valido (inclinazione ammessa in (0°, 45°], segno = verso del profilo)`;
+      if (m.length >= L - EPS) return `length ${fmt(m.length)} non inferiore alla lunghezza del pezzo (${fmt(L)})`;
+      if (m.step >= h / 2 - EPS) return `step ${fmt(m.step)} non inferiore a metà dell'altezza della sezione (${fmt(h / 2)})`;
+      const rise = m.length * tan(a) + m.step;
+      if (rise > h + EPS)
+        return `profilo più alto della sezione: length·tan(angle) + step = ${fmt(rise)} > ${fmt(h)}`;
+      return undefined;
+    }
     case "taglio-testa": {
       const a2 = m.angle2 ?? 0;
       if (Math.abs(m.angle) >= 90 || Math.abs(a2) >= 90) return `angolo di taglio non valido (deve essere in (−90°, 90°))`;
