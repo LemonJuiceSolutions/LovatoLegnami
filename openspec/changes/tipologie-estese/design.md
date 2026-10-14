@@ -1,0 +1,147 @@
+# Design
+
+## Context
+
+Vedi `proposal.md` – Why. Stato reale su cui si costruisce (da `configuratore-pergole/design.md`, "Note di implementazione", e dal codice in `src/domain`):
+
+- **Pezzo** (`src/domain/components/types.ts`): `Piece { id, type, family, section:{b,h}, length, pose: Mat4, label, machinings[] }`; catalogo chiuso `PIECE_TYPES` (7 tipi) e `PIECE_FAMILIES` (prefissi id `<FAM>-<nn>`); sistema locale X lungo la lunghezza, sezione centrata; facce `superiore/inferiore/sinistra/destra/testa-inizio/testa-fine`.
+- **Lavorazioni**: unione su `type` (`mezzo-legno | tenone | mortasa | becco-uccello | foro | taglio-testa`), schemi zod in `schemas.ts`, applicabilità in `machinings.ts`, utensili nel kernel in `src/geometry/occt/build-piece.ts`. `taglio-testa {angle, angle2?}` è già un **taglio composto**: piano per `(at,0,0)` con normale ∝ `(1, tan(angle2), −tan(angle))`.
+- **Giunti**: `Joint { id, type, pieceA, pieceB, params }` (`tenone-mortasa`, `mezzo-legno`), espansi in lavorazioni da `expandJoints`.
+- **Template** (`typologies/template.ts`): `ParamSpec = number | section | boolean`, `BuildStep = place | repeat | joint | machining`, interprete `buildAssembly`; mattoni in `templates/shared.ts` (`commonParams`, `columnStep`, `spread`, `joistSteps` con becco d'uccello e tagli a piombo, `braceSteps` con tagli a 45°, `seatOffset`). Registro con validazione (`validateTemplate`) e generazione di prova con i default.
+- **Assieme**: `Assembly { typologySlug, params, pieces, joints, meta }`; `measureAssembly` con tabella `SUPPORTERS` per tipo; regole dati (`RuleSet`, 6 kind) e `autoSize`; ingombro con OBB (`pieceObb`) e `fitToEnvelope` sui parametri `larghezza/profondita/altezza`.
+- **Kernel**: box meno utensili (`cut`), `TOOL_OFFSET 0,01`; B-rep neutra `piana | cilindrica | altro`, spigoli `retta | cerchio | altro`; writer SAT con `plane-surface`, `cone-surface` (semiangolo 0) ed `ellipse-curve` rapporto 1, spigoli con parametri (archi parziali già supportati); facce/curve `altro` → `SatBodyError` per pezzo.
+- **Distinta CSV** (`export/csv/distinta.ts`): raggruppamento con `pieceCacheKey`, colonne `ID;Tipo;Sezione;Lunghezza;Quantità;Lavorazioni`.
+- Store e UI (task 10–12 di `configuratore-pergole`) sono in corso: la selezione della tipologia oggi è pensata come `select` in `param-form.tsx`; il form genera i campi dai `ParamSpec`.
+
+Vincoli: dominio puro TS (eslint vieta React/Three/replicad), `npm test` e `npm run build` verdi a ogni task, nessuna nuova dipendenza, dati commerciali solo dalla ricerca `ricerca-chepergola.md` (i PDF di montaggio non sono stati letti: i layout dedotti sono marcati `[dedotto]`).
+
+## Goals / Non-Goals
+
+**Goals:**
+- Estendere il catalogo (primitivi, lavorazioni, ferramenta) in modo **additivo**: nessuna lavorazione o tipo esistente cambia semantica; JSON e fixture esistenti restano validi (il nuovo campo `hardware` è opzionale in lettura).
+- Tutte le nuove tipologie come **template dati** che compongono solo catalogo; la geometria "intelligente" (taglio composto da un piano, bullone che fora più strati, giunto metallico che accorcia le aste, arco che si infila nella sandwich) vive in helper puri riusabili, non nei template.
+- Ogni tipologia offre, dove sensato, l'alternativa `bullonata` (riferimento commerciale, ferramenta a vista) e `carpenteria` (giunti Lovato lavorati a CNC), selezionata con un solo parametro.
+- Il SAT prodotto resta su facce **piane e cilindriche**: i pezzi curvi sono progettati (e validati nel dominio) perché non producano altre superfici.
+- La ferramenta è **tracciata** (id, codice, quantità, pezzi collegati, lavorazioni indotte) e finisce nella distinta; non è modellata come solido CAD.
+
+**Non-Goals:**
+- Verifica strutturale della ferramenta o del legno (resta tabellare, `DA VALIDARE`).
+- Sezioni non rettangolari (monaco esagonale/ottagonale, pali tondi) e superfici toroidali/NURBS nel SAT.
+- Coperture (perline, lastre, teli, grondaie) come pezzi: incidono solo su interassi e pendenza, già coperti dalle regole. Fuori scope anche tamponature diverse dal grigliato.
+- Editor di template o di ferramenta lato utente; tutti i dati sono file TS.
+- Disegno a mano di miniature: sono generate dal modello.
+
+## Decisions
+
+### E1. Nuovi primitivi come estensione del catalogo chiuso, un solo campo opzionale per i pezzi curvi
+
+`PIECE_TYPES` += `tavola, arco, cantonale, monaco, mensola, fascia, grigliato`; `PIECE_FAMILIES` += `TAV, ARC, CAN, MON, MEN, FAS, GRG` (`FAMILY_OF` aggiornato). `Piece.curve?: { radius: number; sweep: number }` descrive un **asse curvo nel piano locale X–Z**: il pezzo parte in origine tangente a +X e curva verso +Z (centro di curvatura in `(0, 0, radius)`), `sweep` in gradi, `length` = sviluppo dell'asse = `radius·sweep(rad)`; la sezione resta `b` lungo Y, `h` radiale. Solo `arco` ammette `curve` (lo schema lo rifiuta altrove) e `arco` lo richiede.
+
+**Perché** un campo opzionale invece di un tipo di pezzo separato con geometria propria: tutto il resto (id, sezione, lavorazioni, distinta, cache) resta identico; chi non sa dei pezzi curvi vede un pezzo con una lunghezza (lo sviluppo, che è anche la misura di acquisto del lamellare). Alternativa scartata: `Piece` come unione `straight | curved` — propagazione di `switch` in tutto il dominio per un solo tipo.
+
+**Ingombro dei pezzi curvi**: `pieceObbs(piece): OBB[]` in `assembly/bounds.ts` restituisce `[pieceObb]` per i pezzi dritti e, per quelli curvi, `ceil(sweep/15°)` box di segmento (ogni segmento è una corda con la sezione allargata di `h·(1−cos(Δ/2))` così da contenere la freccia). `pieceObb` resta e per i curvi restituisce il box dell'intero arco (conservativo), così il codice esistente continua a compilare; collisioni, `assemblyBounds`, `minClearHeight` e `measureAssembly` passano a `pieceObbs`. Nelle misure i pezzi curvi non hanno luce né sbalzo (sono esclusi come i controventi) ma restano **appoggi** validi per altri pezzi.
+
+### E2. Lavorazioni: due nuove, il resto per composizione
+
+- `asola-lama { face: HeadFace, width (lungo Y), height (lungo Z), depth (lungo X), offset? }`: tasca rettangolare dalla testa, centrata sulla sezione (offset trasversale lungo Z per lame eccentriche). Serve a lama interna portapilastro (8×68×180) e supporto pensilina a scomparsa (8×105×250). Applicabilità: `width < b`, `height < h`, `depth < length`.
+- `dardo-di-giove { face: HeadFace, length (sovrapposizione lungo X), angle (inclinazione del piano obliquo nel piano X–Z, gradi), step (altezza del dente, lungo Z) }`: profilo 2D nel piano X–Z estruso su tutta la base: la testa viene tagliata da un piano obliquo di `angle` con un gradino centrale alto `step`; il pezzo complementare ha il profilo specchiato. Approssimazione dichiarata: senza chiave centrale (la variante con chiave è una lavorazione futura).
+- **Taglio composto** = `taglio-testa` esistente. Nuovo helper puro `headCutFromPlane(piece | {pose, length}, plane, face): TaglioTesta spec` in `components/head-cut.ts`: trasforma il piano (punto + normale, sistema assieme) nel locale, calcola `at` (intersezione asse–piano) e `angle = atan(−n_z/n_x)`, `angle2 = atan(n_y/n_x)`; errore se il piano è parallelo all'asse. Lo usano cantonali/compluvi (piano verticale della diagonale o faccia del monaco), teste a filo muro (piano del muro), teste al colmo (piano del colmo), aste che entrano in un giunto metallico (piano di battuta). `math/plane.ts` fornisce `Plane {point, normal}`, `planeFromPoints`, `intersectLinePlane`, `signedDistance`, `transformPlane`.
+- **Fori passanti su più strati** = giunto di ferramenta `bullone-passante` (E3), non una lavorazione.
+- **Tagli a 45° delle saette** e **tagli inclinati di testa**: già `taglio-testa` (`braceSteps`).
+- **Sede del cantonale sull'angolo**: `becco-uccello` esistente con `angle` = pendenza del cantonale (sede piana orizzontale, battuta verticale ortogonale all'asse). Approssimazione dichiarata della sede a V.
+- **Punta del monaco**: fino a 8 `taglio-testa` sulla stessa testa (piramide); l'applicabilità esistente lo consente (ogni taglio è un semispazio).
+
+**Vincoli sui pezzi curvi** (perché il SAT resti su piane/cilindriche): su `arco` sono ammessi solo `foro` sulle facce `sinistra/destra` (asse del foro parallelo all'asse del cilindro ⇒ spigoli circolari sulle facce piane, nessuna intersezione con le facce cilindriche se il foro sta nella sezione) e `taglio-testa` con `angle2` assente (piano parallelo all'asse del cilindro ⇒ spigoli rettilinei; un piano obliquo darebbe ellissi). `createMachining` rifiuta le altre con `MachiningError` "non ammessa su pezzi curvi". `at` sui pezzi curvi è la coordinata **curvilinea** lungo l'asse.
+
+### E3. Ferramenta come libreria dati + step di template che espande lavorazioni e voci di distinta
+
+Nuovo modulo `src/domain/hardware/`:
+
+- `types.ts`: `HardwareKind = bullone | vite | tassello | staffa-muro | staffa-terra | giunto-vie | cuspide | piastra`; `HardwareSpec { code, kind, name, forSections?: Section[] (o `forPost` 70/90/120), dims (ingombri), holes: HolePattern[] (fori/asole da praticare nel legno, in coordinate della ferramenta), insertion (per giunti: profondità d'inserimento dell'asta, es. 90 mm, e ingombro del nodo), angle? (giunti 75/105, staffe 15/17/25), screws? {code, count} (viti conteggiate per ferramenta) }`; `HardwareItem { id, code, kind, description, quantity, pose?, pieceIds, machiningIds, params }`.
+- `catalog.ts`: dati dal riferimento (`ricerca-chepergola.md` §1–§4) marcati `DA VALIDARE`: bulloni M12×200/240, M8×120/140; viti 6×40, 6×160, 6×200, 8×200, 8×240; tasselli 10×85; `staffa-muro-listoni-paralleli-90/120` (lama tra le tavole, 1 bullone passante, gioco 90/120); `staffa-inclinata-15/25`, `supporto-scomparsa-17` (asola 8×105×250 + 2 fori Ø15), `staffa-listone-90/120`; `staffa-terra-bicchiere-70/90/120` (nessuna lavorazione), `staffa-terra-p-greco` (4 fori laterali Ø11 a quote fisse), `staffa-terra-lama-interna-90/120/160/200` (asola 8×lama + 2 fori Ø13), `zanca-h`; `giunto-joint-{2,3l,3a,4}-vie-{70,90}-{90,75,105}`, `giunto-{3a,3l,4,5}-vie-{90,120}` (ingombri A/B/C dal sito), `cuspide-{4-25,6-25,8-15}`, `piastra-914/915/916`, `supporto-arcarecci-170/250`.
+- `expand.ts`: `expandHardwareStep(step, pieces, ids)` → `{ pieces (con lavorazioni aggiunte), item }`. Per `bullone-passante {pieces: ref[], face, at, offset, diameter}`: retta dell'asse dal punto sulla faccia del primo pezzo, intersezione con gli OBB degli altri pezzi (riuso dell'enumerazione già in `joints.ts`), `foro` passante su ogni strato attraversato con `at/offset/face` locali, lunghezza del bullone = prima lunghezza di catalogo ≥ spessore totale + 30 mm; errore se un pezzo dichiarato non è attraversato. Per staffe/giunti: le lavorazioni dell'`HolePattern` tradotte sul pezzo in base al punto di attacco (`anchor`: testa/piede/faccia) e i conteggi di viti sommati.
+- `ids`: famiglie `BUL, VIT, TAS, STM, STT, GNT, CUS, PST` con lo stesso generatore `createIdGenerator` (estensione per famiglie di ferramenta). Viti e tasselli sono **solo conteggi** (un `HardwareItem` per codice con `quantity`), senza posa.
+- `Assembly.hardware: readonly HardwareItem[]` (schema: default `[]` in lettura; `toJSON` lo scrive sempre ⇒ fixture golden rigenerate una volta).
+
+**Perché** non modellare la ferramenta come `Piece`: non ha sezione×lunghezza, non va nel SAT, non entra nelle regole; come dato collegato a pezzi e lavorazioni (`machiningIds`) la distinta e la UI la mostrano e le lavorazioni indotte sono tracciabili (`jointId` esistente riusato con l'id della ferramenta). Alternativa scartata: ferramenta come giunto `Joint` — i giunti sono a due pezzi e i bulloni ne attraversano tre; estendere `Joint` avrebbe toccato `expandJoints`, schema e misure.
+
+### E4. Template: `enum`, visibilità condizionata, step `hardware`, metadati di catalogo
+
+- `EnumParamSpec { kind: "enum", name, label, options: {value, label, description?}[], default }` (valori stringa, `ParamValue` già li ammette; `ctx.enum(name)` nel `BuildContext`). Il form lo rende come `select`; `setTypology` dello store mantiene i comuni come oggi.
+- `ParamSpec.visibleWhen?(params: ResolvedParams): boolean`: la UI nasconde il campo, il resolver applica comunque il default (nessun parametro "assente"). Es. `testaPilastro` solo con `forma = monofalda`, `cuspide` solo con `costruzione = bullonata`, `profondita` nascosta nel gazebo a 6/8 lati.
+- `BuildStep` += `HardwareStep { kind: "hardware", code, pieces: ref[], anchor, params }`; l'interprete lo esegue in ordine come `machining` (le lavorazioni della ferramenta vanno sul pezzo subito; l'`HardwareItem` è accumulato in `assembly.hardware`). `catalogProblems` verifica il codice nel catalogo.
+- `TypologyTemplate` += `category: "addossata" | "autoportante" | "carport" | "gazebo" | "pensilina"`, `tags: string[]`, `reference?: string` (sezione della ricerca). `TypologyInfo` li espone per il selettore.
+- **Parametro costruttivo comune** `costruzione: enum bullonata | carpenteria` in `shared.ts` (`constructionParam`) con mattoni duali: `beamOnPosts(mode, …)` → sandwich (2 `tavola` + `bullone-passante` ×2 per pilastro + saette 750 a 45° tra le tavole con bullone) oppure trave singola con `tenone-mortasa` (pilastro→trave) e `braceSteps` esistenti; `joistsOnBeams(mode, …)` → appoggio semplice + viti conteggiate oppure `mezzo-legno` (tacca) / `becco-uccello` se inclinati; `wallAttachment(kind, …)` → staffa (fori/asole) oppure `banchina` + becco d'uccello; `groundAnchor(kind, …)` → lavorazioni del piede.
+
+**Perché** restare sulle funzioni pure TS (D2) e non introdurre un formato dati: l'interprete esistente già copre `place/repeat/machining/joint`; aggiungere `hardware` e `enum` è una modifica locale e type-safe.
+
+### E5. Geometria delle nuove tipologie (convenzioni per i template)
+
+Sistema D3 (X fronte, Y profondità, Z alto; origine anteriore-sinistra). Tutti usano `larghezza/profondita/altezza/pendenza/interasse/sbalzo/campate/sezione<Tipo>` quando il significato coincide, così regole, `autoSize` e `fitToEnvelope` funzionano senza modifiche.
+
+- **`portale-sandwich`**: portali paralleli al fronte (travi lungo X di lunghezza `larghezza`), `campate` campate lungo Y, pilastri per portale = `pilastriPerPortale` (2 di default; 3 nelle MAXI larghe), travetti lungo Y sopra le travi distribuiti lungo X con `interasse`. `forma: piana | monofalda`; `direzionePendenza: profondita` (portali a quote decrescenti, travetti inclinati) o `larghezza` (travi inclinate, pilastri di altezza diversa; `testaPilastro: squadra | inclinata`: a squadra il bullone fa da cerniera e la testa resta sotto l'intradosso inclinato; inclinata ⇒ `taglio-testa` del pilastro di `pendenza`). `altezza` = quota minima d'intradosso (lato basso). Copre T-A, T-C libere, T-G "Pergola Camper" (preset).
+- **`addossata-sandwich`**: telai ortogonali al muro (travi lungo Y dal muro al pilastro con sbalzo), `attaccoMuro: listoni-paralleli | staffa-inclinata-15 | staffa-inclinata-25 | scomparsa-17 | banchina`; con staffe inclinate la pendenza è **imposta** dalla ferramenta (`pendenza` nascosto e sovrascritto, con avviso nel `meta`); travetti paralleli al muro sopra le travi (appoggio o becco d'uccello in carpenteria); testa della trave a filo muro con `headCutFromPlane` sul piano del muro. Copre T-B, T-C addossate, "Double Victor".
+- **`telaio-giunti`**: griglia `nx × ny` (parametri `larghezza`, `profondita`, `campate` lungo X, `campateProfondita` lungo Y) di pilastri a sezione unica (`sezioneAsta` 70×70 o 90×90), travi perimetrali e traversi sullo stesso piano, **lunghezza asta = interasse − 2·(ingombro nodo − inserimento)** dal catalogo giunti, tutte le teste a squadra; `forma: piana | monofalda-15` (giunti 75°/105°: pilastri della fila alta più alti di `profondita·tan 15°`, travi lungo Y inclinate, travetti perpendicolari orizzontali). `fissaggio: libera | addossata` (fila posteriore senza pilastri: `staffa-listone`). Nodo = `HardwareItem` giunto con il numero di vie derivato dagli elementi che vi convergono (2/3L/3A/4/5). Copre T-D.
+- **`carport-arco`**: `portale-sandwich` con 2 pilastri per portale posti a `profondita − sbalzoFrontale` e un `arco` per portale: piede verticale a terra (su `staffa-terra-p-greco`, 4 fori) a distanza `avanzamentoArco` dal pilastro, raggio `raggioArco` (2400) e `sweep` tale che la testa arrivi tra le tavole (la testa è tangente quasi orizzontale: `sweep = 90° + atan(...)` risolto in chiuso dalla geometria del cerchio che passa per il piede ed è tangente all'intradosso della trave a quota data); testa infilata tra le tavole con 2 `bullone-passante` M8; controventi 750 nelle campate. Sezione dell'arco = `sezionePilastro` (90 o 120, come nel riferimento). Copre T-E.
+- **`gazebo-padiglione`**: `lati: 4 | 6 | 8`; per 4 lati base `larghezza × profondita` (rettangolare ammessa: due punte unite da un `colmo` di lunghezza `|larghezza − profondita|`, solo in `carpenteria`; in `bullonata` la cuspide metallica richiede base quadrata ⇒ `ParamError` esplicito), per 6/8 lati poligono regolare di diametro circoscritto `larghezza` (il `profondita` è nascosto). Pilastri agli angoli (+ `montantiIntermedi` per lato), travi perimetrali a filo testa pilastro (giunto 916 / `tenone-mortasa` + `mezzo-legno` agli angoli), `cantonale` da ogni angolo alla punta, `falde: lati | 2·lati` (puntoni intermedi a metà lato, solo per 4 lati), `pendenza` dei puntoni intermedi (quella dei cantonali segue: `tan α_c = tan α · cos(π/lati)`); punta = `cuspide` metallica (teste a squadra + piastre 914/915) oppure `monaco` quadrato con teste dei cantonali tagliate (`headCutFromPlane`) sulla faccia del monaco per 4 lati e, per 6/8 lati, sul piano verticale perpendicolare alla direzione in pianta a distanza apotema dal centro (approssimazione dichiarata: il monaco resta quadrato); `arcarecci` opzionali, `grigliati` opzionali per lato (pannelli `grigliato` tra pilastri, altezza parametrica). Copre T-H, T-I e le estensioni esagonale/ottagonale.
+- **`pensilina-sbalzo`**: `larghezza` lungo il muro, `sbalzo` (profondità), `numeroMensole`/interasse, `attacco: scomparsa-17 | staffa-inclinata-15 | staffa-inclinata-25 | scarpa`, pendenza imposta dalla staffa (o `libera` con `pendenza`); `mensola` per attacco con `asola-lama` + 2 `foro` (scomparsa) o fori laterali; travetti paralleli al muro sopra le mensole; `fascia` frontale di gronda sulle teste; `saette` opzionali sotto ogni mensola (controvento 45° con `staffa-muro` al piede). Copre T-J. Nessun pilastro ⇒ `fitToEnvelope` lavora su `altezza` e `sbalzo`.
+- **`monofalda-scalare`**: `file` (≥ 3) di pilastri lungo Y a quote decrescenti (`pendenza` lungo la profondità), per fila una trave sandwich lungo X (traverso), **correnti** longitudinali (`trave`) lungo Y sopra i traversi, spezzati in tronchi tra le file con `giunzione: dritta | mezzo-legno | dardo-di-giove` sopra gli appoggi; travetti lungo X opzionali; `fascia` frontale 38×300; saette 800. Copre T-G "Copertura Camper".
+- **`a-elle`**: due ali `addossata-sandwich`-like lungo due muri che formano un angolo interno (`larghezzaA` lungo X, `larghezzaB` lungo Y, `profondita` comune, pilastro d'angolo condiviso), falde inclinate verso l'esterno di ciascun muro, `cantonale` di **compluvio** sulla diagonale interna (asse dall'angolo dei muri alla trave d'angolo), travetti di ciascuna ala che terminano sul piano verticale della diagonale con `headCutFromPlane` (taglio composto: a piombo e 45° in pianta). Costruzione `carpenteria` di default (banchine), `bullonata` con staffe.
+
+Ogni template dichiara `reference` alla scheda T-x della ricerca e ha un test di conteggio contro una distinta rilevata (es. 4×6: 6 pilastri, 6 tavole, 12 travetti, 12 bulloni).
+
+### E6. Kernel: pezzi curvi per rivoluzione, nuovi utensili, nessuna nuova superficie
+
+- `arco`: in `build-piece.ts` il solido base è la **rivoluzione** del rettangolo di sezione (nel piano locale X=0: Y ∈ [−b/2, b/2], Z ∈ [−h/2, h/2]) attorno all'asse parallelo a Y passante per `(0, 0, radius)`, di `sweep` gradi, orientata così che l'asse parta tangente a +X e curvi verso +Z. Facce: 2 cilindriche (intradosso `radius − h/2`, estradosso `radius + h/2`), 2 piane laterali (settori anulari con spigoli circolari), 2 piane di testa. L'estrazione B-rep già classifica `Cylinder` e `Circle`; i cerchi parziali hanno `t0 < t1` già gestiti dal writer.
+- Lavorazioni sui curvi: `foro` sulle facce laterali → cilindro con asse ∥ Y nel punto di coordinata curvilinea `at` (posizione = punto dell'arco a `at`, spostato di `offset` lungo la normale radiale); `taglio-testa` con solo `angle` → piano contenente la direzione Y, passante per il punto dell'asse ad `at`, ruotato di `angle` rispetto al piano normale alla tangente. `TOOL_OFFSET` come oggi.
+- `asola-lama` → box dalla testa (esteso di `TOOL_OFFSET` oltre la testa); `dardo-di-giove` → prisma dal profilo 2D (poligono X–Z: piano obliquo + gradino) estruso lungo Y oltre le facce; `grigliato`, `fascia`, `tavola`, `monaco`, `mensola`, `cantonale` → box come gli altri.
+- `neutral-brep-box.ts` += `arcBrep(section, radius, sweep)` in TS puro (le 6 facce, 4 cerchi, 8 rette, 8 vertici) con le stesse convenzioni della B-rep estratta, per testare il writer SAT sui curvi senza WASM.
+- Cache: `pieceCacheKey` include `curve` (già serializza il pezzo canonico: aggiungere il campo alla selezione).
+
+**Perché** rivoluzione e non sweep lungo una polilinea o B-spline: la rivoluzione dà esattamente piane + cilindriche (nessun `altro`), è un'API replicad disponibile (`revolve`) e coincide con il lamellare curvato a raggio costante del riferimento. Alternativa "approssimare con segmenti piani" scartata come default (facce spezzate sgradevoli per il CAM) ma resta disponibile come fallback: se la rivoluzione o una booleana sul curvo fallisce, il kernel segnala `PieceBuildError` e il viewer mostra i segmenti dell'OBB (E1).
+
+### E7. Export
+
+- **SAT/STEP**: nessuna estensione del writer; i pezzi curvi passano grazie a E2/E6. `exportSat`/`exportStep` ricevono solo `pieces` (la ferramenta non è un pezzo: nessun filtro necessario; il test di pipeline lo verifica). Il validatore esistente conferma i conteggi dell'arco (6 facce, 12 spigoli di cui 4 circolari).
+- **Distinta CSV**: `buildDistinta(assembly)` → `{ rows, hardwareRows, csv }`; `csv` = tabella pezzi esistente, riga vuota, tabella `Codice;Descrizione;Quantità;Pezzi` (ferramenta raggruppata per `code`, quantità sommate, id dei pezzi collegati). `hardwareRows` è esposto anche separatamente per la UI. Il nome file non cambia.
+
+### E8. Regole
+
+- `slope-range` += `allowFlat?: boolean` (pendenza misurata ≤ 0,5° ammessa quando `true`): le coperture piane non violano l'intervallo; il default Lovato lo imposta a `true` (DA VALIDARE).
+- `SUPPORTERS` esteso: `tavola ← pilastro, arco`; `travetto += tavola, mensola, cantonale, monaco`; `cantonale ← trave, tavola, monaco, pilastro`; `puntone += monaco, tavola`; `trave += tavola, monaco` (correnti su traversi; colmo gazebo); `fascia ← travetto, mensola, cantonale`; `mensola, arco, monaco, grigliato, pilastro, controvento, banchina ← []`. `CLEAR_HEIGHT_TYPES += tavola, cantonale, mensola, fascia, monaco`.
+- Dati: `SECTION_CATALOG += 45×90, 45×120, 45×145, 70×70, 90×90, 38×300`; tabelle luci per `tavola` (per coppia di tavole, nota nel file), `cantonale`, `mensola` (luce = lunghezza non appoggiata ⇒ funge da sbalzo massimo), `fascia`; sezione minima `pilastro` resta 120×120 come **avviso** solo nel set Lovato? No: il riferimento usa 90×90 e 70×70 — la regola `min-section pilastro 120×120` passa da `errore` ad `avviso` nel set di default (DA VALIDARE), così i preset del riferimento generano senza errori bloccanti.
+- Pezzi curvi: `measureAssembly` non calcola luce/sbalzo per `arco` (come i controventi) ma li usa come appoggi.
+
+### E9. UI
+
+- **Selettore tipologie** (`typology-picker.tsx`): griglia di schede (miniatura, nome, badge categoria, descrizione, tag), filtro per categoria, ricerca testuale; sostituisce il `select` previsto in `param-form.tsx` (che resta per i parametri). Clic → `setTypology(slug)`.
+- **Miniature** (`thumbnails/isometric.ts`, TS puro ma in `src/components` perché produce SVG): proiezione assonometrica cabinet delle `pieceObbs` dell'assieme di default (`generate(slug)`), facce ordinate per profondità (painter's algorithm), colori per famiglia coerenti con il viewer, viewBox adattato; generata una volta per slug con `useMemo`/mappa modulo. Deterministica e sempre coerente con il template. Alternativa scartata: PNG/SVG disegnati a mano — da mantenere a ogni modifica, e otto nuovi file binari nel repo.
+- **Preset** (`preset-picker.tsx`): dialogo "Esempi dal catalogo" raggruppato per tipologia; carica tipologia, parametri e ingombro nello store (stessa via di `config-toolbar` per gli esempi). `examples.ts` esistente resta per i due esempi MVP e aggiunge i preset dal dominio.
+- **Form**: campo `enum` → `Select`; `visibleWhen` → campo nascosto (valore invariato).
+- **Esiti**: sezione "Ferramenta" (tabella `hardwareRows`) sotto violazioni/collisioni; clic su una riga seleziona i pezzi collegati.
+- **Viewer**: pezzi curvi con la mesh del kernel; fallback box = segmenti di `pieceObbs`; ferramenta come simboli semplici (`cylinderGeometry` per i bulloni lungo l'asse, `boxGeometry` sottile per staffe/giunti dall'`HardwareItem.pose` e `dims`), livello "ferramenta" attivabile.
+
+### E10. Preset commerciali
+
+`src/domain/presets/{types,catalog}.ts`: `Preset { id, name, typologySlug, params, envelope?, source, notes, expected?: { pieces: Partial<Record<PieceType, number>>, hardware?: Record<code, number> } }`. I preset derivano dalle distinte in `ricerca-chepergola.md` (§1): standard libera 3×3, 4×2, 4×3, 4×4, 4×6; addossata 2×3, 3×4, 4×6; MAXI 4×4, 5×5, 5×6; addossata MAXI 4×4; moderna 258×258, 427×318; carport 5×3, 5×4, doppio 5×6, doppio MAXI 5×6; pergola camper 3×6; copertura camper 404×799; gazebo 3,1×3,1 a 4 falde 25°, 8 falde 15°, ottagonale; pensilina 4 m sbalzo 1,2. Il test del catalogo genera ogni preset, verifica assenza di violazioni `errore`, assenza di collisioni con l'ingombro dichiarato e i conteggi `expected` (pilastri, tavole, travetti, bulloni) rilevati dal sito (`[dedotto]` dove indicato: scostamenti consentiti solo se annotati nel preset).
+
+## Risks / Trade-offs
+
+- [I layout reali dei kit sono nei PDF non letti: interassi, posizione saette e pendenze sono `[dedotto]`] → i preset citano la fonte e la deduzione; i conteggi verificati sono quelli dichiarati dal sito (pezzi e bulloni), non i layout; revisione con l'ufficio tecnico elencata nel follow-up.
+- [Booleane OCCT su facce cilindriche (fori nell'arco, tagli di testa) possono produrre spigoli `altro` o fallire] → vincoli E2 nel dominio (solo fori ∥ asse del cilindro, solo tagli paralleli all'asse), test geometry dedicati, `SatBodyError` per pezzo con gli altri scritti, fallback a segmenti nel viewer.
+- [`Assembly.hardware` cambia il testo delle fixture golden] → rigenerazione esplicita in un task, con confronto che i pezzi non cambiano (solo il campo aggiunto).
+- [Il catalogo `PIECE_TYPES` cresce a 14 tipi e le tabelle `SUPPORTERS`/luci devono essere complete per ogni tipo] → test che verificano che ogni `PieceType` ha una voce in `SUPPORTERS`, `CLEAR_HEIGHT_TYPES` è coerente e che il set di default tabella almeno `trave/tavola/travetto/puntone/cantonale/mensola`.
+- [Monaco quadrato per 6/8 lati è un'approssimazione] → dichiarata nel template (`meta.approssimazioni`), e la variante con cuspide metallica (default per 6/8) è esatta; monaco poligonale resta un non-goal documentato.
+- [Il `fitToEnvelope` ragiona su `larghezza/profondita/altezza`; pensilina e gazebo poligonale usano solo alcune] → i parametri mancanti sono nascosti ma presenti; `fit` ignora i parametri senza effetto (già tollerato: dimensione "bloccata"), test dedicato per pensilina e gazebo esagonale.
+- [Il form e lo store della change `configuratore-pergole` sono in sviluppo contemporaneo] → i task UI di questa change sono ordinati per ultimi e dichiarano i prerequisiti (10.x–12.x di quella change); modifiche al form limitate a `enum`/`visibleWhen` e alla sostituzione del `select` con il picker.
+- [Molte tipologie ⇒ tempo di validazione del registro all'avvio (una generazione di prova per template)] → generazioni in microsecondi nel dominio puro; test che il registro completo si valida in < 200 ms.
+
+## Migration Plan
+
+Additivo. `fromJSON` accetta file senza `hardware` (default `[]`) e senza `curve`; `ConfigFileSchema` non cambia (`schemaVersion` resta 1: i nuovi parametri sono chiavi in `params`). Le fixture golden vengono rigenerate con `UPDATE_GOLDEN=1`. Rollback = revert; nessun dato persistito lato server.
+
+## Open Questions
+
+- Valori reali di ingombro/inserimento dei giunti JOINT e delle piastre gazebo (non pubblicati sul sito): oggi stimati dai disegni quotati (`A/B/C`), da confermare su un giunto fisico; cambiano solo i dati di `hardware/catalog.ts`.
+- Se Lovato vuole offrire anche il monaco poligonale (6/8 lati) lavorato a CNC: richiederebbe sezioni non rettangolari, da valutare come change separata.
+- Nomenclatura di produzione per la ferramenta (codici interni Lovato vs codici del fornitore): oggi codici descrittivi nostri; solo dati.
