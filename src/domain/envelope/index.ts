@@ -1,2 +1,2 @@
-// Modulo domain/envelope – API pubblica (vuoto finché non implementato).
-export {};
+// Modulo domain/envelope – API pubblica.
+export * from "./types";
