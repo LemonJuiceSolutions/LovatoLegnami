@@ -2,3 +2,4 @@
 export * from "./types";
 export * from "./engine";
 export * from "./autosize";
+export * from "./data/default-lovato";
