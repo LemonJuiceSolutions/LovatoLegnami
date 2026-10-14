@@ -1,0 +1,143 @@
+import { describe, expect, it } from "vitest";
+import { identity, multiply, rotationZ, translation, type Mat4 } from "@/domain/math/mat4";
+import { vec3 } from "@/domain/math/vec3";
+import { boxBrep, pieceBoxBrep } from "@/geometry/neutral-brep-box";
+import { writeSat } from "./writer";
+
+const date = new Date(2026, 9, 14, 9, 30, 0);
+const box = pieceBoxBrep({ b: 120, h: 240 }, 3000);
+
+/** Righe dei record (senza header e terminatore). */
+const recordLines = (text: string) => {
+  const lines = text.trimEnd().split("\n");
+  return lines.slice(3, -1);
+};
+const countTypes = (text: string) => {
+  const counts: Record<string, number> = {};
+  for (const l of recordLines(text)) {
+    const t = l.split(" ")[0];
+    counts[t] = (counts[t] ?? 0) + 1;
+  }
+  return counts;
+};
+
+describe("writeSat – facce piane", () => {
+  it("parallelepipedo → conteggi esatti della spec", () => {
+    const { text, written, errors } = writeSat([{ id: "TRV-01", brep: box, pose: identity() }], {
+      date,
+      includeName: false,
+    });
+    expect(errors).toEqual([]);
+    expect(written).toEqual(["TRV-01"]);
+    expect(countTypes(text)).toEqual({
+      body: 1,
+      lump: 1,
+      shell: 1,
+      face: 6,
+      loop: 6,
+      coedge: 24,
+      edge: 12,
+      vertex: 8,
+      point: 8,
+      "plane-surface": 6,
+      "straight-curve": 12,
+    });
+  });
+
+  it("header 7.0, terminatore e una riga per record chiusa da #", () => {
+    const { text } = writeSat([{ id: "TRV-01", brep: box, pose: identity() }], { date, producer: "CAM X" });
+    const lines = text.split("\n");
+    expect(lines[0]).toBe("700 0 1 0");
+    expect(lines[1]).toBe("@5 CAM X @11 ACIS 7.0 NT @24 Wed Oct 14 09:30:00 2026");
+    expect(lines[2]).toBe("1 9.9999999999999995e-007 1e-010");
+    expect(text.endsWith("End-of-ACIS-data\n")).toBe(true);
+    for (const l of recordLines(text)) expect(l.endsWith(" #")).toBe(true);
+  });
+
+  it("nome del body = id del pezzo (attributo stringa collegato al body)", () => {
+    const { text } = writeSat([{ id: "TRV-01", brep: box, pose: identity() }], { date });
+    const recs = recordLines(text);
+    expect(recs[0]).toBe("body $1 -1 $-1 $2 $-1 $-1 #");
+    expect(recs[1]).toBe(
+      "string_attrib-name_attrib-gen-attrib $-1 -1 $-1 $-1 $0 keep keep_kept ignore copy_keep @17 ATTRIB_XACIS_NAME @6 TRV-01 #",
+    );
+    expect(recs[2]).toBe("lump $-1 -1 $-1 $-1 $3 $0 #");
+    expect(recs[3]).toMatch(/^shell \$-1 -1 \$-1 \$-1 \$-1 \$4 \$-1 \$2 #$/);
+  });
+
+  it("record tipici nel layout 7.0", () => {
+    const { text } = writeSat([{ id: "B", brep: boxBrep(vec3(0, 0, 0), vec3(10, 20, 30)), pose: identity() }], {
+      date,
+      includeName: false,
+    });
+    const recs = recordLines(text);
+    const face = recs.find((l) => l.startsWith("face "))!;
+    expect(face).toMatch(/^face \$-1 -1 \$-1 \$\d+ \$\d+ \$2 \$-1 \$\d+ forward single #$/);
+    expect(recs.find((l) => l.startsWith("plane-surface "))).toMatch(
+      /^plane-surface \$-1 -1 \$-1 (-?[\d.]+ ){9}forward_v I I I I #$/,
+    );
+    expect(recs.find((l) => l.startsWith("coedge "))).toMatch(
+      /^coedge \$-1 -1 \$-1 \$\d+ \$\d+ \$\d+ \$\d+ (forward|reversed) \$\d+ \$-1 #$/,
+    );
+    expect(recs.find((l) => l.startsWith("edge "))).toMatch(
+      /^edge \$-1 -1 \$-1 \$\d+ 0 \$\d+ (10|20|30) \$\d+ \$\d+ forward @7 unknown #$/,
+    );
+    expect(recs.find((l) => l.startsWith("straight-curve "))).toMatch(/^straight-curve \$-1 -1 \$-1 (-?[\d.]+ ){6}I I #$/);
+    expect(recs.filter((l) => l.startsWith("point ")).map((l) => l.slice("point $-1 -1 $-1 ".length, -2))).toContain("10 20 30");
+  });
+
+  it("coordinate trasformate nel sistema dell'assieme (posa applicata alla geometria)", () => {
+    const pose: Mat4 = multiply(translation(vec3(1000, 500, 2400)), rotationZ(Math.PI / 2));
+    const { text } = writeSat([{ id: "B", brep: boxBrep(vec3(0, 0, 0), vec3(10, 20, 30)), pose }], {
+      date,
+      includeName: false,
+    });
+    const points = recordLines(text)
+      .filter((l) => l.startsWith("point "))
+      .map((l) => l.slice("point $-1 -1 $-1 ".length, -2));
+    // (10, 20, 30) ruotato di 90° attorno a Z → (−20, 10, 30), poi traslato
+    expect(points).toContain("980 510 2430");
+    expect(points).toContain("1000 500 2400");
+    expect(text).not.toMatch(/\btransform\b/);
+    expect(text).not.toMatch(/-0 |e-1[0-9]/);
+  });
+
+  it("più body: indici globali e numero di body nell'header", () => {
+    const bodies = ["TVT-01", "TVT-02", "TVT-03"].map((id, i) => ({
+      id,
+      brep: box,
+      pose: translation(vec3(0, i * 600, 0)),
+    }));
+    const { text, written } = writeSat(bodies, { date });
+    expect(written).toEqual(["TVT-01", "TVT-02", "TVT-03"]);
+    expect(text.split("\n")[0]).toBe("700 0 3 0");
+    const recs = recordLines(text);
+    const perBody = recs.length / 3;
+    expect(recs[perBody]).toBe(`body $${perBody + 1} -1 $-1 $${perBody + 2} $-1 $-1 #`);
+    expect(countTypes(text).body).toBe(3);
+  });
+
+  it("versione 4.0: record senza id/pattern e spigoli senza parametri", () => {
+    const { text } = writeSat([{ id: "B", brep: box, pose: identity() }], { date, version: "4.0" });
+    const recs = recordLines(text);
+    expect(text.split("\n")[0]).toBe("400 0 1 0");
+    expect(recs[0]).toBe("body $1 $2 $-1 $-1 #");
+    expect(recs[1]).toMatch(/ 17 ATTRIB_XACIS_NAME 1 B #$/);
+    expect(recs.find((l) => l.startsWith("edge "))).toMatch(/^edge \$-1 \$\d+ \$\d+ \$\d+ \$\d+ forward #$/);
+  });
+
+  it("posa non rigida → errore per quel pezzo, gli altri sono scritti", () => {
+    const mirror: Mat4 = [-1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
+    const { written, errors } = writeSat(
+      [
+        { id: "A", brep: box, pose: mirror },
+        { id: "B", brep: box, pose: identity() },
+      ],
+      { date },
+    );
+    expect(written).toEqual(["B"]);
+    expect(errors).toHaveLength(1);
+    expect(errors[0].pieceId).toBe("A");
+    expect(errors[0].entity).toBe("posa");
+  });
+});
