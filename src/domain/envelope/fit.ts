@@ -159,6 +159,13 @@ export function fitToEnvelope(
 ): FitResult {
   const template = typeof typology === "string" ? getTypology(typology) : typology;
   if (!(step > 0)) throw new Error("fitToEnvelope: il passo deve essere maggiore di 0");
+  // alias delle dimensioni (es. `profondita` → `sbalzo`): la ricerca usa i nomi delle dimensioni,
+  // i parametri della tipologia i propri nomi
+  const aliases = template.fitAliases ?? {};
+  const realName = (key: string): string => (aliases as Record<string, string | undefined>)[key] ?? key;
+  const dimName = new Map(Object.entries(aliases).map(([d, real]) => [real as string, d]));
+  const toReal = (p: Readonly<Record<string, ParamValue>>) => Object.fromEntries(Object.entries(p).map(([k, v]) => [realName(k), v]));
+  const locked: Readonly<Record<string, ParamValue>> = Object.fromEntries(Object.entries(lockedParams).map(([k, v]) => [dimName.get(k) ?? k, v]));
   const floorHeightAt = floorFunction(envelope);
   const cache = new Map<string, Trial>();
 
@@ -168,7 +175,7 @@ export function fitToEnvelope(
     if (hit) return hit;
     let t: Trial;
     try {
-      const assembly = buildAssembly(template, params, { floorHeightAt, embedment: options.embedment });
+      const assembly = buildAssembly(template, toReal(params), { floorHeightAt, embedment: options.embedment });
       const collisions = checkCollisions(assembly, envelope, options.tolerance ?? 0);
       const { violations } = evaluateRules(assembly, ruleSet, { floorHeightAt });
       t = { assembly, collisions, violations, errors: violations.filter((v) => v.severity === "errore") };
@@ -183,11 +190,11 @@ export function fitToEnvelope(
   const feasible = (t: Trial) => collisionFree(t) && t.errors.length === 0;
   const planFree = (t: Trial) => !t.buildError && !t.collisions.some((c) => c.obstacleId === ENVELOPE_ID && c.side && PLAN_SIDES.includes(c.side));
 
-  const specs = new Map(template.params.map((p) => [p.name, p]));
+  const specs = new Map(template.params.map((p) => [dimName.get(p.name) ?? p.name, p]));
   const dims = FIT_DIMENSIONS.filter((d) => specs.get(d)?.kind === "number");
-  const free = dims.filter((d) => lockedParams[d] === undefined);
+  const free = dims.filter((d) => locked[d] === undefined);
   const grids = new Map(free.map((d) => [d, grid(specs.get(d) as NumberParamSpec, step)]));
-  const minimal: Record<string, ParamValue> = { ...lockedParams };
+  const minimal: Record<string, ParamValue> = { ...locked };
   for (const d of free) minimal[d] = grids.get(d)!.spec.min;
 
   // ---- altezza (dimensione più interna): massimo nel box per bisezione, poi discesa a passi

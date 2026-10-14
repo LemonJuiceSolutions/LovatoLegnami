@@ -1,0 +1,542 @@
+{
+  "hardware": [
+    {
+      "code": "supporto-scomparsa-17",
+      "description": "Supporto pensilina a scomparsa 17° (lama 105×250)",
+      "dims": {
+        "x": 250,
+        "y": 90,
+        "z": 160
+      },
+      "id": "STM-01",
+      "kind": "staffa-muro",
+      "machiningIds": [
+        "MEN-01-L03",
+        "MEN-01-L04",
+        "MEN-01-L05"
+      ],
+      "params": {
+        "anchor": "testa",
+        "angle": 17
+      },
+      "pieceIds": [
+        "MEN-01"
+      ],
+      "pose": [
+        -1.2246467991473532e-16,
+        1,
+        0,
+        300,
+        -0.9563047559630354,
+        -1.1711355583995222e-16,
+        -0.29237170472273677,
+        1220.4660193305915,
+        -0.29237170472273677,
+        -3.580520723499547e-17,
+        0.9563047559630354,
+        2779.4555129907885,
+        0,
+        0,
+        0,
+        1
+      ],
+      "quantity": 1
+    },
+    {
+      "code": "tassello-10x85",
+      "description": "Tassello FM-X5 10×85",
+      "id": "TAS-01",
+      "kind": "tassello",
+      "machiningIds": [],
+      "params": {},
+      "pieceIds": [
+        "MEN-01",
+        "MEN-02",
+        "MEN-03"
+      ],
+      "quantity": 12
+    },
+    {
+      "code": "supporto-scomparsa-17",
+      "description": "Supporto pensilina a scomparsa 17° (lama 105×250)",
+      "dims": {
+        "x": 250,
+        "y": 90,
+        "z": 160
+      },
+      "id": "STM-02",
+      "kind": "staffa-muro",
+      "machiningIds": [
+        "MEN-02-L03",
+        "MEN-02-L04",
+        "MEN-02-L05"
+      ],
+      "params": {
+        "anchor": "testa",
+        "angle": 17
+      },
+      "pieceIds": [
+        "MEN-02"
+      ],
+      "pose": [
+        -1.2246467991473532e-16,
+        1,
+        0,
+        2000,
+        -0.9563047559630354,
+        -1.1711355583995222e-16,
+        -0.29237170472273677,
+        1220.4660193305915,
+        -0.29237170472273677,
+        -3.580520723499547e-17,
+        0.9563047559630354,
+        2779.4555129907885,
+        0,
+        0,
+        0,
+        1
+      ],
+      "quantity": 1
+    },
+    {
+      "code": "supporto-scomparsa-17",
+      "description": "Supporto pensilina a scomparsa 17° (lama 105×250)",
+      "dims": {
+        "x": 250,
+        "y": 90,
+        "z": 160
+      },
+      "id": "STM-03",
+      "kind": "staffa-muro",
+      "machiningIds": [
+        "MEN-03-L03",
+        "MEN-03-L04",
+        "MEN-03-L05"
+      ],
+      "params": {
+        "anchor": "testa",
+        "angle": 17
+      },
+      "pieceIds": [
+        "MEN-03"
+      ],
+      "pose": [
+        -1.2246467991473532e-16,
+        1,
+        0,
+        3700,
+        -0.9563047559630354,
+        -1.1711355583995222e-16,
+        -0.29237170472273677,
+        1220.4660193305915,
+        -0.29237170472273677,
+        -3.580520723499547e-17,
+        0.9563047559630354,
+        2779.4555129907885,
+        0,
+        0,
+        0,
+        1
+      ],
+      "quantity": 1
+    },
+    {
+      "code": "vite-6x160",
+      "description": "Vite TORX 6×160",
+      "id": "VIT-01",
+      "kind": "vite",
+      "machiningIds": [],
+      "params": {},
+      "pieceIds": [
+        "TVT-01",
+        "MEN-01",
+        "MEN-02",
+        "MEN-03",
+        "TVT-02",
+        "TVT-03"
+      ],
+      "quantity": 9
+    }
+  ],
+  "joints": [],
+  "meta": {
+    "attacco": "scomparsa-17",
+    "mensole": 3,
+    "originePendenza": "ferramenta",
+    "pendenza": 17,
+    "quotaAttacco": 2700,
+    "quotaGronda": 2333.1231822496075
+  },
+  "params": {
+    "altezza": 2700,
+    "attacco": "scomparsa-17",
+    "interasse": 600,
+    "larghezza": 4000,
+    "numeroMensole": 3,
+    "pendenza": 10,
+    "saette": false,
+    "sbalzo": 1200,
+    "sbalzoLaterale": 300,
+    "sezioneFascia": "38×300",
+    "sezioneMensola": "90×140",
+    "sezioneSaetta": "90×90",
+    "sezioneTravetto": "45×90"
+  },
+  "pieces": [
+    {
+      "family": "MEN",
+      "id": "MEN-01",
+      "label": "MEN-01",
+      "length": 1254.8301077845774,
+      "machinings": [
+        {
+          "angle": 17,
+          "at": 21.401147702106034,
+          "face": "testa-inizio",
+          "id": "MEN-01-L01",
+          "pieceId": "MEN-01",
+          "type": "taglio-testa"
+        },
+        {
+          "angle": 17,
+          "at": 1233.4289600824711,
+          "face": "testa-fine",
+          "id": "MEN-01-L02",
+          "pieceId": "MEN-01",
+          "type": "taglio-testa"
+        },
+        {
+          "at": 1254.8301077845774,
+          "depth": 250,
+          "face": "testa-fine",
+          "height": 105,
+          "id": "MEN-01-L03",
+          "jointId": "STM-01",
+          "pieceId": "MEN-01",
+          "type": "asola-lama",
+          "width": 8
+        },
+        {
+          "at": 1174.8301077845774,
+          "diameter": 15,
+          "face": "sinistra",
+          "id": "MEN-01-L04",
+          "jointId": "STM-01",
+          "offset": 0,
+          "pieceId": "MEN-01",
+          "type": "foro"
+        },
+        {
+          "at": 1064.8301077845774,
+          "diameter": 15,
+          "face": "sinistra",
+          "id": "MEN-01-L05",
+          "jointId": "STM-01",
+          "offset": 0,
+          "pieceId": "MEN-01",
+          "type": "foro"
+        }
+      ],
+      "pose": [
+        0,
+        -1,
+        0,
+        300,
+        0.9563047559630354,
+        0,
+        -0.29237170472273677,
+        20.466019330591735,
+        0.29237170472273677,
+        0,
+        0.9563047559630354,
+        2412.578695240396,
+        0,
+        0,
+        0,
+        1
+      ],
+      "section": {
+        "b": 90,
+        "h": 140
+      },
+      "type": "mensola"
+    },
+    {
+      "family": "MEN",
+      "id": "MEN-02",
+      "label": "MEN-02",
+      "length": 1254.8301077845774,
+      "machinings": [
+        {
+          "angle": 17,
+          "at": 21.401147702106034,
+          "face": "testa-inizio",
+          "id": "MEN-02-L01",
+          "pieceId": "MEN-02",
+          "type": "taglio-testa"
+        },
+        {
+          "angle": 17,
+          "at": 1233.4289600824711,
+          "face": "testa-fine",
+          "id": "MEN-02-L02",
+          "pieceId": "MEN-02",
+          "type": "taglio-testa"
+        },
+        {
+          "at": 1254.8301077845774,
+          "depth": 250,
+          "face": "testa-fine",
+          "height": 105,
+          "id": "MEN-02-L03",
+          "jointId": "STM-02",
+          "pieceId": "MEN-02",
+          "type": "asola-lama",
+          "width": 8
+        },
+        {
+          "at": 1174.8301077845774,
+          "diameter": 15,
+          "face": "sinistra",
+          "id": "MEN-02-L04",
+          "jointId": "STM-02",
+          "offset": 0,
+          "pieceId": "MEN-02",
+          "type": "foro"
+        },
+        {
+          "at": 1064.8301077845774,
+          "diameter": 15,
+          "face": "sinistra",
+          "id": "MEN-02-L05",
+          "jointId": "STM-02",
+          "offset": 0,
+          "pieceId": "MEN-02",
+          "type": "foro"
+        }
+      ],
+      "pose": [
+        0,
+        -1,
+        0,
+        2000,
+        0.9563047559630354,
+        0,
+        -0.29237170472273677,
+        20.466019330591735,
+        0.29237170472273677,
+        0,
+        0.9563047559630354,
+        2412.578695240396,
+        0,
+        0,
+        0,
+        1
+      ],
+      "section": {
+        "b": 90,
+        "h": 140
+      },
+      "type": "mensola"
+    },
+    {
+      "family": "MEN",
+      "id": "MEN-03",
+      "label": "MEN-03",
+      "length": 1254.8301077845774,
+      "machinings": [
+        {
+          "angle": 17,
+          "at": 21.401147702106034,
+          "face": "testa-inizio",
+          "id": "MEN-03-L01",
+          "pieceId": "MEN-03",
+          "type": "taglio-testa"
+        },
+        {
+          "angle": 17,
+          "at": 1233.4289600824711,
+          "face": "testa-fine",
+          "id": "MEN-03-L02",
+          "pieceId": "MEN-03",
+          "type": "taglio-testa"
+        },
+        {
+          "at": 1254.8301077845774,
+          "depth": 250,
+          "face": "testa-fine",
+          "height": 105,
+          "id": "MEN-03-L03",
+          "jointId": "STM-03",
+          "pieceId": "MEN-03",
+          "type": "asola-lama",
+          "width": 8
+        },
+        {
+          "at": 1174.8301077845774,
+          "diameter": 15,
+          "face": "sinistra",
+          "id": "MEN-03-L04",
+          "jointId": "STM-03",
+          "offset": 0,
+          "pieceId": "MEN-03",
+          "type": "foro"
+        },
+        {
+          "at": 1064.8301077845774,
+          "diameter": 15,
+          "face": "sinistra",
+          "id": "MEN-03-L05",
+          "jointId": "STM-03",
+          "offset": 0,
+          "pieceId": "MEN-03",
+          "type": "foro"
+        }
+      ],
+      "pose": [
+        0,
+        -1,
+        0,
+        3700,
+        0.9563047559630354,
+        0,
+        -0.29237170472273677,
+        20.466019330591735,
+        0.29237170472273677,
+        0,
+        0.9563047559630354,
+        2412.578695240396,
+        0,
+        0,
+        0,
+        1
+      ],
+      "section": {
+        "b": 90,
+        "h": 140
+      },
+      "type": "mensola"
+    },
+    {
+      "family": "TVT",
+      "id": "TVT-01",
+      "label": "TVT-01",
+      "length": 4000,
+      "machinings": [],
+      "pose": [
+        1,
+        0,
+        0,
+        0,
+        0,
+        0.9563047559630354,
+        -0.29237170472273677,
+        60.275311948660004,
+        0,
+        0.29237170472273677,
+        0.9563047559630354,
+        2545.0041693969274,
+        0,
+        0,
+        0,
+        1
+      ],
+      "section": {
+        "b": 45,
+        "h": 90
+      },
+      "type": "travetto"
+    },
+    {
+      "family": "TVT",
+      "id": "TVT-02",
+      "label": "TVT-02",
+      "length": 4000,
+      "machinings": [],
+      "pose": [
+        1,
+        0,
+        0,
+        0,
+        0,
+        0.9563047559630354,
+        -0.29237170472273677,
+        594.644137400961,
+        0,
+        0.29237170472273677,
+        0.9563047559630354,
+        2708.377114552723,
+        0,
+        0,
+        0,
+        1
+      ],
+      "section": {
+        "b": 45,
+        "h": 90
+      },
+      "type": "travetto"
+    },
+    {
+      "family": "TVT",
+      "id": "TVT-03",
+      "label": "TVT-03",
+      "length": 4000,
+      "machinings": [],
+      "pose": [
+        1,
+        0,
+        0,
+        0,
+        0,
+        0.9563047559630354,
+        -0.29237170472273677,
+        1129.0129628532623,
+        0,
+        0.29237170472273677,
+        0.9563047559630354,
+        2871.750059708519,
+        0,
+        0,
+        0,
+        1
+      ],
+      "section": {
+        "b": 45,
+        "h": 90
+      },
+      "type": "travetto"
+    },
+    {
+      "family": "FAS",
+      "id": "FAS-01",
+      "label": "FAS-01",
+      "length": 4000,
+      "machinings": [],
+      "pose": [
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        21.93203866118315,
+        0,
+        0,
+        1,
+        2436.1464663150277,
+        0,
+        0,
+        0,
+        1
+      ],
+      "section": {
+        "b": 38,
+        "h": 300
+      },
+      "type": "fascia"
+    }
+  ],
+  "typologySlug": "pensilina-sbalzo"
+}

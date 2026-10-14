@@ -216,6 +216,24 @@ const DATA: HardwareSpec[] = [
     source: "ricerca-chepergola.md §1 T-J (supporto a scomparsa: acciaio 8, base 160×90 con 4 asole Ø13, lama 105×250 con 2 fori Ø15); quote dei fori [dedotto]",
     validation: VALIDATION,
   },
+  // scarpe d'ancoraggio dritte (mensole delle pensiline a pendenza libera): la mensola entra nella scarpa
+  ...([
+    [100, 140],
+    [120, 160],
+  ] as const).map(
+    ([b, h]): HardwareSpec => ({
+      code: `scarpa-ancoraggio-${b}x${h}`,
+      kind: "staffa-muro",
+      name: `Scarpa d'ancoraggio a muro ${b}×${h} (dritta)`,
+      forSections: [{ b, h }],
+      dims: { x: 120, y: b + 6, z: h + 6 },
+      // 2 fori laterali passanti Ø11 per il bullone o le viti di fissaggio [dedotto: a 40 e 90 dalla testa]
+      holes: { anchor: "testa", features: [lateralHole(40, 11), lateralHole(90, 11)] },
+      screws: screws("tassello-10x85", 4),
+      source: "ricerca-chepergola.md §1 T-J (scarpe d'ancoraggio 100×140, 120×160); fori e tasselli [dedotto]",
+      validation: VALIDATION,
+    }),
+  ),
   ...([90, 120] as const).map(
     (s): HardwareSpec => ({
       code: `staffa-listone-${s}`,

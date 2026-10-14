@@ -17,6 +17,7 @@ const FIXTURES = [
   { slug: "telaio-giunti", file: "telaio-giunti-default.json" },
   { slug: "carport-arco", file: "carport-arco-default.json" },
   { slug: "gazebo-padiglione", file: "gazebo-padiglione-default.json" },
+  { slug: "pensilina-sbalzo", file: "pensilina-sbalzo-default.json" },
 ] as const;
 
 const fixturePath = (file: string) => fileURLToPath(new URL(`../__fixtures__/${file}`, import.meta.url));

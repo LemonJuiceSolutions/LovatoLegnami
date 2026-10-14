@@ -310,6 +310,11 @@ export interface TypologyTemplate {
   /** Riferimento alla scheda della ricerca commerciale (es. `"T-A/T-C/T-G"`). */
   readonly reference?: string;
   readonly params: readonly ParamSpec[];
+  /**
+   * Parametro usato da `fitToEnvelope` per una dimensione dell'ingombro quando
+   * il nome differisce (es. la pensilina adatta `sbalzo` alla profondità).
+   */
+  readonly fitAliases?: Readonly<Partial<Record<"altezza" | "profondita" | "larghezza", string>>>;
   build(ctx: BuildContext): readonly BuildStep[];
   /** Metadati opzionali dell'assieme (es. quota d'imposta). */
   meta?(ctx: BuildContext): Readonly<Record<string, ParamValue>>;
