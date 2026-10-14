@@ -1,2 +1,2 @@
-// Modulo domain/rules – API pubblica (vuoto finché non implementato).
-export {};
+// Modulo domain/rules – API pubblica.
+export * from "./types";
