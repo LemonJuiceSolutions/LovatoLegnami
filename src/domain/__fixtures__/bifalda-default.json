@@ -1,0 +1,2525 @@
+{
+  "joints": [
+    {
+      "id": "G-01",
+      "params": {
+        "gap": 1,
+        "height": 80,
+        "length": 50,
+        "width": 40
+      },
+      "pieceA": "PNT-01",
+      "pieceB": "TRV-01",
+      "type": "tenone-mortasa"
+    },
+    {
+      "id": "G-02",
+      "params": {
+        "gap": 1,
+        "height": 80,
+        "length": 50,
+        "width": 40
+      },
+      "pieceA": "PNT-01",
+      "pieceB": "COL-01",
+      "type": "tenone-mortasa"
+    },
+    {
+      "id": "G-03",
+      "params": {
+        "gap": 1,
+        "height": 80,
+        "length": 50,
+        "width": 40
+      },
+      "pieceA": "PNT-02",
+      "pieceB": "TRV-02",
+      "type": "tenone-mortasa"
+    },
+    {
+      "id": "G-04",
+      "params": {
+        "gap": 1,
+        "height": 80,
+        "length": 50,
+        "width": 40
+      },
+      "pieceA": "PNT-02",
+      "pieceB": "COL-01",
+      "type": "tenone-mortasa"
+    },
+    {
+      "id": "G-05",
+      "params": {
+        "gap": 1,
+        "height": 80,
+        "length": 50,
+        "width": 40
+      },
+      "pieceA": "PNT-03",
+      "pieceB": "TRV-01",
+      "type": "tenone-mortasa"
+    },
+    {
+      "id": "G-06",
+      "params": {
+        "gap": 1,
+        "height": 80,
+        "length": 50,
+        "width": 40
+      },
+      "pieceA": "PNT-03",
+      "pieceB": "COL-01",
+      "type": "tenone-mortasa"
+    },
+    {
+      "id": "G-07",
+      "params": {
+        "gap": 1,
+        "height": 80,
+        "length": 50,
+        "width": 40
+      },
+      "pieceA": "PNT-04",
+      "pieceB": "TRV-02",
+      "type": "tenone-mortasa"
+    },
+    {
+      "id": "G-08",
+      "params": {
+        "gap": 1,
+        "height": 80,
+        "length": 50,
+        "width": 40
+      },
+      "pieceA": "PNT-04",
+      "pieceB": "COL-01",
+      "type": "tenone-mortasa"
+    },
+    {
+      "id": "G-09",
+      "params": {
+        "gap": 1,
+        "height": 80,
+        "length": 50,
+        "width": 40
+      },
+      "pieceA": "PNT-05",
+      "pieceB": "TRV-01",
+      "type": "tenone-mortasa"
+    },
+    {
+      "id": "G-10",
+      "params": {
+        "gap": 1,
+        "height": 80,
+        "length": 50,
+        "width": 40
+      },
+      "pieceA": "PNT-05",
+      "pieceB": "COL-01",
+      "type": "tenone-mortasa"
+    },
+    {
+      "id": "G-11",
+      "params": {
+        "gap": 1,
+        "height": 80,
+        "length": 50,
+        "width": 40
+      },
+      "pieceA": "PNT-06",
+      "pieceB": "TRV-02",
+      "type": "tenone-mortasa"
+    },
+    {
+      "id": "G-12",
+      "params": {
+        "gap": 1,
+        "height": 80,
+        "length": 50,
+        "width": 40
+      },
+      "pieceA": "PNT-06",
+      "pieceB": "COL-01",
+      "type": "tenone-mortasa"
+    }
+  ],
+  "meta": {
+    "quotaColmo": 3367.940468532405,
+    "quotaImposta": 2400,
+    "yColmo": 2514.723222932107
+  },
+  "params": {
+    "altezza": 2400,
+    "campate": 2,
+    "controventi": true,
+    "interasse": 800,
+    "larghezza": 5000,
+    "pendenza": 20,
+    "profondita": 4000,
+    "saetta": 400,
+    "sbalzo": 400,
+    "sbalzoLaterale": 600,
+    "sezioneColmo": "120×240",
+    "sezioneControvento": "100×100",
+    "sezionePilastro": "120×120",
+    "sezionePuntone": "120×120",
+    "sezioneTrave": "120×240",
+    "sezioneTravetto": "80×160"
+  },
+  "pieces": [
+    {
+      "family": "TRV",
+      "id": "TRV-01",
+      "label": "TRV-01",
+      "length": 5000,
+      "machinings": [
+        {
+          "angle": 0,
+          "at": 660,
+          "depth": 51,
+          "face": "sinistra",
+          "height": 81,
+          "id": "TRV-01-L01",
+          "jointId": "G-01",
+          "offset": 36.149333651445644,
+          "pieceId": "TRV-01",
+          "type": "mortasa",
+          "width": 41
+        },
+        {
+          "angle": 0,
+          "at": 2500,
+          "depth": 51,
+          "face": "sinistra",
+          "height": 81,
+          "id": "TRV-01-L02",
+          "jointId": "G-05",
+          "offset": 36.149333651445644,
+          "pieceId": "TRV-01",
+          "type": "mortasa",
+          "width": 41
+        },
+        {
+          "angle": 0,
+          "at": 4340,
+          "depth": 51,
+          "face": "sinistra",
+          "height": 81,
+          "id": "TRV-01-L03",
+          "jointId": "G-09",
+          "offset": 36.149333651445644,
+          "pieceId": "TRV-01",
+          "type": "mortasa",
+          "width": 41
+        }
+      ],
+      "pose": [
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        514.723222932107,
+        0,
+        0,
+        1,
+        2520,
+        0,
+        0,
+        0,
+        1
+      ],
+      "section": {
+        "b": 120,
+        "h": 240
+      },
+      "type": "trave"
+    },
+    {
+      "family": "TRV",
+      "id": "TRV-02",
+      "label": "TRV-02",
+      "length": 5000,
+      "machinings": [
+        {
+          "angle": 0,
+          "at": 660,
+          "depth": 51,
+          "face": "destra",
+          "height": 81,
+          "id": "TRV-02-L01",
+          "jointId": "G-03",
+          "offset": 36.14933365144556,
+          "pieceId": "TRV-02",
+          "type": "mortasa",
+          "width": 41
+        },
+        {
+          "angle": 0,
+          "at": 2500,
+          "depth": 51,
+          "face": "destra",
+          "height": 81,
+          "id": "TRV-02-L02",
+          "jointId": "G-07",
+          "offset": 36.14933365144556,
+          "pieceId": "TRV-02",
+          "type": "mortasa",
+          "width": 41
+        },
+        {
+          "angle": 0,
+          "at": 4340,
+          "depth": 51,
+          "face": "destra",
+          "height": 81,
+          "id": "TRV-02-L03",
+          "jointId": "G-11",
+          "offset": 36.14933365144556,
+          "pieceId": "TRV-02",
+          "type": "mortasa",
+          "width": 41
+        }
+      ],
+      "pose": [
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        4514.723222932107,
+        0,
+        0,
+        1,
+        2520,
+        0,
+        0,
+        0,
+        1
+      ],
+      "section": {
+        "b": 120,
+        "h": 240
+      },
+      "type": "trave"
+    },
+    {
+      "family": "COL",
+      "id": "COL-01",
+      "label": "COL-01",
+      "length": 5000,
+      "machinings": [
+        {
+          "angle": 0,
+          "at": 660,
+          "depth": 51,
+          "face": "destra",
+          "height": 81,
+          "id": "COL-01-L01",
+          "jointId": "G-02",
+          "offset": -7.5270944604987555,
+          "pieceId": "COL-01",
+          "type": "mortasa",
+          "width": 41
+        },
+        {
+          "angle": 0,
+          "at": 660,
+          "depth": 51,
+          "face": "sinistra",
+          "height": 81,
+          "id": "COL-01-L02",
+          "jointId": "G-04",
+          "offset": -7.527094460498921,
+          "pieceId": "COL-01",
+          "type": "mortasa",
+          "width": 41
+        },
+        {
+          "angle": 0,
+          "at": 2500,
+          "depth": 51,
+          "face": "destra",
+          "height": 81,
+          "id": "COL-01-L03",
+          "jointId": "G-06",
+          "offset": -7.5270944604987555,
+          "pieceId": "COL-01",
+          "type": "mortasa",
+          "width": 41
+        },
+        {
+          "angle": 0,
+          "at": 2500,
+          "depth": 51,
+          "face": "sinistra",
+          "height": 81,
+          "id": "COL-01-L04",
+          "jointId": "G-08",
+          "offset": -7.527094460498921,
+          "pieceId": "COL-01",
+          "type": "mortasa",
+          "width": 41
+        },
+        {
+          "angle": 0,
+          "at": 4340,
+          "depth": 51,
+          "face": "destra",
+          "height": 81,
+          "id": "COL-01-L05",
+          "jointId": "G-10",
+          "offset": -7.5270944604987555,
+          "pieceId": "COL-01",
+          "type": "mortasa",
+          "width": 41
+        },
+        {
+          "angle": 0,
+          "at": 4340,
+          "depth": 51,
+          "face": "sinistra",
+          "height": 81,
+          "id": "COL-01-L06",
+          "jointId": "G-12",
+          "offset": -7.527094460498921,
+          "pieceId": "COL-01",
+          "type": "mortasa",
+          "width": 41
+        }
+      ],
+      "pose": [
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        2514.723222932107,
+        0,
+        0,
+        1,
+        3247.940468532405,
+        0,
+        0,
+        0,
+        1
+      ],
+      "section": {
+        "b": 120,
+        "h": 240
+      },
+      "type": "colmo"
+    },
+    {
+      "family": "PIL",
+      "id": "PIL-01",
+      "label": "PIL-01",
+      "length": 2400,
+      "machinings": [],
+      "pose": [
+        0,
+        1,
+        0,
+        660,
+        0,
+        0,
+        1,
+        514.723222932107,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1
+      ],
+      "section": {
+        "b": 120,
+        "h": 120
+      },
+      "type": "pilastro"
+    },
+    {
+      "family": "PIL",
+      "id": "PIL-02",
+      "label": "PIL-02",
+      "length": 2400,
+      "machinings": [],
+      "pose": [
+        0,
+        1,
+        0,
+        2500,
+        0,
+        0,
+        1,
+        514.723222932107,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1
+      ],
+      "section": {
+        "b": 120,
+        "h": 120
+      },
+      "type": "pilastro"
+    },
+    {
+      "family": "PIL",
+      "id": "PIL-03",
+      "label": "PIL-03",
+      "length": 2400,
+      "machinings": [],
+      "pose": [
+        0,
+        1,
+        0,
+        4340,
+        0,
+        0,
+        1,
+        514.723222932107,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1
+      ],
+      "section": {
+        "b": 120,
+        "h": 120
+      },
+      "type": "pilastro"
+    },
+    {
+      "family": "PIL",
+      "id": "PIL-04",
+      "label": "PIL-04",
+      "length": 2400,
+      "machinings": [],
+      "pose": [
+        0,
+        1,
+        0,
+        660,
+        0,
+        0,
+        1,
+        4514.723222932107,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1
+      ],
+      "section": {
+        "b": 120,
+        "h": 120
+      },
+      "type": "pilastro"
+    },
+    {
+      "family": "PIL",
+      "id": "PIL-05",
+      "label": "PIL-05",
+      "length": 2400,
+      "machinings": [],
+      "pose": [
+        0,
+        1,
+        0,
+        2500,
+        0,
+        0,
+        1,
+        4514.723222932107,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1
+      ],
+      "section": {
+        "b": 120,
+        "h": 120
+      },
+      "type": "pilastro"
+    },
+    {
+      "family": "PIL",
+      "id": "PIL-06",
+      "label": "PIL-06",
+      "length": 2400,
+      "machinings": [],
+      "pose": [
+        0,
+        1,
+        0,
+        4340,
+        0,
+        0,
+        1,
+        4514.723222932107,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1
+      ],
+      "section": {
+        "b": 120,
+        "h": 120
+      },
+      "type": "pilastro"
+    },
+    {
+      "family": "PNT",
+      "id": "PNT-01",
+      "label": "PNT-01",
+      "length": 2056.977784142771,
+      "machinings": [
+        {
+          "at": 0,
+          "face": "testa-inizio",
+          "height": 80,
+          "id": "PNT-01-L01",
+          "jointId": "G-01",
+          "length": 50,
+          "pieceId": "PNT-01",
+          "type": "tenone",
+          "width": 40
+        },
+        {
+          "at": 2056.977784142771,
+          "face": "testa-fine",
+          "height": 80,
+          "id": "PNT-01-L02",
+          "jointId": "G-02",
+          "length": 50,
+          "pieceId": "PNT-01",
+          "type": "tenone",
+          "width": 40
+        }
+      ],
+      "pose": [
+        0,
+        -1,
+        0,
+        660,
+        0.9396926207859084,
+        0,
+        -0.3420201433256687,
+        548.2598004923517,
+        0.3420201433256687,
+        0,
+        0.9396926207859084,
+        2546.5174355865624,
+        0,
+        0,
+        0,
+        1
+      ],
+      "section": {
+        "b": 120,
+        "h": 120
+      },
+      "type": "puntone"
+    },
+    {
+      "family": "PNT",
+      "id": "PNT-02",
+      "label": "PNT-02",
+      "length": 2056.977784142771,
+      "machinings": [
+        {
+          "at": 0,
+          "face": "testa-inizio",
+          "height": 80,
+          "id": "PNT-02-L01",
+          "jointId": "G-03",
+          "length": 50,
+          "pieceId": "PNT-02",
+          "type": "tenone",
+          "width": 40
+        },
+        {
+          "at": 2056.977784142771,
+          "face": "testa-fine",
+          "height": 80,
+          "id": "PNT-02-L02",
+          "jointId": "G-04",
+          "length": 50,
+          "pieceId": "PNT-02",
+          "type": "tenone",
+          "width": 40
+        }
+      ],
+      "pose": [
+        0,
+        1,
+        0,
+        660,
+        -0.9396926207859084,
+        0,
+        0.3420201433256687,
+        4481.186645371862,
+        0.3420201433256687,
+        0,
+        0.9396926207859084,
+        2546.5174355865624,
+        0,
+        0,
+        0,
+        1
+      ],
+      "section": {
+        "b": 120,
+        "h": 120
+      },
+      "type": "puntone"
+    },
+    {
+      "family": "PNT",
+      "id": "PNT-03",
+      "label": "PNT-03",
+      "length": 2056.977784142771,
+      "machinings": [
+        {
+          "at": 0,
+          "face": "testa-inizio",
+          "height": 80,
+          "id": "PNT-03-L01",
+          "jointId": "G-05",
+          "length": 50,
+          "pieceId": "PNT-03",
+          "type": "tenone",
+          "width": 40
+        },
+        {
+          "at": 2056.977784142771,
+          "face": "testa-fine",
+          "height": 80,
+          "id": "PNT-03-L02",
+          "jointId": "G-06",
+          "length": 50,
+          "pieceId": "PNT-03",
+          "type": "tenone",
+          "width": 40
+        }
+      ],
+      "pose": [
+        0,
+        -1,
+        0,
+        2500,
+        0.9396926207859084,
+        0,
+        -0.3420201433256687,
+        548.2598004923517,
+        0.3420201433256687,
+        0,
+        0.9396926207859084,
+        2546.5174355865624,
+        0,
+        0,
+        0,
+        1
+      ],
+      "section": {
+        "b": 120,
+        "h": 120
+      },
+      "type": "puntone"
+    },
+    {
+      "family": "PNT",
+      "id": "PNT-04",
+      "label": "PNT-04",
+      "length": 2056.977784142771,
+      "machinings": [
+        {
+          "at": 0,
+          "face": "testa-inizio",
+          "height": 80,
+          "id": "PNT-04-L01",
+          "jointId": "G-07",
+          "length": 50,
+          "pieceId": "PNT-04",
+          "type": "tenone",
+          "width": 40
+        },
+        {
+          "at": 2056.977784142771,
+          "face": "testa-fine",
+          "height": 80,
+          "id": "PNT-04-L02",
+          "jointId": "G-08",
+          "length": 50,
+          "pieceId": "PNT-04",
+          "type": "tenone",
+          "width": 40
+        }
+      ],
+      "pose": [
+        0,
+        1,
+        0,
+        2500,
+        -0.9396926207859084,
+        0,
+        0.3420201433256687,
+        4481.186645371862,
+        0.3420201433256687,
+        0,
+        0.9396926207859084,
+        2546.5174355865624,
+        0,
+        0,
+        0,
+        1
+      ],
+      "section": {
+        "b": 120,
+        "h": 120
+      },
+      "type": "puntone"
+    },
+    {
+      "family": "PNT",
+      "id": "PNT-05",
+      "label": "PNT-05",
+      "length": 2056.977784142771,
+      "machinings": [
+        {
+          "at": 0,
+          "face": "testa-inizio",
+          "height": 80,
+          "id": "PNT-05-L01",
+          "jointId": "G-09",
+          "length": 50,
+          "pieceId": "PNT-05",
+          "type": "tenone",
+          "width": 40
+        },
+        {
+          "at": 2056.977784142771,
+          "face": "testa-fine",
+          "height": 80,
+          "id": "PNT-05-L02",
+          "jointId": "G-10",
+          "length": 50,
+          "pieceId": "PNT-05",
+          "type": "tenone",
+          "width": 40
+        }
+      ],
+      "pose": [
+        0,
+        -1,
+        0,
+        4340,
+        0.9396926207859084,
+        0,
+        -0.3420201433256687,
+        548.2598004923517,
+        0.3420201433256687,
+        0,
+        0.9396926207859084,
+        2546.5174355865624,
+        0,
+        0,
+        0,
+        1
+      ],
+      "section": {
+        "b": 120,
+        "h": 120
+      },
+      "type": "puntone"
+    },
+    {
+      "family": "PNT",
+      "id": "PNT-06",
+      "label": "PNT-06",
+      "length": 2056.977784142771,
+      "machinings": [
+        {
+          "at": 0,
+          "face": "testa-inizio",
+          "height": 80,
+          "id": "PNT-06-L01",
+          "jointId": "G-11",
+          "length": 50,
+          "pieceId": "PNT-06",
+          "type": "tenone",
+          "width": 40
+        },
+        {
+          "at": 2056.977784142771,
+          "face": "testa-fine",
+          "height": 80,
+          "id": "PNT-06-L02",
+          "jointId": "G-12",
+          "length": 50,
+          "pieceId": "PNT-06",
+          "type": "tenone",
+          "width": 40
+        }
+      ],
+      "pose": [
+        0,
+        1,
+        0,
+        4340,
+        -0.9396926207859084,
+        0,
+        0.3420201433256687,
+        4481.186645371862,
+        0.3420201433256687,
+        0,
+        0.9396926207859084,
+        2546.5174355865624,
+        0,
+        0,
+        0,
+        1
+      ],
+      "section": {
+        "b": 120,
+        "h": 120
+      },
+      "type": "puntone"
+    },
+    {
+      "family": "TVT",
+      "id": "TVT-01",
+      "label": "TVT-01",
+      "length": 2676.112557773336,
+      "machinings": [
+        {
+          "angle": 20,
+          "at": 29.117618741296187,
+          "face": "testa-inizio",
+          "id": "TVT-01-L01",
+          "pieceId": "TVT-01",
+          "type": "taglio-testa"
+        },
+        {
+          "angle": 20,
+          "at": 440.6093271931653,
+          "depth": 41.04241719908029,
+          "face": "inferiore",
+          "id": "TVT-01-L02",
+          "pieceId": "TVT-01",
+          "type": "becco-uccello"
+        },
+        {
+          "angle": 20,
+          "at": 2568.9648721449894,
+          "depth": 41.04241719908043,
+          "face": "inferiore",
+          "id": "TVT-01-L03",
+          "pieceId": "TVT-01",
+          "type": "becco-uccello"
+        },
+        {
+          "angle": 20,
+          "at": 2646.99493903204,
+          "face": "testa-fine",
+          "id": "TVT-01-L04",
+          "pieceId": "TVT-01",
+          "type": "taglio-testa"
+        }
+      ],
+      "pose": [
+        0,
+        -1,
+        0,
+        40,
+        0.9396926207859084,
+        0,
+        -0.3420201433256687,
+        27.361611466053482,
+        0.3420201433256687,
+        0,
+        0.9396926207859084,
+        2525.9108878444476,
+        0,
+        0,
+        0,
+        1
+      ],
+      "section": {
+        "b": 80,
+        "h": 160
+      },
+      "type": "travetto"
+    },
+    {
+      "family": "TVT",
+      "id": "TVT-02",
+      "label": "TVT-02",
+      "length": 2676.112557773336,
+      "machinings": [
+        {
+          "angle": 20,
+          "at": 29.117618741296187,
+          "face": "testa-inizio",
+          "id": "TVT-02-L01",
+          "pieceId": "TVT-02",
+          "type": "taglio-testa"
+        },
+        {
+          "angle": 20,
+          "at": 440.6093271931653,
+          "depth": 41.04241719908029,
+          "face": "inferiore",
+          "id": "TVT-02-L02",
+          "pieceId": "TVT-02",
+          "type": "becco-uccello"
+        },
+        {
+          "angle": 20,
+          "at": 2568.9648721449894,
+          "depth": 41.04241719908043,
+          "face": "inferiore",
+          "id": "TVT-02-L03",
+          "pieceId": "TVT-02",
+          "type": "becco-uccello"
+        },
+        {
+          "angle": 20,
+          "at": 2646.99493903204,
+          "face": "testa-fine",
+          "id": "TVT-02-L04",
+          "pieceId": "TVT-02",
+          "type": "taglio-testa"
+        }
+      ],
+      "pose": [
+        0,
+        -1,
+        0,
+        742.8571428571429,
+        0.9396926207859084,
+        0,
+        -0.3420201433256687,
+        27.361611466053482,
+        0.3420201433256687,
+        0,
+        0.9396926207859084,
+        2525.9108878444476,
+        0,
+        0,
+        0,
+        1
+      ],
+      "section": {
+        "b": 80,
+        "h": 160
+      },
+      "type": "travetto"
+    },
+    {
+      "family": "TVT",
+      "id": "TVT-03",
+      "label": "TVT-03",
+      "length": 2676.112557773336,
+      "machinings": [
+        {
+          "angle": 20,
+          "at": 29.117618741296187,
+          "face": "testa-inizio",
+          "id": "TVT-03-L01",
+          "pieceId": "TVT-03",
+          "type": "taglio-testa"
+        },
+        {
+          "angle": 20,
+          "at": 440.6093271931653,
+          "depth": 41.04241719908029,
+          "face": "inferiore",
+          "id": "TVT-03-L02",
+          "pieceId": "TVT-03",
+          "type": "becco-uccello"
+        },
+        {
+          "angle": 20,
+          "at": 2568.9648721449894,
+          "depth": 41.04241719908043,
+          "face": "inferiore",
+          "id": "TVT-03-L03",
+          "pieceId": "TVT-03",
+          "type": "becco-uccello"
+        },
+        {
+          "angle": 20,
+          "at": 2646.99493903204,
+          "face": "testa-fine",
+          "id": "TVT-03-L04",
+          "pieceId": "TVT-03",
+          "type": "taglio-testa"
+        }
+      ],
+      "pose": [
+        0,
+        -1,
+        0,
+        1445.7142857142858,
+        0.9396926207859084,
+        0,
+        -0.3420201433256687,
+        27.361611466053482,
+        0.3420201433256687,
+        0,
+        0.9396926207859084,
+        2525.9108878444476,
+        0,
+        0,
+        0,
+        1
+      ],
+      "section": {
+        "b": 80,
+        "h": 160
+      },
+      "type": "travetto"
+    },
+    {
+      "family": "TVT",
+      "id": "TVT-04",
+      "label": "TVT-04",
+      "length": 2676.112557773336,
+      "machinings": [
+        {
+          "angle": 20,
+          "at": 29.117618741296187,
+          "face": "testa-inizio",
+          "id": "TVT-04-L01",
+          "pieceId": "TVT-04",
+          "type": "taglio-testa"
+        },
+        {
+          "angle": 20,
+          "at": 440.6093271931653,
+          "depth": 41.04241719908029,
+          "face": "inferiore",
+          "id": "TVT-04-L02",
+          "pieceId": "TVT-04",
+          "type": "becco-uccello"
+        },
+        {
+          "angle": 20,
+          "at": 2568.9648721449894,
+          "depth": 41.04241719908043,
+          "face": "inferiore",
+          "id": "TVT-04-L03",
+          "pieceId": "TVT-04",
+          "type": "becco-uccello"
+        },
+        {
+          "angle": 20,
+          "at": 2646.99493903204,
+          "face": "testa-fine",
+          "id": "TVT-04-L04",
+          "pieceId": "TVT-04",
+          "type": "taglio-testa"
+        }
+      ],
+      "pose": [
+        0,
+        -1,
+        0,
+        2148.5714285714284,
+        0.9396926207859084,
+        0,
+        -0.3420201433256687,
+        27.361611466053482,
+        0.3420201433256687,
+        0,
+        0.9396926207859084,
+        2525.9108878444476,
+        0,
+        0,
+        0,
+        1
+      ],
+      "section": {
+        "b": 80,
+        "h": 160
+      },
+      "type": "travetto"
+    },
+    {
+      "family": "TVT",
+      "id": "TVT-05",
+      "label": "TVT-05",
+      "length": 2676.112557773336,
+      "machinings": [
+        {
+          "angle": 20,
+          "at": 29.117618741296187,
+          "face": "testa-inizio",
+          "id": "TVT-05-L01",
+          "pieceId": "TVT-05",
+          "type": "taglio-testa"
+        },
+        {
+          "angle": 20,
+          "at": 440.6093271931653,
+          "depth": 41.04241719908029,
+          "face": "inferiore",
+          "id": "TVT-05-L02",
+          "pieceId": "TVT-05",
+          "type": "becco-uccello"
+        },
+        {
+          "angle": 20,
+          "at": 2568.9648721449894,
+          "depth": 41.04241719908043,
+          "face": "inferiore",
+          "id": "TVT-05-L03",
+          "pieceId": "TVT-05",
+          "type": "becco-uccello"
+        },
+        {
+          "angle": 20,
+          "at": 2646.99493903204,
+          "face": "testa-fine",
+          "id": "TVT-05-L04",
+          "pieceId": "TVT-05",
+          "type": "taglio-testa"
+        }
+      ],
+      "pose": [
+        0,
+        -1,
+        0,
+        2851.4285714285716,
+        0.9396926207859084,
+        0,
+        -0.3420201433256687,
+        27.361611466053482,
+        0.3420201433256687,
+        0,
+        0.9396926207859084,
+        2525.9108878444476,
+        0,
+        0,
+        0,
+        1
+      ],
+      "section": {
+        "b": 80,
+        "h": 160
+      },
+      "type": "travetto"
+    },
+    {
+      "family": "TVT",
+      "id": "TVT-06",
+      "label": "TVT-06",
+      "length": 2676.112557773336,
+      "machinings": [
+        {
+          "angle": 20,
+          "at": 29.117618741296187,
+          "face": "testa-inizio",
+          "id": "TVT-06-L01",
+          "pieceId": "TVT-06",
+          "type": "taglio-testa"
+        },
+        {
+          "angle": 20,
+          "at": 440.6093271931653,
+          "depth": 41.04241719908029,
+          "face": "inferiore",
+          "id": "TVT-06-L02",
+          "pieceId": "TVT-06",
+          "type": "becco-uccello"
+        },
+        {
+          "angle": 20,
+          "at": 2568.9648721449894,
+          "depth": 41.04241719908043,
+          "face": "inferiore",
+          "id": "TVT-06-L03",
+          "pieceId": "TVT-06",
+          "type": "becco-uccello"
+        },
+        {
+          "angle": 20,
+          "at": 2646.99493903204,
+          "face": "testa-fine",
+          "id": "TVT-06-L04",
+          "pieceId": "TVT-06",
+          "type": "taglio-testa"
+        }
+      ],
+      "pose": [
+        0,
+        -1,
+        0,
+        3554.285714285714,
+        0.9396926207859084,
+        0,
+        -0.3420201433256687,
+        27.361611466053482,
+        0.3420201433256687,
+        0,
+        0.9396926207859084,
+        2525.9108878444476,
+        0,
+        0,
+        0,
+        1
+      ],
+      "section": {
+        "b": 80,
+        "h": 160
+      },
+      "type": "travetto"
+    },
+    {
+      "family": "TVT",
+      "id": "TVT-07",
+      "label": "TVT-07",
+      "length": 2676.112557773336,
+      "machinings": [
+        {
+          "angle": 20,
+          "at": 29.117618741296187,
+          "face": "testa-inizio",
+          "id": "TVT-07-L01",
+          "pieceId": "TVT-07",
+          "type": "taglio-testa"
+        },
+        {
+          "angle": 20,
+          "at": 440.6093271931653,
+          "depth": 41.04241719908029,
+          "face": "inferiore",
+          "id": "TVT-07-L02",
+          "pieceId": "TVT-07",
+          "type": "becco-uccello"
+        },
+        {
+          "angle": 20,
+          "at": 2568.9648721449894,
+          "depth": 41.04241719908043,
+          "face": "inferiore",
+          "id": "TVT-07-L03",
+          "pieceId": "TVT-07",
+          "type": "becco-uccello"
+        },
+        {
+          "angle": 20,
+          "at": 2646.99493903204,
+          "face": "testa-fine",
+          "id": "TVT-07-L04",
+          "pieceId": "TVT-07",
+          "type": "taglio-testa"
+        }
+      ],
+      "pose": [
+        0,
+        -1,
+        0,
+        4257.142857142857,
+        0.9396926207859084,
+        0,
+        -0.3420201433256687,
+        27.361611466053482,
+        0.3420201433256687,
+        0,
+        0.9396926207859084,
+        2525.9108878444476,
+        0,
+        0,
+        0,
+        1
+      ],
+      "section": {
+        "b": 80,
+        "h": 160
+      },
+      "type": "travetto"
+    },
+    {
+      "family": "TVT",
+      "id": "TVT-08",
+      "label": "TVT-08",
+      "length": 2676.112557773336,
+      "machinings": [
+        {
+          "angle": 20,
+          "at": 29.117618741296187,
+          "face": "testa-inizio",
+          "id": "TVT-08-L01",
+          "pieceId": "TVT-08",
+          "type": "taglio-testa"
+        },
+        {
+          "angle": 20,
+          "at": 440.6093271931653,
+          "depth": 41.04241719908029,
+          "face": "inferiore",
+          "id": "TVT-08-L02",
+          "pieceId": "TVT-08",
+          "type": "becco-uccello"
+        },
+        {
+          "angle": 20,
+          "at": 2568.9648721449894,
+          "depth": 41.04241719908043,
+          "face": "inferiore",
+          "id": "TVT-08-L03",
+          "pieceId": "TVT-08",
+          "type": "becco-uccello"
+        },
+        {
+          "angle": 20,
+          "at": 2646.99493903204,
+          "face": "testa-fine",
+          "id": "TVT-08-L04",
+          "pieceId": "TVT-08",
+          "type": "taglio-testa"
+        }
+      ],
+      "pose": [
+        0,
+        -1,
+        0,
+        4960,
+        0.9396926207859084,
+        0,
+        -0.3420201433256687,
+        27.361611466053482,
+        0.3420201433256687,
+        0,
+        0.9396926207859084,
+        2525.9108878444476,
+        0,
+        0,
+        0,
+        1
+      ],
+      "section": {
+        "b": 80,
+        "h": 160
+      },
+      "type": "travetto"
+    },
+    {
+      "family": "TVT",
+      "id": "TVT-09",
+      "label": "TVT-09",
+      "length": 2676.112557773336,
+      "machinings": [
+        {
+          "angle": 20,
+          "at": 29.117618741296187,
+          "face": "testa-inizio",
+          "id": "TVT-09-L01",
+          "pieceId": "TVT-09",
+          "type": "taglio-testa"
+        },
+        {
+          "angle": 20,
+          "at": 440.6093271931653,
+          "depth": 41.04241719908029,
+          "face": "inferiore",
+          "id": "TVT-09-L02",
+          "pieceId": "TVT-09",
+          "type": "becco-uccello"
+        },
+        {
+          "angle": 20,
+          "at": 2568.9648721449894,
+          "depth": 41.04241719908043,
+          "face": "inferiore",
+          "id": "TVT-09-L03",
+          "pieceId": "TVT-09",
+          "type": "becco-uccello"
+        },
+        {
+          "angle": 20,
+          "at": 2646.99493903204,
+          "face": "testa-fine",
+          "id": "TVT-09-L04",
+          "pieceId": "TVT-09",
+          "type": "taglio-testa"
+        }
+      ],
+      "pose": [
+        0,
+        1,
+        0,
+        40,
+        -0.9396926207859084,
+        0,
+        0.3420201433256687,
+        5002.084834398161,
+        0.3420201433256687,
+        0,
+        0.9396926207859084,
+        2525.9108878444476,
+        0,
+        0,
+        0,
+        1
+      ],
+      "section": {
+        "b": 80,
+        "h": 160
+      },
+      "type": "travetto"
+    },
+    {
+      "family": "TVT",
+      "id": "TVT-10",
+      "label": "TVT-10",
+      "length": 2676.112557773336,
+      "machinings": [
+        {
+          "angle": 20,
+          "at": 29.117618741296187,
+          "face": "testa-inizio",
+          "id": "TVT-10-L01",
+          "pieceId": "TVT-10",
+          "type": "taglio-testa"
+        },
+        {
+          "angle": 20,
+          "at": 440.6093271931653,
+          "depth": 41.04241719908029,
+          "face": "inferiore",
+          "id": "TVT-10-L02",
+          "pieceId": "TVT-10",
+          "type": "becco-uccello"
+        },
+        {
+          "angle": 20,
+          "at": 2568.9648721449894,
+          "depth": 41.04241719908043,
+          "face": "inferiore",
+          "id": "TVT-10-L03",
+          "pieceId": "TVT-10",
+          "type": "becco-uccello"
+        },
+        {
+          "angle": 20,
+          "at": 2646.99493903204,
+          "face": "testa-fine",
+          "id": "TVT-10-L04",
+          "pieceId": "TVT-10",
+          "type": "taglio-testa"
+        }
+      ],
+      "pose": [
+        0,
+        1,
+        0,
+        742.8571428571429,
+        -0.9396926207859084,
+        0,
+        0.3420201433256687,
+        5002.084834398161,
+        0.3420201433256687,
+        0,
+        0.9396926207859084,
+        2525.9108878444476,
+        0,
+        0,
+        0,
+        1
+      ],
+      "section": {
+        "b": 80,
+        "h": 160
+      },
+      "type": "travetto"
+    },
+    {
+      "family": "TVT",
+      "id": "TVT-11",
+      "label": "TVT-11",
+      "length": 2676.112557773336,
+      "machinings": [
+        {
+          "angle": 20,
+          "at": 29.117618741296187,
+          "face": "testa-inizio",
+          "id": "TVT-11-L01",
+          "pieceId": "TVT-11",
+          "type": "taglio-testa"
+        },
+        {
+          "angle": 20,
+          "at": 440.6093271931653,
+          "depth": 41.04241719908029,
+          "face": "inferiore",
+          "id": "TVT-11-L02",
+          "pieceId": "TVT-11",
+          "type": "becco-uccello"
+        },
+        {
+          "angle": 20,
+          "at": 2568.9648721449894,
+          "depth": 41.04241719908043,
+          "face": "inferiore",
+          "id": "TVT-11-L03",
+          "pieceId": "TVT-11",
+          "type": "becco-uccello"
+        },
+        {
+          "angle": 20,
+          "at": 2646.99493903204,
+          "face": "testa-fine",
+          "id": "TVT-11-L04",
+          "pieceId": "TVT-11",
+          "type": "taglio-testa"
+        }
+      ],
+      "pose": [
+        0,
+        1,
+        0,
+        1445.7142857142858,
+        -0.9396926207859084,
+        0,
+        0.3420201433256687,
+        5002.084834398161,
+        0.3420201433256687,
+        0,
+        0.9396926207859084,
+        2525.9108878444476,
+        0,
+        0,
+        0,
+        1
+      ],
+      "section": {
+        "b": 80,
+        "h": 160
+      },
+      "type": "travetto"
+    },
+    {
+      "family": "TVT",
+      "id": "TVT-12",
+      "label": "TVT-12",
+      "length": 2676.112557773336,
+      "machinings": [
+        {
+          "angle": 20,
+          "at": 29.117618741296187,
+          "face": "testa-inizio",
+          "id": "TVT-12-L01",
+          "pieceId": "TVT-12",
+          "type": "taglio-testa"
+        },
+        {
+          "angle": 20,
+          "at": 440.6093271931653,
+          "depth": 41.04241719908029,
+          "face": "inferiore",
+          "id": "TVT-12-L02",
+          "pieceId": "TVT-12",
+          "type": "becco-uccello"
+        },
+        {
+          "angle": 20,
+          "at": 2568.9648721449894,
+          "depth": 41.04241719908043,
+          "face": "inferiore",
+          "id": "TVT-12-L03",
+          "pieceId": "TVT-12",
+          "type": "becco-uccello"
+        },
+        {
+          "angle": 20,
+          "at": 2646.99493903204,
+          "face": "testa-fine",
+          "id": "TVT-12-L04",
+          "pieceId": "TVT-12",
+          "type": "taglio-testa"
+        }
+      ],
+      "pose": [
+        0,
+        1,
+        0,
+        2148.5714285714284,
+        -0.9396926207859084,
+        0,
+        0.3420201433256687,
+        5002.084834398161,
+        0.3420201433256687,
+        0,
+        0.9396926207859084,
+        2525.9108878444476,
+        0,
+        0,
+        0,
+        1
+      ],
+      "section": {
+        "b": 80,
+        "h": 160
+      },
+      "type": "travetto"
+    },
+    {
+      "family": "TVT",
+      "id": "TVT-13",
+      "label": "TVT-13",
+      "length": 2676.112557773336,
+      "machinings": [
+        {
+          "angle": 20,
+          "at": 29.117618741296187,
+          "face": "testa-inizio",
+          "id": "TVT-13-L01",
+          "pieceId": "TVT-13",
+          "type": "taglio-testa"
+        },
+        {
+          "angle": 20,
+          "at": 440.6093271931653,
+          "depth": 41.04241719908029,
+          "face": "inferiore",
+          "id": "TVT-13-L02",
+          "pieceId": "TVT-13",
+          "type": "becco-uccello"
+        },
+        {
+          "angle": 20,
+          "at": 2568.9648721449894,
+          "depth": 41.04241719908043,
+          "face": "inferiore",
+          "id": "TVT-13-L03",
+          "pieceId": "TVT-13",
+          "type": "becco-uccello"
+        },
+        {
+          "angle": 20,
+          "at": 2646.99493903204,
+          "face": "testa-fine",
+          "id": "TVT-13-L04",
+          "pieceId": "TVT-13",
+          "type": "taglio-testa"
+        }
+      ],
+      "pose": [
+        0,
+        1,
+        0,
+        2851.4285714285716,
+        -0.9396926207859084,
+        0,
+        0.3420201433256687,
+        5002.084834398161,
+        0.3420201433256687,
+        0,
+        0.9396926207859084,
+        2525.9108878444476,
+        0,
+        0,
+        0,
+        1
+      ],
+      "section": {
+        "b": 80,
+        "h": 160
+      },
+      "type": "travetto"
+    },
+    {
+      "family": "TVT",
+      "id": "TVT-14",
+      "label": "TVT-14",
+      "length": 2676.112557773336,
+      "machinings": [
+        {
+          "angle": 20,
+          "at": 29.117618741296187,
+          "face": "testa-inizio",
+          "id": "TVT-14-L01",
+          "pieceId": "TVT-14",
+          "type": "taglio-testa"
+        },
+        {
+          "angle": 20,
+          "at": 440.6093271931653,
+          "depth": 41.04241719908029,
+          "face": "inferiore",
+          "id": "TVT-14-L02",
+          "pieceId": "TVT-14",
+          "type": "becco-uccello"
+        },
+        {
+          "angle": 20,
+          "at": 2568.9648721449894,
+          "depth": 41.04241719908043,
+          "face": "inferiore",
+          "id": "TVT-14-L03",
+          "pieceId": "TVT-14",
+          "type": "becco-uccello"
+        },
+        {
+          "angle": 20,
+          "at": 2646.99493903204,
+          "face": "testa-fine",
+          "id": "TVT-14-L04",
+          "pieceId": "TVT-14",
+          "type": "taglio-testa"
+        }
+      ],
+      "pose": [
+        0,
+        1,
+        0,
+        3554.285714285714,
+        -0.9396926207859084,
+        0,
+        0.3420201433256687,
+        5002.084834398161,
+        0.3420201433256687,
+        0,
+        0.9396926207859084,
+        2525.9108878444476,
+        0,
+        0,
+        0,
+        1
+      ],
+      "section": {
+        "b": 80,
+        "h": 160
+      },
+      "type": "travetto"
+    },
+    {
+      "family": "TVT",
+      "id": "TVT-15",
+      "label": "TVT-15",
+      "length": 2676.112557773336,
+      "machinings": [
+        {
+          "angle": 20,
+          "at": 29.117618741296187,
+          "face": "testa-inizio",
+          "id": "TVT-15-L01",
+          "pieceId": "TVT-15",
+          "type": "taglio-testa"
+        },
+        {
+          "angle": 20,
+          "at": 440.6093271931653,
+          "depth": 41.04241719908029,
+          "face": "inferiore",
+          "id": "TVT-15-L02",
+          "pieceId": "TVT-15",
+          "type": "becco-uccello"
+        },
+        {
+          "angle": 20,
+          "at": 2568.9648721449894,
+          "depth": 41.04241719908043,
+          "face": "inferiore",
+          "id": "TVT-15-L03",
+          "pieceId": "TVT-15",
+          "type": "becco-uccello"
+        },
+        {
+          "angle": 20,
+          "at": 2646.99493903204,
+          "face": "testa-fine",
+          "id": "TVT-15-L04",
+          "pieceId": "TVT-15",
+          "type": "taglio-testa"
+        }
+      ],
+      "pose": [
+        0,
+        1,
+        0,
+        4257.142857142857,
+        -0.9396926207859084,
+        0,
+        0.3420201433256687,
+        5002.084834398161,
+        0.3420201433256687,
+        0,
+        0.9396926207859084,
+        2525.9108878444476,
+        0,
+        0,
+        0,
+        1
+      ],
+      "section": {
+        "b": 80,
+        "h": 160
+      },
+      "type": "travetto"
+    },
+    {
+      "family": "TVT",
+      "id": "TVT-16",
+      "label": "TVT-16",
+      "length": 2676.112557773336,
+      "machinings": [
+        {
+          "angle": 20,
+          "at": 29.117618741296187,
+          "face": "testa-inizio",
+          "id": "TVT-16-L01",
+          "pieceId": "TVT-16",
+          "type": "taglio-testa"
+        },
+        {
+          "angle": 20,
+          "at": 440.6093271931653,
+          "depth": 41.04241719908029,
+          "face": "inferiore",
+          "id": "TVT-16-L02",
+          "pieceId": "TVT-16",
+          "type": "becco-uccello"
+        },
+        {
+          "angle": 20,
+          "at": 2568.9648721449894,
+          "depth": 41.04241719908043,
+          "face": "inferiore",
+          "id": "TVT-16-L03",
+          "pieceId": "TVT-16",
+          "type": "becco-uccello"
+        },
+        {
+          "angle": 20,
+          "at": 2646.99493903204,
+          "face": "testa-fine",
+          "id": "TVT-16-L04",
+          "pieceId": "TVT-16",
+          "type": "taglio-testa"
+        }
+      ],
+      "pose": [
+        0,
+        1,
+        0,
+        4960,
+        -0.9396926207859084,
+        0,
+        0.3420201433256687,
+        5002.084834398161,
+        0.3420201433256687,
+        0,
+        0.9396926207859084,
+        2525.9108878444476,
+        0,
+        0,
+        0,
+        1
+      ],
+      "section": {
+        "b": 80,
+        "h": 160
+      },
+      "type": "travetto"
+    },
+    {
+      "family": "CTV",
+      "id": "CTV-01",
+      "label": "CTV-01",
+      "length": 665.685424949238,
+      "machinings": [
+        {
+          "angle": 45,
+          "at": 50,
+          "face": "testa-inizio",
+          "id": "CTV-01-L01",
+          "pieceId": "CTV-01",
+          "type": "taglio-testa"
+        },
+        {
+          "angle": -45,
+          "at": 615.685424949238,
+          "face": "testa-fine",
+          "id": "CTV-01-L02",
+          "pieceId": "CTV-01",
+          "type": "taglio-testa"
+        }
+      ],
+      "pose": [
+        -0.7071067811865476,
+        0,
+        0.7071067811865476,
+        635.3553390593274,
+        0,
+        -1.0000000000000002,
+        0,
+        514.723222932107,
+        0.7071067811865476,
+        0,
+        0.7071067811865476,
+        1964.6446609406726,
+        0,
+        0,
+        0,
+        1
+      ],
+      "section": {
+        "b": 100,
+        "h": 100
+      },
+      "type": "controvento"
+    },
+    {
+      "family": "CTV",
+      "id": "CTV-02",
+      "label": "CTV-02",
+      "length": 665.685424949238,
+      "machinings": [
+        {
+          "angle": 45,
+          "at": 50,
+          "face": "testa-inizio",
+          "id": "CTV-02-L01",
+          "pieceId": "CTV-02",
+          "type": "taglio-testa"
+        },
+        {
+          "angle": -45,
+          "at": 615.685424949238,
+          "face": "testa-fine",
+          "id": "CTV-02-L02",
+          "pieceId": "CTV-02",
+          "type": "taglio-testa"
+        }
+      ],
+      "pose": [
+        0.7071067811865476,
+        0,
+        -0.7071067811865476,
+        684.6446609406726,
+        0,
+        1.0000000000000002,
+        0,
+        514.723222932107,
+        0.7071067811865476,
+        0,
+        0.7071067811865476,
+        1964.6446609406726,
+        0,
+        0,
+        0,
+        1
+      ],
+      "section": {
+        "b": 100,
+        "h": 100
+      },
+      "type": "controvento"
+    },
+    {
+      "family": "CTV",
+      "id": "CTV-03",
+      "label": "CTV-03",
+      "length": 665.685424949238,
+      "machinings": [
+        {
+          "angle": 45,
+          "at": 50,
+          "face": "testa-inizio",
+          "id": "CTV-03-L01",
+          "pieceId": "CTV-03",
+          "type": "taglio-testa"
+        },
+        {
+          "angle": -45,
+          "at": 615.685424949238,
+          "face": "testa-fine",
+          "id": "CTV-03-L02",
+          "pieceId": "CTV-03",
+          "type": "taglio-testa"
+        }
+      ],
+      "pose": [
+        -0.7071067811865476,
+        0,
+        0.7071067811865476,
+        2475.3553390593274,
+        0,
+        -1.0000000000000002,
+        0,
+        514.723222932107,
+        0.7071067811865476,
+        0,
+        0.7071067811865476,
+        1964.6446609406726,
+        0,
+        0,
+        0,
+        1
+      ],
+      "section": {
+        "b": 100,
+        "h": 100
+      },
+      "type": "controvento"
+    },
+    {
+      "family": "CTV",
+      "id": "CTV-04",
+      "label": "CTV-04",
+      "length": 665.685424949238,
+      "machinings": [
+        {
+          "angle": 45,
+          "at": 50,
+          "face": "testa-inizio",
+          "id": "CTV-04-L01",
+          "pieceId": "CTV-04",
+          "type": "taglio-testa"
+        },
+        {
+          "angle": -45,
+          "at": 615.685424949238,
+          "face": "testa-fine",
+          "id": "CTV-04-L02",
+          "pieceId": "CTV-04",
+          "type": "taglio-testa"
+        }
+      ],
+      "pose": [
+        0.7071067811865476,
+        0,
+        -0.7071067811865476,
+        2524.6446609406726,
+        0,
+        1.0000000000000002,
+        0,
+        514.723222932107,
+        0.7071067811865476,
+        0,
+        0.7071067811865476,
+        1964.6446609406726,
+        0,
+        0,
+        0,
+        1
+      ],
+      "section": {
+        "b": 100,
+        "h": 100
+      },
+      "type": "controvento"
+    },
+    {
+      "family": "CTV",
+      "id": "CTV-05",
+      "label": "CTV-05",
+      "length": 665.685424949238,
+      "machinings": [
+        {
+          "angle": 45,
+          "at": 50,
+          "face": "testa-inizio",
+          "id": "CTV-05-L01",
+          "pieceId": "CTV-05",
+          "type": "taglio-testa"
+        },
+        {
+          "angle": -45,
+          "at": 615.685424949238,
+          "face": "testa-fine",
+          "id": "CTV-05-L02",
+          "pieceId": "CTV-05",
+          "type": "taglio-testa"
+        }
+      ],
+      "pose": [
+        -0.7071067811865476,
+        0,
+        0.7071067811865476,
+        4315.355339059327,
+        0,
+        -1.0000000000000002,
+        0,
+        514.723222932107,
+        0.7071067811865476,
+        0,
+        0.7071067811865476,
+        1964.6446609406726,
+        0,
+        0,
+        0,
+        1
+      ],
+      "section": {
+        "b": 100,
+        "h": 100
+      },
+      "type": "controvento"
+    },
+    {
+      "family": "CTV",
+      "id": "CTV-06",
+      "label": "CTV-06",
+      "length": 665.685424949238,
+      "machinings": [
+        {
+          "angle": 45,
+          "at": 50,
+          "face": "testa-inizio",
+          "id": "CTV-06-L01",
+          "pieceId": "CTV-06",
+          "type": "taglio-testa"
+        },
+        {
+          "angle": -45,
+          "at": 615.685424949238,
+          "face": "testa-fine",
+          "id": "CTV-06-L02",
+          "pieceId": "CTV-06",
+          "type": "taglio-testa"
+        }
+      ],
+      "pose": [
+        0.7071067811865476,
+        0,
+        -0.7071067811865476,
+        4364.644660940673,
+        0,
+        1.0000000000000002,
+        0,
+        514.723222932107,
+        0.7071067811865476,
+        0,
+        0.7071067811865476,
+        1964.6446609406726,
+        0,
+        0,
+        0,
+        1
+      ],
+      "section": {
+        "b": 100,
+        "h": 100
+      },
+      "type": "controvento"
+    },
+    {
+      "family": "CTV",
+      "id": "CTV-07",
+      "label": "CTV-07",
+      "length": 665.685424949238,
+      "machinings": [
+        {
+          "angle": 45,
+          "at": 50,
+          "face": "testa-inizio",
+          "id": "CTV-07-L01",
+          "pieceId": "CTV-07",
+          "type": "taglio-testa"
+        },
+        {
+          "angle": -45,
+          "at": 615.685424949238,
+          "face": "testa-fine",
+          "id": "CTV-07-L02",
+          "pieceId": "CTV-07",
+          "type": "taglio-testa"
+        }
+      ],
+      "pose": [
+        -0.7071067811865476,
+        0,
+        0.7071067811865476,
+        635.3553390593274,
+        0,
+        -1.0000000000000002,
+        0,
+        4514.723222932107,
+        0.7071067811865476,
+        0,
+        0.7071067811865476,
+        1964.6446609406726,
+        0,
+        0,
+        0,
+        1
+      ],
+      "section": {
+        "b": 100,
+        "h": 100
+      },
+      "type": "controvento"
+    },
+    {
+      "family": "CTV",
+      "id": "CTV-08",
+      "label": "CTV-08",
+      "length": 665.685424949238,
+      "machinings": [
+        {
+          "angle": 45,
+          "at": 50,
+          "face": "testa-inizio",
+          "id": "CTV-08-L01",
+          "pieceId": "CTV-08",
+          "type": "taglio-testa"
+        },
+        {
+          "angle": -45,
+          "at": 615.685424949238,
+          "face": "testa-fine",
+          "id": "CTV-08-L02",
+          "pieceId": "CTV-08",
+          "type": "taglio-testa"
+        }
+      ],
+      "pose": [
+        0.7071067811865476,
+        0,
+        -0.7071067811865476,
+        684.6446609406726,
+        0,
+        1.0000000000000002,
+        0,
+        4514.723222932107,
+        0.7071067811865476,
+        0,
+        0.7071067811865476,
+        1964.6446609406726,
+        0,
+        0,
+        0,
+        1
+      ],
+      "section": {
+        "b": 100,
+        "h": 100
+      },
+      "type": "controvento"
+    },
+    {
+      "family": "CTV",
+      "id": "CTV-09",
+      "label": "CTV-09",
+      "length": 665.685424949238,
+      "machinings": [
+        {
+          "angle": 45,
+          "at": 50,
+          "face": "testa-inizio",
+          "id": "CTV-09-L01",
+          "pieceId": "CTV-09",
+          "type": "taglio-testa"
+        },
+        {
+          "angle": -45,
+          "at": 615.685424949238,
+          "face": "testa-fine",
+          "id": "CTV-09-L02",
+          "pieceId": "CTV-09",
+          "type": "taglio-testa"
+        }
+      ],
+      "pose": [
+        -0.7071067811865476,
+        0,
+        0.7071067811865476,
+        2475.3553390593274,
+        0,
+        -1.0000000000000002,
+        0,
+        4514.723222932107,
+        0.7071067811865476,
+        0,
+        0.7071067811865476,
+        1964.6446609406726,
+        0,
+        0,
+        0,
+        1
+      ],
+      "section": {
+        "b": 100,
+        "h": 100
+      },
+      "type": "controvento"
+    },
+    {
+      "family": "CTV",
+      "id": "CTV-10",
+      "label": "CTV-10",
+      "length": 665.685424949238,
+      "machinings": [
+        {
+          "angle": 45,
+          "at": 50,
+          "face": "testa-inizio",
+          "id": "CTV-10-L01",
+          "pieceId": "CTV-10",
+          "type": "taglio-testa"
+        },
+        {
+          "angle": -45,
+          "at": 615.685424949238,
+          "face": "testa-fine",
+          "id": "CTV-10-L02",
+          "pieceId": "CTV-10",
+          "type": "taglio-testa"
+        }
+      ],
+      "pose": [
+        0.7071067811865476,
+        0,
+        -0.7071067811865476,
+        2524.6446609406726,
+        0,
+        1.0000000000000002,
+        0,
+        4514.723222932107,
+        0.7071067811865476,
+        0,
+        0.7071067811865476,
+        1964.6446609406726,
+        0,
+        0,
+        0,
+        1
+      ],
+      "section": {
+        "b": 100,
+        "h": 100
+      },
+      "type": "controvento"
+    },
+    {
+      "family": "CTV",
+      "id": "CTV-11",
+      "label": "CTV-11",
+      "length": 665.685424949238,
+      "machinings": [
+        {
+          "angle": 45,
+          "at": 50,
+          "face": "testa-inizio",
+          "id": "CTV-11-L01",
+          "pieceId": "CTV-11",
+          "type": "taglio-testa"
+        },
+        {
+          "angle": -45,
+          "at": 615.685424949238,
+          "face": "testa-fine",
+          "id": "CTV-11-L02",
+          "pieceId": "CTV-11",
+          "type": "taglio-testa"
+        }
+      ],
+      "pose": [
+        -0.7071067811865476,
+        0,
+        0.7071067811865476,
+        4315.355339059327,
+        0,
+        -1.0000000000000002,
+        0,
+        4514.723222932107,
+        0.7071067811865476,
+        0,
+        0.7071067811865476,
+        1964.6446609406726,
+        0,
+        0,
+        0,
+        1
+      ],
+      "section": {
+        "b": 100,
+        "h": 100
+      },
+      "type": "controvento"
+    },
+    {
+      "family": "CTV",
+      "id": "CTV-12",
+      "label": "CTV-12",
+      "length": 665.685424949238,
+      "machinings": [
+        {
+          "angle": 45,
+          "at": 50,
+          "face": "testa-inizio",
+          "id": "CTV-12-L01",
+          "pieceId": "CTV-12",
+          "type": "taglio-testa"
+        },
+        {
+          "angle": -45,
+          "at": 615.685424949238,
+          "face": "testa-fine",
+          "id": "CTV-12-L02",
+          "pieceId": "CTV-12",
+          "type": "taglio-testa"
+        }
+      ],
+      "pose": [
+        0.7071067811865476,
+        0,
+        -0.7071067811865476,
+        4364.644660940673,
+        0,
+        1.0000000000000002,
+        0,
+        4514.723222932107,
+        0.7071067811865476,
+        0,
+        0.7071067811865476,
+        1964.6446609406726,
+        0,
+        0,
+        0,
+        1
+      ],
+      "section": {
+        "b": 100,
+        "h": 100
+      },
+      "type": "controvento"
+    }
+  ],
+  "typologySlug": "autoportante-bifalda"
+}
