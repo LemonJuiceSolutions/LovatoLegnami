@@ -45,11 +45,11 @@ export const DEFAULT_SAT_PRODUCER = "Lovato Legnami - Configuratore pergole";
 /** Nome usato dai traduttori ACIS (InterOp) per il nome delle entità. */
 export const DEFAULT_NAME_ATTRIBUTE = "ATTRIB_XACIS_NAME";
 
-/** Pezzo non scrivibile: superficie/curva non supportata o posa non rigida. */
+/** Pezzo non scrivibile: superficie/curva non supportata, posa non rigida o solido mancante. */
 export class SatBodyError extends Error {
   constructor(
     readonly pieceId: string,
-    readonly entity: "superficie" | "curva" | "topologia" | "posa",
+    readonly entity: "superficie" | "curva" | "topologia" | "posa" | "solido",
     readonly entityType: string,
     detail: string,
   ) {
