@@ -1,0 +1,993 @@
+{
+  "hardware": [
+    {
+      "code": "giunto-gazebo-916",
+      "description": "Giunto angolare 3 vie art. 916 (testa pilastro + 2 traverse 90×90)",
+      "dims": {
+        "x": 200,
+        "y": 200,
+        "z": 90
+      },
+      "id": "GNT-01",
+      "kind": "giunto-vie",
+      "machiningIds": [],
+      "params": {
+        "angle": 90,
+        "layout": "3A",
+        "ways": 3
+      },
+      "pieceIds": [
+        "PIL-01",
+        "TRV-04",
+        "TRV-01"
+      ],
+      "pose": [
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        2445,
+        0,
+        0,
+        0,
+        1
+      ],
+      "quantity": 1
+    },
+    {
+      "code": "giunto-gazebo-916",
+      "description": "Giunto angolare 3 vie art. 916 (testa pilastro + 2 traverse 90×90)",
+      "dims": {
+        "x": 200,
+        "y": 200,
+        "z": 90
+      },
+      "id": "GNT-02",
+      "kind": "giunto-vie",
+      "machiningIds": [],
+      "params": {
+        "angle": 90,
+        "layout": "3A",
+        "ways": 3
+      },
+      "pieceIds": [
+        "PIL-02",
+        "TRV-01",
+        "TRV-02"
+      ],
+      "pose": [
+        1,
+        0,
+        0,
+        3100,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        2445,
+        0,
+        0,
+        0,
+        1
+      ],
+      "quantity": 1
+    },
+    {
+      "code": "giunto-gazebo-916",
+      "description": "Giunto angolare 3 vie art. 916 (testa pilastro + 2 traverse 90×90)",
+      "dims": {
+        "x": 200,
+        "y": 200,
+        "z": 90
+      },
+      "id": "GNT-03",
+      "kind": "giunto-vie",
+      "machiningIds": [],
+      "params": {
+        "angle": 90,
+        "layout": "3A",
+        "ways": 3
+      },
+      "pieceIds": [
+        "PIL-03",
+        "TRV-02",
+        "TRV-03"
+      ],
+      "pose": [
+        1,
+        0,
+        0,
+        3100,
+        0,
+        1,
+        0,
+        3100,
+        0,
+        0,
+        1,
+        2445,
+        0,
+        0,
+        0,
+        1
+      ],
+      "quantity": 1
+    },
+    {
+      "code": "giunto-gazebo-916",
+      "description": "Giunto angolare 3 vie art. 916 (testa pilastro + 2 traverse 90×90)",
+      "dims": {
+        "x": 200,
+        "y": 200,
+        "z": 90
+      },
+      "id": "GNT-04",
+      "kind": "giunto-vie",
+      "machiningIds": [],
+      "params": {
+        "angle": 90,
+        "layout": "3A",
+        "ways": 3
+      },
+      "pieceIds": [
+        "PIL-04",
+        "TRV-03",
+        "TRV-04"
+      ],
+      "pose": [
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        3100,
+        0,
+        0,
+        1,
+        2445,
+        0,
+        0,
+        0,
+        1
+      ],
+      "quantity": 1
+    },
+    {
+      "code": "piastra-915",
+      "description": "Piastra art. 915 per puntone 70×70 (piede, fissata al giunto 916)",
+      "dims": {
+        "x": 120,
+        "y": 70,
+        "z": 70
+      },
+      "id": "PST-01",
+      "kind": "piastra",
+      "machiningIds": [],
+      "params": {
+        "anchor": "piede"
+      },
+      "pieceIds": [
+        "CAN-01"
+      ],
+      "pose": [
+        0.671542934237818,
+        -0.7071067811865475,
+        -0.2214273864617059,
+        -7.749958526159706,
+        0.671542934237818,
+        0.7071067811865475,
+        -0.2214273864617059,
+        -7.749958526159706,
+        0.3131456130149731,
+        0,
+        0.9497051253149457,
+        2523.239679386023,
+        0,
+        0,
+        0,
+        1
+      ],
+      "quantity": 1
+    },
+    {
+      "code": "piastra-915",
+      "description": "Piastra art. 915 per puntone 70×70 (piede, fissata al giunto 916)",
+      "dims": {
+        "x": 120,
+        "y": 70,
+        "z": 70
+      },
+      "id": "PST-02",
+      "kind": "piastra",
+      "machiningIds": [],
+      "params": {
+        "anchor": "piede"
+      },
+      "pieceIds": [
+        "CAN-02"
+      ],
+      "pose": [
+        -0.671542934237818,
+        -0.7071067811865475,
+        0.2214273864617059,
+        3107.74995852616,
+        0.671542934237818,
+        -0.7071067811865475,
+        -0.2214273864617059,
+        -7.749958526159706,
+        0.3131456130149731,
+        0,
+        0.9497051253149457,
+        2523.239679386023,
+        0,
+        0,
+        0,
+        1
+      ],
+      "quantity": 1
+    },
+    {
+      "code": "piastra-915",
+      "description": "Piastra art. 915 per puntone 70×70 (piede, fissata al giunto 916)",
+      "dims": {
+        "x": 120,
+        "y": 70,
+        "z": 70
+      },
+      "id": "PST-03",
+      "kind": "piastra",
+      "machiningIds": [],
+      "params": {
+        "anchor": "piede"
+      },
+      "pieceIds": [
+        "CAN-03"
+      ],
+      "pose": [
+        -0.671542934237818,
+        0.7071067811865475,
+        0.2214273864617059,
+        3107.74995852616,
+        -0.671542934237818,
+        -0.7071067811865475,
+        0.2214273864617059,
+        3107.74995852616,
+        0.3131456130149731,
+        0,
+        0.9497051253149457,
+        2523.239679386023,
+        0,
+        0,
+        0,
+        1
+      ],
+      "quantity": 1
+    },
+    {
+      "code": "piastra-915",
+      "description": "Piastra art. 915 per puntone 70×70 (piede, fissata al giunto 916)",
+      "dims": {
+        "x": 120,
+        "y": 70,
+        "z": 70
+      },
+      "id": "PST-04",
+      "kind": "piastra",
+      "machiningIds": [],
+      "params": {
+        "anchor": "piede"
+      },
+      "pieceIds": [
+        "CAN-04"
+      ],
+      "pose": [
+        0.671542934237818,
+        0.7071067811865475,
+        -0.2214273864617059,
+        -7.749958526159706,
+        -0.671542934237818,
+        0.7071067811865475,
+        0.2214273864617059,
+        3107.74995852616,
+        0.3131456130149731,
+        0,
+        0.9497051253149457,
+        2523.239679386023,
+        0,
+        0,
+        0,
+        1
+      ],
+      "quantity": 1
+    },
+    {
+      "code": "cuspide-4-25",
+      "description": "Cuspide per gazebo a 4 falde 25°",
+      "dims": {
+        "x": 470,
+        "y": 470,
+        "z": 300
+      },
+      "id": "CUS-01",
+      "kind": "cuspide",
+      "machiningIds": [],
+      "params": {
+        "angle": 25,
+        "slopes": 4
+      },
+      "pieceIds": [
+        "CAN-01",
+        "CAN-02",
+        "CAN-03",
+        "CAN-04"
+      ],
+      "pose": [
+        1,
+        0,
+        0,
+        1550,
+        0,
+        1,
+        0,
+        1550,
+        0,
+        0,
+        1,
+        3249.630414537403,
+        0,
+        0,
+        0,
+        1
+      ],
+      "quantity": 1
+    },
+    {
+      "code": "piastra-914",
+      "description": "Piastra art. 914 per puntone 70×70 (testa, fissata alla cuspide)",
+      "dims": {
+        "x": 120,
+        "y": 70,
+        "z": 70
+      },
+      "id": "PST-05",
+      "kind": "piastra",
+      "machiningIds": [],
+      "params": {
+        "of": "CUS-01"
+      },
+      "pieceIds": [
+        "CAN-01"
+      ],
+      "quantity": 1
+    },
+    {
+      "code": "piastra-914",
+      "description": "Piastra art. 914 per puntone 70×70 (testa, fissata alla cuspide)",
+      "dims": {
+        "x": 120,
+        "y": 70,
+        "z": 70
+      },
+      "id": "PST-06",
+      "kind": "piastra",
+      "machiningIds": [],
+      "params": {
+        "of": "CUS-01"
+      },
+      "pieceIds": [
+        "CAN-02"
+      ],
+      "quantity": 1
+    },
+    {
+      "code": "piastra-914",
+      "description": "Piastra art. 914 per puntone 70×70 (testa, fissata alla cuspide)",
+      "dims": {
+        "x": 120,
+        "y": 70,
+        "z": 70
+      },
+      "id": "PST-07",
+      "kind": "piastra",
+      "machiningIds": [],
+      "params": {
+        "of": "CUS-01"
+      },
+      "pieceIds": [
+        "CAN-03"
+      ],
+      "quantity": 1
+    },
+    {
+      "code": "piastra-914",
+      "description": "Piastra art. 914 per puntone 70×70 (testa, fissata alla cuspide)",
+      "dims": {
+        "x": 120,
+        "y": 70,
+        "z": 70
+      },
+      "id": "PST-08",
+      "kind": "piastra",
+      "machiningIds": [],
+      "params": {
+        "of": "CUS-01"
+      },
+      "pieceIds": [
+        "CAN-04"
+      ],
+      "quantity": 1
+    },
+    {
+      "code": "staffa-terra-bicchiere-90",
+      "description": "Staffa a bicchiere 90×90",
+      "dims": {
+        "x": 150,
+        "y": 100,
+        "z": 100
+      },
+      "id": "STT-01",
+      "kind": "staffa-terra",
+      "machiningIds": [],
+      "params": {
+        "anchor": "piede"
+      },
+      "pieceIds": [
+        "PIL-01"
+      ],
+      "pose": [
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1
+      ],
+      "quantity": 1
+    },
+    {
+      "code": "vite-8x40",
+      "description": "Vite 8×40",
+      "id": "VIT-01",
+      "kind": "vite",
+      "machiningIds": [],
+      "params": {},
+      "pieceIds": [
+        "PIL-01",
+        "PIL-02",
+        "PIL-03",
+        "PIL-04"
+      ],
+      "quantity": 16
+    },
+    {
+      "code": "staffa-terra-bicchiere-90",
+      "description": "Staffa a bicchiere 90×90",
+      "dims": {
+        "x": 150,
+        "y": 100,
+        "z": 100
+      },
+      "id": "STT-02",
+      "kind": "staffa-terra",
+      "machiningIds": [],
+      "params": {
+        "anchor": "piede"
+      },
+      "pieceIds": [
+        "PIL-02"
+      ],
+      "pose": [
+        0,
+        1,
+        0,
+        3100,
+        0,
+        0,
+        1,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1
+      ],
+      "quantity": 1
+    },
+    {
+      "code": "staffa-terra-bicchiere-90",
+      "description": "Staffa a bicchiere 90×90",
+      "dims": {
+        "x": 150,
+        "y": 100,
+        "z": 100
+      },
+      "id": "STT-03",
+      "kind": "staffa-terra",
+      "machiningIds": [],
+      "params": {
+        "anchor": "piede"
+      },
+      "pieceIds": [
+        "PIL-03"
+      ],
+      "pose": [
+        0,
+        1,
+        0,
+        3100,
+        0,
+        0,
+        1,
+        3100,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1
+      ],
+      "quantity": 1
+    },
+    {
+      "code": "staffa-terra-bicchiere-90",
+      "description": "Staffa a bicchiere 90×90",
+      "dims": {
+        "x": 150,
+        "y": 100,
+        "z": 100
+      },
+      "id": "STT-04",
+      "kind": "staffa-terra",
+      "machiningIds": [],
+      "params": {
+        "anchor": "piede"
+      },
+      "pieceIds": [
+        "PIL-04"
+      ],
+      "pose": [
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        3100,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1
+      ],
+      "quantity": 1
+    }
+  ],
+  "joints": [],
+  "meta": {
+    "costruzione": "bullonata",
+    "cuspide": "cuspide-4-25",
+    "falde": 4,
+    "lati": 4,
+    "originePendenza": "ferramenta",
+    "pendenza": 25,
+    "pendenzaCantonali": 18.248902383234398,
+    "punta": "cuspide"
+  },
+  "params": {
+    "altezza": 2400,
+    "altezzaGrigliato": 1800,
+    "ancoraggioTerra": "bicchiere",
+    "arcarecci": 0,
+    "costruzione": "bullonata",
+    "falde": "lati",
+    "grigliati": 0,
+    "larghezza": 3100,
+    "lati": "4",
+    "montantiIntermedi": 0,
+    "pendenza": 25,
+    "profondita": 3100,
+    "punta": "cuspide",
+    "sezioneArcareccio": "45×90",
+    "sezioneCantonale": "70×70",
+    "sezioneCantonaleCarpenteria": "90×90",
+    "sezioneColmo": "120×120",
+    "sezioneMonaco": "250×250",
+    "sezionePilastro": "90×90",
+    "sezioneTrave": "90×90",
+    "sporgenzaAngoli": 150
+  },
+  "pieces": [
+    {
+      "family": "PIL",
+      "id": "PIL-01",
+      "label": "PIL-01",
+      "length": 2400,
+      "machinings": [],
+      "pose": [
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1
+      ],
+      "section": {
+        "b": 90,
+        "h": 90
+      },
+      "type": "pilastro"
+    },
+    {
+      "family": "PIL",
+      "id": "PIL-02",
+      "label": "PIL-02",
+      "length": 2400,
+      "machinings": [],
+      "pose": [
+        0,
+        1,
+        0,
+        3100,
+        0,
+        0,
+        1,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1
+      ],
+      "section": {
+        "b": 90,
+        "h": 90
+      },
+      "type": "pilastro"
+    },
+    {
+      "family": "PIL",
+      "id": "PIL-03",
+      "label": "PIL-03",
+      "length": 2400,
+      "machinings": [],
+      "pose": [
+        0,
+        1,
+        0,
+        3100,
+        0,
+        0,
+        1,
+        3100,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1
+      ],
+      "section": {
+        "b": 90,
+        "h": 90
+      },
+      "type": "pilastro"
+    },
+    {
+      "family": "PIL",
+      "id": "PIL-04",
+      "label": "PIL-04",
+      "length": 2400,
+      "machinings": [],
+      "pose": [
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        3100,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1
+      ],
+      "section": {
+        "b": 90,
+        "h": 90
+      },
+      "type": "pilastro"
+    },
+    {
+      "family": "TRV",
+      "id": "TRV-01",
+      "label": "TRV-01",
+      "length": 3010,
+      "machinings": [],
+      "pose": [
+        1,
+        0,
+        0,
+        45,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        2445,
+        0,
+        0,
+        0,
+        1
+      ],
+      "section": {
+        "b": 90,
+        "h": 90
+      },
+      "type": "trave"
+    },
+    {
+      "family": "TRV",
+      "id": "TRV-02",
+      "label": "TRV-02",
+      "length": 3010,
+      "machinings": [],
+      "pose": [
+        0,
+        -1,
+        0,
+        3100,
+        1,
+        0,
+        0,
+        45,
+        0,
+        0,
+        1,
+        2445,
+        0,
+        0,
+        0,
+        1
+      ],
+      "section": {
+        "b": 90,
+        "h": 90
+      },
+      "type": "trave"
+    },
+    {
+      "family": "TRV",
+      "id": "TRV-03",
+      "label": "TRV-03",
+      "length": 3010,
+      "machinings": [],
+      "pose": [
+        -1,
+        0,
+        0,
+        3055,
+        0,
+        -1,
+        0,
+        3100,
+        0,
+        0,
+        1,
+        2445,
+        0,
+        0,
+        0,
+        1
+      ],
+      "section": {
+        "b": 90,
+        "h": 90
+      },
+      "type": "trave"
+    },
+    {
+      "family": "TRV",
+      "id": "TRV-04",
+      "label": "TRV-04",
+      "length": 3010,
+      "machinings": [],
+      "pose": [
+        0,
+        1,
+        0,
+        0,
+        -1,
+        0,
+        0,
+        3055,
+        0,
+        0,
+        1,
+        2445,
+        0,
+        0,
+        0,
+        1
+      ],
+      "section": {
+        "b": 90,
+        "h": 90
+      },
+      "type": "trave"
+    },
+    {
+      "family": "CAN",
+      "id": "CAN-01",
+      "label": "CAN-01",
+      "length": 1992.2299788061619,
+      "machinings": [],
+      "pose": [
+        0.671542934237818,
+        -0.7071067811865475,
+        -0.2214273864617059,
+        -7.749958526159706,
+        0.671542934237818,
+        0.7071067811865475,
+        -0.2214273864617059,
+        -7.749958526159706,
+        0.3131456130149731,
+        0,
+        0.9497051253149457,
+        2523.239679386023,
+        0,
+        0,
+        0,
+        1
+      ],
+      "section": {
+        "b": 70,
+        "h": 70
+      },
+      "type": "cantonale"
+    },
+    {
+      "family": "CAN",
+      "id": "CAN-02",
+      "label": "CAN-02",
+      "length": 1992.2299788061619,
+      "machinings": [],
+      "pose": [
+        -0.671542934237818,
+        -0.7071067811865475,
+        0.2214273864617059,
+        3107.74995852616,
+        0.671542934237818,
+        -0.7071067811865475,
+        -0.2214273864617059,
+        -7.749958526159706,
+        0.3131456130149731,
+        0,
+        0.9497051253149457,
+        2523.239679386023,
+        0,
+        0,
+        0,
+        1
+      ],
+      "section": {
+        "b": 70,
+        "h": 70
+      },
+      "type": "cantonale"
+    },
+    {
+      "family": "CAN",
+      "id": "CAN-03",
+      "label": "CAN-03",
+      "length": 1992.2299788061619,
+      "machinings": [],
+      "pose": [
+        -0.671542934237818,
+        0.7071067811865475,
+        0.2214273864617059,
+        3107.74995852616,
+        -0.671542934237818,
+        -0.7071067811865475,
+        0.2214273864617059,
+        3107.74995852616,
+        0.3131456130149731,
+        0,
+        0.9497051253149457,
+        2523.239679386023,
+        0,
+        0,
+        0,
+        1
+      ],
+      "section": {
+        "b": 70,
+        "h": 70
+      },
+      "type": "cantonale"
+    },
+    {
+      "family": "CAN",
+      "id": "CAN-04",
+      "label": "CAN-04",
+      "length": 1992.2299788061619,
+      "machinings": [],
+      "pose": [
+        0.671542934237818,
+        0.7071067811865475,
+        -0.2214273864617059,
+        -7.749958526159706,
+        -0.671542934237818,
+        0.7071067811865475,
+        0.2214273864617059,
+        3107.74995852616,
+        0.3131456130149731,
+        0,
+        0.9497051253149457,
+        2523.239679386023,
+        0,
+        0,
+        0,
+        1
+      ],
+      "section": {
+        "b": 70,
+        "h": 70
+      },
+      "type": "cantonale"
+    }
+  ],
+  "typologySlug": "gazebo-padiglione"
+}

@@ -295,7 +295,7 @@ const DATA: HardwareSpec[] = [
     dims: { x: 200, y: 200, z: 90 },
     joint: { ways: 3, layout: "3A", node: 200, insertion: 55 },
     angle: 90,
-    accessories: [{ code: "piastra-915", count: 1 }],
+    // la piastra 915 (piede del cantonale) è posata dal template sul cantonale, non come accessorio del nodo
     source: "ricerca-chepergola.md §1 T-H (art. 916 + piastra 915); ingombri [dedotto]",
     validation: VALIDATION,
   },

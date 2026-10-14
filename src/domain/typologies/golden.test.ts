@@ -16,6 +16,7 @@ const FIXTURES = [
   { slug: "monofalda-scalare", file: "monofalda-scalare-default.json" },
   { slug: "telaio-giunti", file: "telaio-giunti-default.json" },
   { slug: "carport-arco", file: "carport-arco-default.json" },
+  { slug: "gazebo-padiglione", file: "gazebo-padiglione-default.json" },
 ] as const;
 
 const fixturePath = (file: string) => fileURLToPath(new URL(`../__fixtures__/${file}`, import.meta.url));

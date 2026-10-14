@@ -26,7 +26,7 @@ import { type ClearHeight, type FloorHeightFn, minClearHeight, pieceObb, pieceOb
 /** Per ogni tipo di pezzo, i tipi che gli fanno da appoggio. Dati, estendibili. */
 export const SUPPORTERS: Readonly<Record<PieceType, readonly PieceType[]>> = {
   trave: ["pilastro", "tavola", "monaco", "banchina", "trave"],
-  colmo: ["puntone", "pilastro"],
+  colmo: ["puntone", "pilastro", "monaco"],
   travetto: ["trave", "banchina", "colmo", "tavola", "mensola", "cantonale", "monaco"],
   puntone: ["trave", "colmo", "monaco", "tavola"],
   banchina: [],
@@ -44,11 +44,11 @@ export const SUPPORTERS: Readonly<Record<PieceType, readonly PieceType[]>> = {
 
 /**
  * Ferramenta che fa da appoggio ai pezzi collegati (E8): staffe a muro, nodi
- * metallici e cuspidi. L'appoggio è puntuale, nella proiezione dell'origine
+ * metallici, cuspidi e piastre (piede dei cantonali, supporti degli arcarecci). L'appoggio è puntuale, nella proiezione dell'origine
  * della voce sull'asse del pezzo. Non vale per i `CANTILEVER_TYPES`
  * (la mensola resta misurata come sbalzo).
  */
-export const HARDWARE_SUPPORT_KINDS: readonly HardwareKind[] = ["staffa-muro", "giunto-vie", "cuspide"];
+export const HARDWARE_SUPPORT_KINDS: readonly HardwareKind[] = ["staffa-muro", "giunto-vie", "cuspide", "piastra"];
 
 /**
  * Tipi misurati anche senza appoggi nel modello (incastrati a muro): la luce
