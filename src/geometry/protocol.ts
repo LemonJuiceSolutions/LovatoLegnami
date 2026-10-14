@@ -9,8 +9,12 @@ import { NeutralBrepSchema, type NeutralBrep } from "./neutral-brep";
  * una nuova `build` invalida le precedenti e il worker scarta i risultati con
  * id superato. Gli schemi zod servono ai test e alla validazione ai confini.
  *
- * Client → worker: `init`, `build`, `cancel`.
- * Worker → client: `ready`, `progress`, `piece-result`, `done`, `error`.
+ * Client → worker: `init`, `build`, `cancel`, `export-step`.
+ * Worker → client: `ready`, `progress`, `piece-result`, `done`, `step-result`, `error`.
+ *
+ * `export-step` non annulla né è annullato dalle `build`: usa i solidi in
+ * cache (costruendo quelli mancanti) e risponde con `step-result` o `error`
+ * di fase `export` con lo stesso `id`.
  */
 
 /** Dati del pezzo che determinano il solido (la posa serve solo a viewer/export). */
@@ -60,7 +64,16 @@ export interface Cancel {
   readonly id: number;
 }
 
-export type ClientMessage = InitRequest | BuildRequest | Cancel;
+/** Richiesta di export STEP dei pezzi (posizionati con la loro posa). */
+export interface ExportStepRequest {
+  readonly kind: "export-step";
+  readonly id: number;
+  readonly pieces: readonly PieceGeometryInput[];
+  /** Opzioni della build da cui riusare i solidi in cache. */
+  readonly options?: BuildOptions;
+}
+
+export type ClientMessage = InitRequest | BuildRequest | Cancel | ExportStepRequest;
 
 export interface Ready {
   readonly kind: "ready";
@@ -110,15 +123,32 @@ export interface BuildDone {
   readonly built: number;
 }
 
+/** Pezzo escluso dall'export (solido non costruibile o posa non valida). */
+export interface PieceExportError {
+  readonly pieceId: string;
+  readonly message: string;
+}
+
+/** File STEP prodotto dal worker. */
+export interface StepResult {
+  readonly kind: "step-result";
+  readonly id: number;
+  /** Contenuto del file `.step` (testo ISO-10303-21 in UTF-8). */
+  readonly data: Uint8Array;
+  /** Id dei pezzi scritti, nell'ordine della richiesta. */
+  readonly written: readonly string[];
+  readonly errors: readonly PieceExportError[];
+}
+
 /** Errore globale: inizializzazione del kernel (`id` null) o richiesta fallita. */
 export interface BuildError {
   readonly kind: "error";
   readonly id: number | null;
-  readonly phase: "init" | "build";
+  readonly phase: "init" | "build" | "export";
   readonly message: string;
 }
 
-export type WorkerMessage = Ready | Progress | PieceResultMessage | BuildDone | BuildError;
+export type WorkerMessage = Ready | Progress | PieceResultMessage | BuildDone | StepResult | BuildError;
 
 // ---------------------------------------------------------------------------
 // Schemi zod
@@ -157,7 +187,14 @@ export const BuildRequestSchema: z.ZodType<BuildRequest> = z.object({
 
 export const CancelSchema: z.ZodType<Cancel> = z.object({ kind: z.literal("cancel"), id: requestId });
 
-export const ClientMessageSchema = z.union([InitRequestSchema, BuildRequestSchema, CancelSchema]);
+export const ExportStepRequestSchema: z.ZodType<ExportStepRequest> = z.object({
+  kind: z.literal("export-step"),
+  id: requestId,
+  pieces: z.array(PieceGeometryInputSchema).min(1),
+  options: BuildOptionsSchema.optional(),
+});
+
+export const ClientMessageSchema = z.union([InitRequestSchema, BuildRequestSchema, CancelSchema, ExportStepRequestSchema]);
 
 export const ProgressSchema: z.ZodType<Progress> = z
   .object({
@@ -217,8 +254,21 @@ export const BuildDoneSchema: z.ZodType<BuildDone> = z.object({
 export const BuildErrorSchema: z.ZodType<BuildError> = z.object({
   kind: z.literal("error"),
   id: requestId.nullable(),
-  phase: z.enum(["init", "build"]),
+  phase: z.enum(["init", "build", "export"]),
   message: z.string().min(1),
+});
+
+export const PieceExportErrorSchema: z.ZodType<PieceExportError> = z.object({
+  pieceId: z.string().min(1),
+  message: z.string().min(1),
+});
+
+export const StepResultSchema: z.ZodType<StepResult> = z.object({
+  kind: z.literal("step-result"),
+  id: requestId,
+  data: z.instanceof(Uint8Array),
+  written: z.array(z.string().min(1)),
+  errors: z.array(PieceExportErrorSchema),
 });
 
 export const ReadySchema: z.ZodType<Ready> = z.object({ kind: z.literal("ready") });
@@ -228,11 +278,13 @@ export const WorkerMessageSchema = z.union([
   ProgressSchema,
   PieceResultMessageSchema,
   BuildDoneSchema,
+  StepResultSchema,
   BuildErrorSchema,
 ]);
 
-/** Oggetti trasferibili (buffer delle mesh) di un messaggio del worker, per `postMessage`. */
+/** Oggetti trasferibili (buffer delle mesh o del file STEP) di un messaggio del worker, per `postMessage`. */
 export function transferablesOf(msg: WorkerMessage): ArrayBuffer[] {
+  if (msg.kind === "step-result") return msg.data.buffer instanceof ArrayBuffer ? [msg.data.buffer] : [];
   if (msg.kind !== "piece-result" || !msg.result.mesh) return [];
   const { positions, normals, indices } = msg.result.mesh;
   return [positions.buffer, normals.buffer, indices.buffer].filter(

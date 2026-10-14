@@ -5,6 +5,8 @@ import {
   BuildRequestSchema,
   CancelSchema,
   ClientMessageSchema,
+  ExportStepRequestSchema,
+  StepResultSchema,
   PieceResultMessageSchema,
   ProgressSchema,
   WorkerMessageSchema,
@@ -84,5 +86,23 @@ describe("protocollo kernel", () => {
     const msg: WorkerMessage = { kind: "piece-result", id: 1, result: { pieceId: "A", cacheKey: "k", pose: identity(), mesh: mesh() } };
     expect(transferablesOf(msg)).toHaveLength(3);
     expect(transferablesOf({ kind: "ready" })).toEqual([]);
+  });
+
+  it("valida ExportStepRequest e StepResult; il buffer STEP è trasferibile", () => {
+    const req = { kind: "export-step", id: 4, pieces: [piece], options: { tolerance: 0.5 } };
+    expect(ExportStepRequestSchema.safeParse(req).success).toBe(true);
+    expect(ClientMessageSchema.safeParse(req).success).toBe(true);
+    expect(ExportStepRequestSchema.safeParse({ ...req, pieces: [] }).success).toBe(false);
+    const res: WorkerMessage = {
+      kind: "step-result",
+      id: 4,
+      data: new TextEncoder().encode("ISO-10303-21;"),
+      written: ["PIL-01"],
+      errors: [{ pieceId: "PIL-02", message: "solido non costruibile" }],
+    };
+    expect(StepResultSchema.safeParse(res).success).toBe(true);
+    expect(WorkerMessageSchema.safeParse(res).success).toBe(true);
+    expect(transferablesOf(res)).toHaveLength(1);
+    expect(WorkerMessageSchema.safeParse({ kind: "error", id: 4, phase: "export", message: "x" }).success).toBe(true);
   });
 });

@@ -3,12 +3,13 @@ import { generate } from "@/domain";
 import { identity } from "@/domain/math/mat4";
 import {
   BuildCancelledError,
+  KernelExportError,
   KernelUnavailableError,
   createKernelClient,
   type BuildProgress,
   type WorkerLike,
 } from "./client";
-import type { BuildRequest, ClientMessage, PieceResult, WorkerMessage } from "./protocol";
+import type { BuildRequest, ClientMessage, ExportStepRequest, PieceResult, WorkerMessage } from "./protocol";
 
 /** Worker finto: registra i messaggi e permette di rispondere a mano. */
 class FakeWorker implements WorkerLike {
@@ -169,5 +170,35 @@ describe("createKernelClient", () => {
     client.dispose();
     expect(w.terminated).toBe(true);
     expect(client.status).toBe("unavailable");
+  });
+
+  it("exportStep invia export-step senza annullare la build e risolve con il file", async () => {
+    const client = createKernelClient({ createWorker: () => new FakeWorker() });
+    const w = FakeWorker.last!;
+    w.emit({ kind: "ready" });
+    const build = client.build(assembly);
+    const exp = client.exportStep(assembly, { tolerance: 0.5 });
+    const req = w.sent.at(-1) as ExportStepRequest;
+    expect(req).toMatchObject({ kind: "export-step", options: { tolerance: 0.5 } });
+    expect(req.pieces).toHaveLength(assembly.pieces.length);
+    const data = new TextEncoder().encode("ISO-10303-21;");
+    w.emit({ kind: "step-result", id: req.id, data, written: ["PIL-01"], errors: [] });
+    await expect(exp).resolves.toEqual({ data, written: ["PIL-01"], errors: [] });
+    respond(w, w.lastBuild(), []);
+    await expect(build).resolves.toHaveLength(assembly.pieces.length);
+  });
+
+  it("exportStep: errore di fase export → KernelExportError; kernel non disponibile → rifiuto", async () => {
+    const client = createKernelClient({ createWorker: () => new FakeWorker() });
+    const w = FakeWorker.last!;
+    w.emit({ kind: "ready" });
+    const exp = client.exportStep(assembly);
+    const req = w.sent.at(-1) as ExportStepRequest;
+    w.emit({ kind: "error", id: req.id, phase: "export", message: "nessun pezzo esportabile" });
+    await expect(exp).rejects.toBeInstanceOf(KernelExportError);
+    const pendingExp = client.exportStep(assembly);
+    w.emit({ kind: "error", id: null, phase: "init", message: "crash" });
+    await expect(pendingExp).rejects.toBeInstanceOf(KernelUnavailableError);
+    await expect(client.exportStep(assembly)).rejects.toBeInstanceOf(KernelUnavailableError);
   });
 });

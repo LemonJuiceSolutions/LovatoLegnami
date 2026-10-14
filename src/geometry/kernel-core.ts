@@ -1,15 +1,19 @@
-import type { Solid } from "replicad";
+import type { Shape3D, Solid } from "replicad";
 import { measureVolume } from "replicad";
+import { exportStep } from "@/export/step";
 import { LruCache, pieceCacheKey } from "./cache";
 import type { NeutralBrep } from "./neutral-brep";
 import { PieceBuildError, buildPieceSolid, errorMessage } from "./occt/build-piece";
 import { extractBrep } from "./occt/extract-brep";
 import { initOcct, type OcctFactory } from "./occt/init";
 import { DEFAULT_ANGULAR_TOLERANCE, DEFAULT_MESH_TOLERANCE, meshShape } from "./occt/mesh";
+import { placeShape } from "./occt/pose";
 import {
   transferablesOf,
   type BuildRequest,
   type ClientMessage,
+  type ExportStepRequest,
+  type PieceExportError,
   type PieceGeometryInput,
   type PieceMesh,
   type PieceResult,
@@ -107,6 +111,58 @@ export function createKernel(options: KernelOptions): Kernel {
     }
   };
 
+  /** Voce di cache del pezzo, costruita se manca. */
+  const entryFor = (piece: PieceGeometryInput, opts: BuildRequest["options"]) => {
+    const keys = keyFor(piece, opts);
+    let entry = cache.get(keys.entryKey);
+    let fresh = false;
+    if (entry) stats.cacheHits++;
+    else {
+      entry = buildOne(piece, opts);
+      fresh = true;
+      cache.set(keys.entryKey, entry);
+    }
+    return { ...keys, entry, fresh };
+  };
+
+  /** Export STEP (9.1): solidi in cache posizionati con la posa del pezzo. */
+  const exportStepFile = async (req: ExportStepRequest): Promise<void> => {
+    try {
+      await ensureInit();
+    } catch (e) {
+      post({ kind: "error", id: req.id, phase: "init", message: errorMessage(e) });
+      return;
+    }
+    const placed: Shape3D[] = [];
+    const written: string[] = [];
+    const errors: PieceExportError[] = [];
+    try {
+      for (const piece of req.pieces) {
+        const { entry } = entryFor(piece, req.options);
+        if (!entry.solid) {
+          errors.push({ pieceId: piece.id, message: entry.error?.message ?? `Pezzo ${piece.id}: solido non disponibile` });
+          continue;
+        }
+        try {
+          placed.push(placeShape(entry.solid, piece.pose));
+          written.push(piece.id);
+        } catch (e) {
+          errors.push({ pieceId: piece.id, message: `Pezzo ${piece.id}: ${errorMessage(e)}` });
+        }
+      }
+      if (placed.length === 0) {
+        post({ kind: "error", id: req.id, phase: "export", message: "Export STEP: nessun pezzo esportabile" });
+        return;
+      }
+      const data = await exportStep(placed, written);
+      post({ kind: "step-result", id: req.id, data, written, errors });
+    } catch (e) {
+      post({ kind: "error", id: req.id, phase: "export", message: errorMessage(e) });
+    } finally {
+      for (const s of placed) s.delete();
+    }
+  };
+
   const build = async (req: BuildRequest): Promise<void> => {
     current = req.id;
     try {
@@ -123,14 +179,8 @@ export function createKernel(options: KernelOptions): Kernel {
       await yieldControl();
       if (current !== req.id) return;
       const piece = req.pieces[i];
-      const { pieceKey, entryKey } = keyFor(piece, req.options);
-      let entry = cache.get(entryKey);
-      if (entry) stats.cacheHits++;
-      else {
-        entry = buildOne(piece, req.options);
-        built++;
-        cache.set(entryKey, entry);
-      }
+      const { pieceKey, entry, fresh } = entryFor(piece, req.options);
+      if (fresh) built++;
       const result: PieceResult = {
         pieceId: piece.id,
         cacheKey: pieceKey,
@@ -164,6 +214,8 @@ export function createKernel(options: KernelOptions): Kernel {
         case "build":
           if (msg.id < current) return; // richiesta già superata
           return build(msg);
+        case "export-step":
+          return exportStepFile(msg);
       }
     },
     solidFor(piece, opts) {

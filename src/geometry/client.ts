@@ -2,6 +2,7 @@ import type { Assembly, Piece } from "@/domain/components/types";
 import type {
   BuildOptions,
   ClientMessage,
+  PieceExportError,
   PieceGeometryInput,
   PieceResult,
   Progress,
@@ -42,10 +43,26 @@ export interface KernelClient {
     onProgress?: (progress: BuildProgress) => void,
     options?: BuildOptions,
   ): Promise<PieceResult[]>;
+  /**
+   * Export STEP dei pezzi (9.1) eseguito nel worker: riusa i solidi in cache
+   * della build con le stesse `options` (costruisce quelli mancanti). Non
+   * annulla la build in corso. Rifiuta con `KernelExportError` se nessun
+   * pezzo è esportabile.
+   */
+  exportStep(assembly: Pick<Assembly, "pieces">, options?: BuildOptions): Promise<StepExport>;
   /** Annulla la costruzione in corso (la sua promessa viene rifiutata). */
   cancel(): void;
   /** Termina il worker. */
   dispose(): void;
+}
+
+/** File STEP prodotto dal worker. */
+export interface StepExport {
+  readonly data: Uint8Array;
+  /** Id dei pezzi scritti. */
+  readonly written: readonly string[];
+  /** Pezzi esclusi (solido non costruibile). */
+  readonly errors: readonly PieceExportError[];
 }
 
 /** Il kernel non è disponibile (WASM non caricato, worker non avviabile). */
@@ -69,6 +86,14 @@ export class KernelBuildError extends Error {
   constructor(message: string) {
     super(message);
     this.name = "KernelBuildError";
+  }
+}
+
+/** Errore dell'export STEP nel worker. */
+export class KernelExportError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "KernelExportError";
   }
 }
 
@@ -114,6 +139,7 @@ export function createKernelClient(options: KernelClientOptions = {}): KernelCli
   let error: string | undefined;
   let nextId = 1;
   let pending: PendingBuild | null = null;
+  const exports = new Map<number, { resolve: (r: StepExport) => void; reject: (e: Error) => void }>();
   const listeners = new Set<(s: KernelStatus, e?: string) => void>();
   const readyWaiters: { resolve: () => void; reject: (e: Error) => void }[] = [];
   let worker: WorkerLike | null = null;
@@ -130,6 +156,8 @@ export function createKernelClient(options: KernelClientOptions = {}): KernelCli
         pending.reject(err);
         pending = null;
       }
+      for (const e of exports.values()) e.reject(err);
+      exports.clear();
     }
   };
 
@@ -139,7 +167,10 @@ export function createKernelClient(options: KernelClientOptions = {}): KernelCli
         if (status !== "unavailable") setStatus("ready");
         return;
       case "error":
-        if (msg.phase === "init") {
+        if (msg.phase === "export" && msg.id !== null) {
+          exports.get(msg.id)?.reject(new KernelExportError(msg.message));
+          exports.delete(msg.id);
+        } else if (msg.phase === "init") {
           setStatus("unavailable", msg.message);
         } else if (pending && pending.id === msg.id) {
           pending.reject(new KernelBuildError(msg.message));
@@ -152,6 +183,12 @@ export function createKernelClient(options: KernelClientOptions = {}): KernelCli
       case "piece-result":
         if (pending && pending.id === msg.id) pending.results.set(msg.result.pieceId, msg.result);
         return;
+      case "step-result": {
+        const e = exports.get(msg.id);
+        exports.delete(msg.id);
+        e?.resolve({ data: msg.data, written: msg.written, errors: msg.errors });
+        return;
+      }
       case "done":
         if (pending && pending.id === msg.id) {
           const p = pending;
@@ -214,6 +251,15 @@ export function createKernelClient(options: KernelClientOptions = {}): KernelCli
         pending = { id, order: pieces.map((p) => p.id), results: new Map(), onProgress, resolve, reject };
       });
       worker.postMessage({ kind: "build", id, pieces, ...(buildOptions ? { options: buildOptions } : {}) });
+      return promise;
+    },
+    exportStep(assembly, buildOptions) {
+      if (status === "unavailable" || !worker)
+        return Promise.reject(new KernelUnavailableError(error ?? "worker non avviato"));
+      const id = nextId++;
+      const pieces = assembly.pieces.map(toGeometryInput);
+      const promise = new Promise<StepExport>((resolve, reject) => exports.set(id, { resolve, reject }));
+      worker.postMessage({ kind: "export-step", id, pieces, ...(buildOptions ? { options: buildOptions } : {}) });
       return promise;
     },
     cancel: cancelPending,

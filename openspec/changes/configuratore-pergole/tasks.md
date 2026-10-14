@@ -69,7 +69,7 @@ Riferimenti: `specs/*/spec.md` per il comportamento atteso, `design.md` per arch
 
 ## 9. Export STEP, distinta CSV, nomi file
 
-- [ ] 9.1 Implementare `src/export/step/index.ts` `exportStep(shapes, names)` tramite replicad (compound di solidi, nome per pezzo, mm) eseguito nel worker (nuovo messaggio `ExportStep`); verificare con test geometry che il file prodotto per 2 box contiene 2 `MANIFOLD_SOLID_BREP` e i nomi dei pezzi.
+- [x] 9.1 Implementare `src/export/step/index.ts` `exportStep(shapes, names)` tramite replicad (compound di solidi, nome per pezzo, mm) eseguito nel worker (nuovo messaggio `ExportStep`); verificare con test geometry che il file prodotto per 2 box contiene 2 `MANIFOLD_SOLID_BREP` e i nomi dei pezzi.
 - [ ] 9.2 Implementare `src/export/csv/distinta.ts` `buildDistinta(assembly)` (raggruppamento per tipo+sezione+lunghezza+hash lavorazioni, colonne `ID;Tipo;Sezione;Lunghezza;Quantità;Lavorazioni`, `;`, BOM UTF-8, decimali con virgola); verificare con test: 11 travetti identici → 1 riga quantità 11 con gli id, pilastri 2400/2400/2500 → 2 righe.
 - [ ] 9.3 Implementare `src/export/filename.ts` (`pergola-<tipologia>-<AAAAMMGG-HHMM>.<ext>`) e `src/export/download.ts` (download Blob nel browser); verificare con test del nome file per la data della spec (`pergola-addossata-monofalda-20261014-0930.sat`).
 
