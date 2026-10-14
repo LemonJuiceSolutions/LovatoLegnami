@@ -1,0 +1,822 @@
+{
+  "hardware": [
+    {
+      "code": "staffa-terra-joint-90",
+      "description": "Staffa a terra JOINT 90 (bicchiere antracite)",
+      "dims": {
+        "x": 150,
+        "y": 94,
+        "z": 94
+      },
+      "id": "STT-01",
+      "kind": "staffa-terra",
+      "machiningIds": [],
+      "params": {
+        "anchor": "piede"
+      },
+      "pieceIds": [
+        "PIL-01"
+      ],
+      "pose": [
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1
+      ],
+      "quantity": 1
+    },
+    {
+      "code": "vite-6x40",
+      "description": "Vite nera 6×40",
+      "id": "VIT-01",
+      "kind": "vite",
+      "machiningIds": [],
+      "params": {},
+      "pieceIds": [
+        "PIL-01",
+        "PIL-02",
+        "PIL-03",
+        "PIL-04",
+        "TRV-01",
+        "TRV-03",
+        "TRV-04",
+        "TRV-02",
+        "TRV-05",
+        "TRV-06"
+      ],
+      "quantity": 160
+    },
+    {
+      "code": "staffa-terra-joint-90",
+      "description": "Staffa a terra JOINT 90 (bicchiere antracite)",
+      "dims": {
+        "x": 150,
+        "y": 94,
+        "z": 94
+      },
+      "id": "STT-02",
+      "kind": "staffa-terra",
+      "machiningIds": [],
+      "params": {
+        "anchor": "piede"
+      },
+      "pieceIds": [
+        "PIL-02"
+      ],
+      "pose": [
+        0,
+        1,
+        0,
+        2580,
+        0,
+        0,
+        1,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1
+      ],
+      "quantity": 1
+    },
+    {
+      "code": "staffa-terra-joint-90",
+      "description": "Staffa a terra JOINT 90 (bicchiere antracite)",
+      "dims": {
+        "x": 150,
+        "y": 94,
+        "z": 94
+      },
+      "id": "STT-03",
+      "kind": "staffa-terra",
+      "machiningIds": [],
+      "params": {
+        "anchor": "piede"
+      },
+      "pieceIds": [
+        "PIL-03"
+      ],
+      "pose": [
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        2580,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1
+      ],
+      "quantity": 1
+    },
+    {
+      "code": "staffa-terra-joint-90",
+      "description": "Staffa a terra JOINT 90 (bicchiere antracite)",
+      "dims": {
+        "x": 150,
+        "y": 94,
+        "z": 94
+      },
+      "id": "STT-04",
+      "kind": "staffa-terra",
+      "machiningIds": [],
+      "params": {
+        "anchor": "piede"
+      },
+      "pieceIds": [
+        "PIL-04"
+      ],
+      "pose": [
+        0,
+        1,
+        0,
+        2580,
+        0,
+        0,
+        1,
+        2580,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1
+      ],
+      "quantity": 1
+    },
+    {
+      "code": "giunto-joint-3a-vie-90-90",
+      "description": "Giunto JOINT 3 vie angolare 90° per 90×90",
+      "dims": {
+        "x": 360,
+        "y": 360,
+        "z": 360
+      },
+      "id": "GNT-01",
+      "kind": "giunto-vie",
+      "machiningIds": [],
+      "params": {
+        "angle": 90,
+        "layout": "3A",
+        "ways": 3
+      },
+      "pieceIds": [
+        "PIL-01",
+        "TRV-01",
+        "TRV-03"
+      ],
+      "pose": [
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        2490,
+        0,
+        0,
+        0,
+        1
+      ],
+      "quantity": 1
+    },
+    {
+      "code": "giunto-joint-3a-vie-90-90",
+      "description": "Giunto JOINT 3 vie angolare 90° per 90×90",
+      "dims": {
+        "x": 360,
+        "y": 360,
+        "z": 360
+      },
+      "id": "GNT-02",
+      "kind": "giunto-vie",
+      "machiningIds": [],
+      "params": {
+        "angle": 90,
+        "layout": "3A",
+        "ways": 3
+      },
+      "pieceIds": [
+        "PIL-02",
+        "TRV-01",
+        "TRV-04"
+      ],
+      "pose": [
+        1,
+        0,
+        0,
+        2580,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        2490,
+        0,
+        0,
+        0,
+        1
+      ],
+      "quantity": 1
+    },
+    {
+      "code": "giunto-joint-3a-vie-90-90",
+      "description": "Giunto JOINT 3 vie angolare 90° per 90×90",
+      "dims": {
+        "x": 360,
+        "y": 360,
+        "z": 360
+      },
+      "id": "GNT-03",
+      "kind": "giunto-vie",
+      "machiningIds": [],
+      "params": {
+        "angle": 90,
+        "layout": "3A",
+        "ways": 3
+      },
+      "pieceIds": [
+        "PIL-03",
+        "TRV-02",
+        "TRV-03"
+      ],
+      "pose": [
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        2580,
+        0,
+        0,
+        1,
+        2490,
+        0,
+        0,
+        0,
+        1
+      ],
+      "quantity": 1
+    },
+    {
+      "code": "giunto-joint-3a-vie-90-90",
+      "description": "Giunto JOINT 3 vie angolare 90° per 90×90",
+      "dims": {
+        "x": 360,
+        "y": 360,
+        "z": 360
+      },
+      "id": "GNT-04",
+      "kind": "giunto-vie",
+      "machiningIds": [],
+      "params": {
+        "angle": 90,
+        "layout": "3A",
+        "ways": 3
+      },
+      "pieceIds": [
+        "PIL-04",
+        "TRV-02",
+        "TRV-04"
+      ],
+      "pose": [
+        1,
+        0,
+        0,
+        2580,
+        0,
+        1,
+        0,
+        2580,
+        0,
+        0,
+        1,
+        2490,
+        0,
+        0,
+        0,
+        1
+      ],
+      "quantity": 1
+    },
+    {
+      "code": "giunto-joint-3l-vie-90-90",
+      "description": "Giunto JOINT 3 vie lineare 90° per 90×90",
+      "dims": {
+        "x": 360,
+        "y": 360,
+        "z": 360
+      },
+      "id": "GNT-05",
+      "kind": "giunto-vie",
+      "machiningIds": [],
+      "params": {
+        "angle": 90,
+        "layout": "3L",
+        "ways": 3
+      },
+      "pieceIds": [
+        "TRV-01",
+        "TRV-05"
+      ],
+      "pose": [
+        1,
+        0,
+        0,
+        860,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        2490,
+        0,
+        0,
+        0,
+        1
+      ],
+      "quantity": 1
+    },
+    {
+      "code": "giunto-joint-3l-vie-90-90",
+      "description": "Giunto JOINT 3 vie lineare 90° per 90×90",
+      "dims": {
+        "x": 360,
+        "y": 360,
+        "z": 360
+      },
+      "id": "GNT-06",
+      "kind": "giunto-vie",
+      "machiningIds": [],
+      "params": {
+        "angle": 90,
+        "layout": "3L",
+        "ways": 3
+      },
+      "pieceIds": [
+        "TRV-02",
+        "TRV-05"
+      ],
+      "pose": [
+        1,
+        0,
+        0,
+        860,
+        0,
+        1,
+        0,
+        2580,
+        0,
+        0,
+        1,
+        2490,
+        0,
+        0,
+        0,
+        1
+      ],
+      "quantity": 1
+    },
+    {
+      "code": "giunto-joint-3l-vie-90-90",
+      "description": "Giunto JOINT 3 vie lineare 90° per 90×90",
+      "dims": {
+        "x": 360,
+        "y": 360,
+        "z": 360
+      },
+      "id": "GNT-07",
+      "kind": "giunto-vie",
+      "machiningIds": [],
+      "params": {
+        "angle": 90,
+        "layout": "3L",
+        "ways": 3
+      },
+      "pieceIds": [
+        "TRV-01",
+        "TRV-06"
+      ],
+      "pose": [
+        1,
+        0,
+        0,
+        1720,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        2490,
+        0,
+        0,
+        0,
+        1
+      ],
+      "quantity": 1
+    },
+    {
+      "code": "giunto-joint-3l-vie-90-90",
+      "description": "Giunto JOINT 3 vie lineare 90° per 90×90",
+      "dims": {
+        "x": 360,
+        "y": 360,
+        "z": 360
+      },
+      "id": "GNT-08",
+      "kind": "giunto-vie",
+      "machiningIds": [],
+      "params": {
+        "angle": 90,
+        "layout": "3L",
+        "ways": 3
+      },
+      "pieceIds": [
+        "TRV-02",
+        "TRV-06"
+      ],
+      "pose": [
+        1,
+        0,
+        0,
+        1720,
+        0,
+        1,
+        0,
+        2580,
+        0,
+        0,
+        1,
+        2490,
+        0,
+        0,
+        0,
+        1
+      ],
+      "quantity": 1
+    }
+  ],
+  "joints": [],
+  "meta": {
+    "fissaggio": "libera",
+    "forma": "piana",
+    "interasseX": 2580,
+    "interasseY": 2580,
+    "pendenza": 0,
+    "rialzoFilaAlta": 0,
+    "sezioneAsta": "90×90"
+  },
+  "params": {
+    "altezza": 2445,
+    "campate": 1,
+    "campateProfondita": 1,
+    "fissaggio": "libera",
+    "forma": "piana",
+    "interasseTraversi": 1100,
+    "larghezza": 2580,
+    "profondita": 2580,
+    "sezioneAsta": "90×90",
+    "staffeTerra": true
+  },
+  "pieces": [
+    {
+      "family": "PIL",
+      "id": "PIL-01",
+      "label": "pilastro",
+      "length": 2400,
+      "machinings": [],
+      "pose": [
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1
+      ],
+      "section": {
+        "b": 90,
+        "h": 90
+      },
+      "type": "pilastro"
+    },
+    {
+      "family": "PIL",
+      "id": "PIL-02",
+      "label": "pilastro",
+      "length": 2400,
+      "machinings": [],
+      "pose": [
+        0,
+        1,
+        0,
+        2580,
+        0,
+        0,
+        1,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1
+      ],
+      "section": {
+        "b": 90,
+        "h": 90
+      },
+      "type": "pilastro"
+    },
+    {
+      "family": "PIL",
+      "id": "PIL-03",
+      "label": "pilastro",
+      "length": 2400,
+      "machinings": [],
+      "pose": [
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        2580,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1
+      ],
+      "section": {
+        "b": 90,
+        "h": 90
+      },
+      "type": "pilastro"
+    },
+    {
+      "family": "PIL",
+      "id": "PIL-04",
+      "label": "pilastro",
+      "length": 2400,
+      "machinings": [],
+      "pose": [
+        0,
+        1,
+        0,
+        2580,
+        0,
+        0,
+        1,
+        2580,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1
+      ],
+      "section": {
+        "b": 90,
+        "h": 90
+      },
+      "type": "pilastro"
+    },
+    {
+      "family": "TRV",
+      "id": "TRV-01",
+      "label": "trave",
+      "length": 2400,
+      "machinings": [],
+      "pose": [
+        1,
+        0,
+        0,
+        90,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        2490,
+        0,
+        0,
+        0,
+        1
+      ],
+      "section": {
+        "b": 90,
+        "h": 90
+      },
+      "type": "trave"
+    },
+    {
+      "family": "TRV",
+      "id": "TRV-02",
+      "label": "trave",
+      "length": 2400,
+      "machinings": [],
+      "pose": [
+        1,
+        0,
+        0,
+        90,
+        0,
+        1,
+        0,
+        2580,
+        0,
+        0,
+        1,
+        2490,
+        0,
+        0,
+        0,
+        1
+      ],
+      "section": {
+        "b": 90,
+        "h": 90
+      },
+      "type": "trave"
+    },
+    {
+      "family": "TRV",
+      "id": "TRV-03",
+      "label": "trave",
+      "length": 2400,
+      "machinings": [],
+      "pose": [
+        0,
+        -1,
+        0,
+        0,
+        1,
+        0,
+        0,
+        90,
+        0,
+        0,
+        1,
+        2490,
+        0,
+        0,
+        0,
+        1
+      ],
+      "section": {
+        "b": 90,
+        "h": 90
+      },
+      "type": "trave"
+    },
+    {
+      "family": "TRV",
+      "id": "TRV-04",
+      "label": "trave",
+      "length": 2400,
+      "machinings": [],
+      "pose": [
+        0,
+        -1,
+        0,
+        2580,
+        1,
+        0,
+        0,
+        90,
+        0,
+        0,
+        1,
+        2490,
+        0,
+        0,
+        0,
+        1
+      ],
+      "section": {
+        "b": 90,
+        "h": 90
+      },
+      "type": "trave"
+    },
+    {
+      "family": "TRV",
+      "id": "TRV-05",
+      "label": "traverso",
+      "length": 2400,
+      "machinings": [],
+      "pose": [
+        0,
+        -1,
+        0,
+        860,
+        1,
+        0,
+        0,
+        90,
+        0,
+        0,
+        1,
+        2490,
+        0,
+        0,
+        0,
+        1
+      ],
+      "section": {
+        "b": 90,
+        "h": 90
+      },
+      "type": "trave"
+    },
+    {
+      "family": "TRV",
+      "id": "TRV-06",
+      "label": "traverso",
+      "length": 2400,
+      "machinings": [],
+      "pose": [
+        0,
+        -1,
+        0,
+        1720,
+        1,
+        0,
+        0,
+        90,
+        0,
+        0,
+        1,
+        2490,
+        0,
+        0,
+        0,
+        1
+      ],
+      "section": {
+        "b": 90,
+        "h": 90
+      },
+      "type": "trave"
+    }
+  ],
+  "typologySlug": "telaio-giunti"
+}

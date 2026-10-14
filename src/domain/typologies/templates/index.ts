@@ -4,8 +4,9 @@ import { addossataSandwich } from "./addossata-sandwich";
 import { autoportanteBifalda } from "./autoportante-bifalda";
 import { monofaldaScalare } from "./monofalda-scalare";
 import { portaleSandwich } from "./portale-sandwich";
+import { telaioGiunti } from "./telaio-giunti";
 
-export { addossataMonofalda, addossataSandwich, autoportanteBifalda, monofaldaScalare, portaleSandwich };
+export { addossataMonofalda, addossataSandwich, autoportanteBifalda, monofaldaScalare, portaleSandwich, telaioGiunti };
 
 /** Template di tipologia inclusi nel prodotto, nell'ordine di elenco. */
 export const BUILTIN_TEMPLATES: readonly TypologyTemplate[] = [
@@ -14,4 +15,5 @@ export const BUILTIN_TEMPLATES: readonly TypologyTemplate[] = [
   portaleSandwich,
   addossataSandwich,
   monofaldaScalare,
+  telaioGiunti,
 ];
