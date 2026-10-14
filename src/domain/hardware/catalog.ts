@@ -170,11 +170,10 @@ const DATA: HardwareSpec[] = [
       name: `Staffa a muro listoni paralleli ${gap} (lama tra le tavole)`,
       forSections: [plank],
       dims: { x: 160, y: gap, z: plank.h },
-      // la lama tra le tavole è serrata da 1 bullone passante: foro Ø13 nelle tavole [dedotto: a 60 dalla testa a muro]
-      holes: { anchor: "testa", features: [lateralHole(60, 13)] },
-      accessories: [{ code: gap === 90 ? "bullone-m12x200" : "bullone-m12x240", count: 1 }],
+      // la lama tra le tavole è serrata da 1 bullone passante (tavola–lama–tavola): fori e bullone
+      // vengono dallo step `bullone-passante` del template, che ne calcola la lunghezza
       screws: screws("tassello-10x85", 2),
-      source: "ricerca-chepergola.md §1 T-B (2 tasselli e 1 bullone per staffa dalle distinte 2×3 e 4×6), T-C; quote [dedotto]",
+      source: "ricerca-chepergola.md §1 T-B (2 tasselli e 1 bullone passante per staffa dalle distinte 2×3 e 4×6), T-C",
       validation: VALIDATION,
     }),
   ),
