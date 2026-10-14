@@ -64,6 +64,17 @@ describe("store configuratore – config e derived", () => {
     expect(store.getState().config.typology).toBe("autoportante-bifalda");
   });
 
+  it("ripristina sulla bifalda: ingombro di default allargato, nessuna collisione né errore", () => {
+    const store = createConfiguratoreStore();
+    store.getState().setTypology("autoportante-bifalda");
+    store.getState().resetConfig("autoportante-bifalda");
+    const { config, derived } = store.getState();
+    expect(config.envelope.box.depth).toBeGreaterThan(defaultConfig().envelope.box.depth);
+    expect(derived.collisions).toEqual([]);
+    expect(selectErrors(store.getState())).toEqual([]);
+    expect(defaultConfig().envelope).toBe(defaultConfig("addossata-monofalda").envelope);
+  });
+
   it("parametro comune non ammesso dalla nuova tipologia torna al default", () => {
     const store = createConfiguratoreStore({ initialConfig: defaultConfig("autoportante-bifalda") });
     store.getState().setParam("pendenza", 34);

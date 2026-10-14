@@ -2,6 +2,7 @@ import {
   DEFAULT_LOVATO_RULES,
   ParamError,
   TypologyNotFoundError,
+  assemblyBounds,
   checkCollisions,
   defaultParams,
   evaluateRules,
@@ -66,12 +67,42 @@ export const DEFAULT_TYPOLOGY = "addossata-monofalda";
 /** Ingombro di default: contiene la monofalda di default con il muro 50 mm dietro la banchina. */
 export const DEFAULT_ENVELOPE: Envelope = parseEnvelope({ box: { width: 6000, depth: 3600, height: 3700 } });
 
+const ceil100 = (mm: number) => Math.ceil(mm / 100) * 100;
+const envelopeCache = new Map<string, Envelope>();
+
+/**
+ * Ingombro di default della tipologia: `DEFAULT_ENVELOPE` se contiene
+ * l'assieme di default senza collisioni, altrimenti allargato (al centimetro
+ * superiore, con 100 mm di margine) fino a contenerlo, così "Ripristina" non
+ * parte mai da una configurazione in collisione (es. bifalda 5 × 4 m).
+ */
+export function defaultEnvelopeFor(typology: string): Envelope {
+  const cached = envelopeCache.get(typology);
+  if (cached) return cached;
+  const assembly = generate(typology);
+  let envelope = DEFAULT_ENVELOPE;
+  const bounds = assemblyBounds(assembly);
+  if (bounds && checkCollisions(assembly, DEFAULT_ENVELOPE).length > 0) {
+    const { max } = bounds;
+    const box = DEFAULT_ENVELOPE.box;
+    envelope = parseEnvelope({
+      box: {
+        width: Math.max(box.width, ceil100(max.x)),
+        depth: Math.max(box.depth, ceil100(max.y) + 100),
+        height: Math.max(box.height, ceil100(max.z) + 100),
+      },
+    });
+  }
+  envelopeCache.set(typology, envelope);
+  return envelope;
+}
+
 export function defaultConfig(typology: string = DEFAULT_TYPOLOGY): ConfiguratoreConfig {
   return {
     schemaVersion: CONFIG_SCHEMA_VERSION,
     typology,
     params: { ...defaultParams(getTypology(typology)) },
-    envelope: DEFAULT_ENVELOPE,
+    envelope: defaultEnvelopeFor(typology),
     embedment: 0,
     exportOptions: { sat: DEFAULT_SAT_OPTIONS },
   };
