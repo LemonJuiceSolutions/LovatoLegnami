@@ -17,6 +17,9 @@ function getClaudeCommand(): { cmd: string; baseArgs: string[] } {
   }
 }
 
+const SAFE_SESSION_ID = /^[0-9a-f-]{36}$/i
+const SAFE_MODEL = /^[a-zA-Z0-9._:-]+$/
+
 interface ChatRequestBody {
   prompt: string
   provider?: 'ollama' | 'claude-cli' | 'anthropic' | 'openai' | 'openrouter'
@@ -49,6 +52,13 @@ export async function POST(request: NextRequest) {
       + (context ? '\n\n══ CONTESTO PAGINA ══\n' + context : '')
 
     if (provider === 'claude-cli') {
+      // Values end up on the CLI command line (via cmd.exe on Windows): allow only safe characters
+      if ((sessionId && !SAFE_SESSION_ID.test(sessionId)) || (model && !SAFE_MODEL.test(model))) {
+        return new Response(JSON.stringify({ error: 'sessionId o model non validi' }), {
+          status: 400,
+          headers: { 'Content-Type': 'application/json' },
+        })
+      }
       return handleClaudeCliChat(prompt, sessionId, serverSystemPrompt, model)
     }
 
@@ -167,8 +177,8 @@ function handleClaudeCliChat(
 
   const { cmd, baseArgs } = getClaudeCommand()
   const args: string[] = [...baseArgs]
-  if (sessionId) args.push('--resume', sessionId)
-  if (model) args.push('--model', model)
+  if (sessionId) args.push(`--resume=${sessionId}`)
+  if (model) args.push(`--model=${model}`)
   // --tools "": disable ALL built-in tools — agent responds with text only
   args.push('--tools', '')
   args.push('-p', '--output-format', 'stream-json', '--verbose')
