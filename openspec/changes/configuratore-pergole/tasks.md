@@ -12,7 +12,7 @@ Riferimenti: `specs/*/spec.md` per il comportamento atteso, `design.md` per arch
 
 - [x] 2.1 Implementare `src/domain/math/vec3.ts` (somma, scala, dot, cross, norm, distanza, uguaglianza con tolleranza 1e-6) e `mat4.ts` (identità, traslazione, rotazioni attorno agli assi, moltiplicazione, applica a punto/vettore, inversa di trasformazione rigida); verificare con test unitari su casi noti (rotazione 90° di (1,0,0) → (0,1,0), inversa·M = I).
 - [x] 2.2 Implementare `src/domain/math/aabb.ts` (AABB da punti, unione, contiene punto/box con tolleranza, intersezione e profondità di penetrazione) e `obb.ts` (OBB da pose + dimensioni, 8 vertici, test OBB–AABB con Separating Axis Theorem); verificare con test: box separati, box in contatto, box compenetranti con profondità attesa, box ruotato di 45° che interseca solo con la rotazione.
-- [ ] 2.3 Implementare `src/domain/math/interp.ts` (interpolazione bilineare su 4 angoli) e `delaunay.ts` (Bowyer–Watson 2D + interpolazione baricentrica che restituisce la quota al punto); verificare con test: piano → valore costante, pendenza → valore al centro, punto extra rispettato esattamente, punto fuori dall'involucro → estrapolazione dal bordo con flag `outside: true`.
+- [x] 2.3 Implementare `src/domain/math/interp.ts` (interpolazione bilineare su 4 angoli) e `delaunay.ts` (Bowyer–Watson 2D + interpolazione baricentrica che restituisce la quota al punto); verificare con test: piano → valore costante, pendenza → valore al centro, punto extra rispettato esattamente, punto fuori dall'involucro → estrapolazione dal bordo con flag `outside: true`.
 
 ## 3. Dominio – componenti e lavorazioni (spec `componenti-e-lavorazioni`)
 

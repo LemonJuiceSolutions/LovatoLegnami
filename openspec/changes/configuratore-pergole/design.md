@@ -154,3 +154,13 @@ Funzionalità additiva, nessuna migrazione dati. Deploy standard (`npm run build
 - Marca/modello della CNC e del CAM, e un file SAT campione accettato: determinano solo la versione ACIS e le opzioni di default.
 - Convenzioni aziendali di nomenclatura dei pezzi in produzione (prefissi, numerazione) da riflettere negli id: oggi `PIL-01` ecc.
 - Se servirà STEP AP242 con PMI o basta AP214: oggi AP214 di default.
+
+## Note di implementazione
+
+- **Vitest 3.2** (non 2.x): necessario per i `projects` inline in `vitest.config.ts` che il task 7.3 userà per la suite `geometry` (`--project geometry`). `test.exclude` include `**/node_modules/**` oltre a `**/*.geometry.test.ts`.
+- **Lint dominio**: override in `.eslintrc.json` per `src/domain/**` con `paths` (`react`, `react-dom`, `three`, `replicad`, `replicad-opencascadejs`) e `patterns` (`react/*`, `react-dom/*`, `three/*`, `replicad/*`, `@react-three/*`).
+- **Cartelle D1**: `index.ts` con `export {};` nei moduli (`domain/{math,components,typologies,rules,envelope,assembly}`, `geometry`, `export/{sat,step,csv,zip}`, `stores`); `.gitkeep` in `typologies/templates`, `rules/data`, `__fixtures__`, `components/configuratore`.
+- **`Mat4`**: array di 16 numeri **per righe** (`m[r*4+c]`), vettori colonna (`p' = M·p`), `multiply(a,b)` applica prima `b`. Rotazioni in **radianti** (helper `degToRad`/`radToDeg`); `fromBasis(origin, xAxis, zAxis)` ricava Y = Z × X. `axisOf`/`originOf` estraggono assi e origine della posa.
+- **Convenzione locale del pezzo** assunta in `obbFromPose(pose, size, localMin?)`: X da 0 a lunghezza, sezione centrata sull'asse X (`localMin = (0, −b/2, −h/2)`); sovrascrivibile con `localMin` se il task 3.1 sceglie diversamente.
+- **Profondità di penetrazione**: minima sovrapposizione sugli assi (AABB) o sui 15 assi SAT (OBB–AABB); > 0 compenetrazione, 0 contatto, < 0 separazione. `aabbIntersects`/`obbIntersectsAabb` sono stretti: il contatto non è collisione (profondità ≤ tol).
+- **Interpolazione**: `bilinear` e `interpolateAt` restituiscono `{ value, outside }`. Fuori dal dominio: bilineare clampa sul bordo del rettangolo; Delaunay proietta sullo spigolo di bordo più vicino dell'involucro convesso e interpola lungo lo spigolo. `triangulate` accorpa punti con stesse (x,y) (vince l'ultimo) e lancia errore per < 3 punti o punti allineati.
