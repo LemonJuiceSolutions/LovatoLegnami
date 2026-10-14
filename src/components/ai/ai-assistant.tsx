@@ -7,8 +7,8 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import type { AiMessage } from "@/lib/ai-types"
 
-const SETTINGS_KEY = "ceriana-ai-settings"
-const HISTORY_KEY = "ceriana-ai-history"
+const SETTINGS_KEY = "base-ai-settings"
+const HISTORY_KEY = "base-ai-history"
 
 function generateId() {
   return Math.random().toString(36).slice(2) + Date.now().toString(36)
@@ -66,13 +66,13 @@ export function AiAssistant() {
   // Pick up settings saved from /ai
   React.useEffect(() => {
     const handler = () => setAiSettings(getAiSettings())
-    window.addEventListener("ceriana-ai-settings-changed", handler)
-    return () => window.removeEventListener("ceriana-ai-settings-changed", handler)
+    window.addEventListener("base-ai-settings-changed", handler)
+    return () => window.removeEventListener("base-ai-settings-changed", handler)
   }, [])
 
   // Tell layout to make room for the panel
   React.useEffect(() => {
-    window.dispatchEvent(new CustomEvent("ceriana-ai-panel-toggle", { detail: { open } }))
+    window.dispatchEvent(new CustomEvent("base-ai-panel-toggle", { detail: { open } }))
   }, [open])
 
   React.useEffect(() => {

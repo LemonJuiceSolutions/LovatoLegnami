@@ -5,9 +5,9 @@ import "@/app/globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "CERIANA",
-  description: "Ceriana",
-  applicationName: "CERIANA",
+  title: "BASE",
+  description: "Base",
+  applicationName: "BASE",
 };
 
 export const viewport: Viewport = {

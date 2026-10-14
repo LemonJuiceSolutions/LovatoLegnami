@@ -114,7 +114,7 @@ function extractProvider(modelId: string): string {
   return modelId.split("/")[0] || modelId
 }
 
-const STORAGE_KEY = "ceriana-ai-settings"
+const STORAGE_KEY = "base-ai-settings"
 
 function loadSettings(): AiSettings {
   if (typeof window === "undefined") return { provider: "ollama", model: "qwen3:32b", apiKey: "", groqApiKey: "" }
@@ -137,7 +137,7 @@ function saveSettings(settings: AiSettings) {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(settings))
     // Dispatch event so AiAssistant components pick it up
-    window.dispatchEvent(new CustomEvent("ceriana-ai-settings-changed", { detail: settings }))
+    window.dispatchEvent(new CustomEvent("base-ai-settings-changed", { detail: settings }))
   } catch { /* ignore */ }
 }
 

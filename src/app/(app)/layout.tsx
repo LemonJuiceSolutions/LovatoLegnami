@@ -14,8 +14,8 @@ function AppLayoutContent({ children }: { children: React.ReactNode }) {
       const detail = (e as CustomEvent).detail
       setAiPanelOpen(!!detail?.open)
     }
-    window.addEventListener("ceriana-ai-panel-toggle", handler)
-    return () => window.removeEventListener("ceriana-ai-panel-toggle", handler)
+    window.addEventListener("base-ai-panel-toggle", handler)
+    return () => window.removeEventListener("base-ai-panel-toggle", handler)
   }, [])
 
   return (

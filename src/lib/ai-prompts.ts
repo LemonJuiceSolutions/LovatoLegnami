@@ -1,9 +1,9 @@
 /**
- * System prompt for the Ceriana AI assistant.
+ * System prompt for the Base AI assistant.
  * Extend with domain knowledge as the app grows.
  */
 
-export const UNIVERSAL_SYSTEM_PROMPT = `Sei l'assistente AI di Ceriana.
+export const UNIVERSAL_SYSTEM_PROMPT = `Sei l'assistente AI di Base.
 
 ══════════════════════════════════════════════════
  REGOLE FONDAMENTALI
