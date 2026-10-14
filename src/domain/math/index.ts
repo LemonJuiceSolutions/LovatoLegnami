@@ -4,3 +4,5 @@ export * from "./aabb";
 export * from "./obb";
 export * from "./interp";
 export * from "./delaunay";
+export * from "./plane";
+export * from "./arc";
