@@ -2,3 +2,4 @@
 export * from "./types";
 export * from "./ids";
 export * from "./bounds";
+export * from "./measures";
