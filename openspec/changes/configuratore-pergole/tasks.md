@@ -5,7 +5,7 @@ Riferimenti: `specs/*/spec.md` per il comportamento atteso, `design.md` per arch
 ## 1. Setup e tooling
 
 - [x] 1.1 Aggiungere `vitest` (devDependency) con `vitest.config.ts` (ambiente `node`, alias `@/*` → `src/*`, `include: ["src/**/*.test.ts"]`, esclusione `**/*.geometry.test.ts`) e script `test`, `test:watch` in `package.json`; verificare con un test banale `src/domain/smoke.test.ts` che `npm test` passa e `npm run build` resta verde.
-- [ ] 1.2 Aggiungere la regola eslint `no-restricted-imports` per `src/domain/**` che vieta `react`, `react-dom`, `three`, `@react-three/*`, `replicad`, `replicad-opencascadejs`; verificare che `npm run lint` fallisce su un file di prova con `import "react"` in `src/domain/` e passa dopo la rimozione.
+- [x] 1.2 Aggiungere la regola eslint `no-restricted-imports` per `src/domain/**` che vieta `react`, `react-dom`, `three`, `@react-three/*`, `replicad`, `replicad-opencascadejs`; verificare che `npm run lint` fallisce su un file di prova con `import "react"` in `src/domain/` e passa dopo la rimozione.
 - [ ] 1.3 Creare la struttura di cartelle di D1 (`src/domain/{math,components,typologies/templates,rules/data,envelope,assembly,__fixtures__}`, `src/geometry`, `src/export/{sat,step,csv,zip}`, `src/stores`, `src/components/configuratore`) con `index.ts` vuoti dove serve; verificare che `npm run build` passa.
 
 ## 2. Dominio – matematica di base

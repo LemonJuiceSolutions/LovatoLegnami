@@ -1,3 +1,25 @@
 {
-  "extends": "next/core-web-vitals"
+  "extends": "next/core-web-vitals",
+  "overrides": [
+    {
+      "files": ["src/domain/**/*.ts", "src/domain/**/*.tsx"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "paths": [
+              { "name": "react", "message": "src/domain è TypeScript puro: niente React." },
+              { "name": "react-dom", "message": "src/domain è TypeScript puro: niente React DOM." },
+              { "name": "three", "message": "src/domain è TypeScript puro: niente Three." },
+              { "name": "replicad", "message": "src/domain è TypeScript puro: niente kernel geometrico." },
+              { "name": "replicad-opencascadejs", "message": "src/domain è TypeScript puro: niente kernel geometrico." }
+            ],
+            "patterns": [
+              { "group": ["react/*", "react-dom/*", "three/*", "replicad/*", "@react-three/*"], "message": "src/domain è TypeScript puro: import vietato." }
+            ]
+          }
+        ]
+      }
+    }
+  ]
 }
