@@ -121,7 +121,10 @@ describe("mattoni duali: stessa pianta e stessa quota d'intradosso", () => {
     expect(count(a, "bullone")).toBe(0);
     for (const post of ofType(a, "pilastro")) {
       expect(post.machinings.map((m) => m.type)).toContain("tenone");
-      expect(maxZ(post)).toBeCloseTo(2400, 6);
+      // spalla del tenone a filo dell'intradosso: il tenone (60) entra nella trave
+      const tenone = post.machinings.find((m) => m.type === "tenone")!;
+      expect(tenone.type === "tenone" && tenone.length).toBe(60);
+      expect(maxZ(post)).toBeCloseTo(2460, 6);
     }
     expect(a.joints.filter((j) => j.type === "tenone-mortasa")).toHaveLength(4);
   });

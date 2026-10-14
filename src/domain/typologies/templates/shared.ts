@@ -82,7 +82,23 @@ export const commonParams = (d: {
   sec("sezioneControvento", "Sezione controventi", "controvento", "100×100"),
 ];
 
-export { num as numberParam, sec as sectionParam };
+/** Parametro a scelta da coppie `[valore, etichetta]` (o `[valore, etichetta, descrizione]`). */
+const choice = (
+  name: string,
+  label: string,
+  options: readonly (readonly [string, string] | readonly [string, string, string])[],
+  def: string,
+  extra: Partial<Omit<EnumParamSpec, "kind" | "name" | "label" | "options" | "default">> = {},
+): EnumParamSpec => ({
+  kind: "enum",
+  name,
+  label,
+  options: options.map(([value, l, description]) => ({ value, label: l, ...(description ? { description } : {}) })),
+  default: def,
+  ...extra,
+});
+
+export { num as numberParam, sec as sectionParam, choice as enumParam };
 
 /** Pose rigida da origine e assi X, Z (versori ortogonali). */
 const pose = fromBasis;
@@ -388,7 +404,9 @@ export interface PortalResult {
  *   pilastro (a ±h/4 dall'asse delle tavole), saette da 750 a 45° con la
  *   testa tra le tavole serrata da un bullone e 2 viti al piede;
  * - `carpenteria`: `trave` singola sopra i pilastri, `tenone-mortasa`
- *   pilastro → trave, saette a 45° tra pilastro e intradosso.
+ *   pilastro → trave (spalla a filo dell'intradosso, il tenone fa parte della
+ *   lunghezza del pilastro; testa sempre a squadra), saette a 45° tra
+ *   pilastro e intradosso.
  * I pilastri hanno Z locale lungo `dir` (b trasversale alla trave) e seguono
  * il pavimento come `columnStep`. Con trave inclinata la testa dei pilastri è
  * a squadra sotto il piano (default) o tagliata sul piano (`postHead`).
@@ -424,10 +442,13 @@ export function beamOnPosts(ctx: BuildContext, mode: Construction, o: PortalOpti
   // pilastri: testa a filo dell'estradosso (bullonata) o dell'intradosso (carpenteria)
   const headPlane = bolted ? top : bottom;
   const inclined = Math.abs(t) > 1e-9;
-  const cutHead = inclined && o.postHead === "inclinata";
+  // in carpenteria la testa resta a squadra: il taglio inclinato asporterebbe il tenone
+  const cutHead = inclined && bolted && o.postHead === "inclinata";
+  const tenon = { width: Math.round(sp.b / 3), height: Math.round((2 * sp.h) / 3), length: Math.min(60, sec.h / 2), gap: 1 };
   const posts: Placed[] = o.posts.map((s, i) => {
     const p = at(s);
-    const zTop = zOn(headPlane, s) + (cutHead ? 1 : -1) * (sp.h / 2) * Math.abs(t);
+    // carpenteria: la spalla del tenone sotto l'intradosso, il tenone (compreso nella lunghezza) entra nella trave
+    const zTop = zOn(headPlane, s) + (cutHead ? 1 : -1) * (sp.h / 2) * Math.abs(t) + (bolted ? 0 : tenon.length);
     const step = columnStep(ctx, `${o.prefix}-pilastro-${i}`, p.x, p.y, zTop, sp, u);
     return { ref: step.ref, type: "pilastro", section: sp, length: step.length as number, pose: step.pose as Pose };
   });
@@ -455,7 +476,7 @@ export function beamOnPosts(ctx: BuildContext, mode: Construction, o: PortalOpti
         type: "tenone-mortasa",
         a: post,
         b: beams[0].ref,
-        params: { width: Math.round(sp.b / 3), height: Math.round((2 * sp.h) / 3), length: Math.min(60, sec.h / 2), gap: 1 },
+        params: tenon,
       });
   });
 
@@ -474,7 +495,7 @@ export function beamOnPosts(ctx: BuildContext, mode: Construction, o: PortalOpti
         const flank = s + (side * sp.h) / 2;
         const neighbours = o.posts.filter((q, j) => j !== i && (q - s) * side > 0).map((q) => (Math.abs(q - s) - sp.h) / 2);
         const room = Math.min(side > 0 ? sEnds[1] - flank : flank - sEnds[0], ...neighbours);
-        const postTop = zOn(headPlane, s) - (sp.h / 2) * Math.abs(t);
+        const postTop = zOn(headPlane, s) - (sp.h / 2) * Math.abs(t); // spalla (carpenteria) o testa a squadra
         const foot = ctx.floorHeightAt(at(s).x, at(s).y) - ctx.embedment;
         if (room < reach || rise > (postTop - foot) / 2) continue;
         const ref = `${o.prefix}-saetta-${i}-${side < 0 ? "s" : "d"}`;

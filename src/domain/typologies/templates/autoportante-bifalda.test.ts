@@ -11,7 +11,7 @@ const spec = { larghezza: 5000, profondita: 4000, campate: 2, interasse: 800 };
 
 describe("tipologia autoportante-bifalda", () => {
   it("è registrata insieme alla monofalda", () => {
-    expect(listTypologies().map((t) => t.slug)).toEqual(["addossata-monofalda", "autoportante-bifalda"]);
+    expect(listTypologies().map((t) => t.slug).slice(0, 2)).toEqual(["addossata-monofalda", "autoportante-bifalda"]);
   });
 
   it("conteggi della spec: 5000×4000, 2 campate, interasse 800", () => {

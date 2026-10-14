@@ -28,8 +28,9 @@ function pipeline(slug: string) {
 }
 
 describe("pipeline dominio → export", () => {
-  it("le tipologie registrate sono quelle attese", () => {
-    expect(listTypologies().map((t) => t.slug).sort()).toEqual([...SLUGS].sort());
+  it("le tipologie registrate includono quelle attese", () => {
+    // le tipologie di `tipologie-estese` hanno la propria pipeline (task 9.3)
+    expect(listTypologies().map((t) => t.slug)).toEqual(expect.arrayContaining([...SLUGS]));
   });
 
   it.each(SLUGS)("%s di default: zero errori di regole e collisioni", (slug) => {
