@@ -1,12 +1,13 @@
-import { pieceObb } from "../assembly/bounds";
+import { pieceObbs } from "../assembly/bounds";
 import type { Assembly } from "../components/types";
 import { obbAabbPenetration, obbVertices } from "../math/obb";
 import { type Envelope, type Side, absoluteObstacles } from "./types";
 
 /**
  * Controllo collisioni (D5): ogni pezzo come OBB (sezione × lunghezza nella
- * sua posa, lavorazioni ignorate: approssimazione conservativa) deve stare
- * dentro il box base dell'ingombro e non compenetrare gli ostacoli.
+ * sua posa, lavorazioni ignorate: approssimazione conservativa; per i pezzi
+ * curvi la catena di box di segmento di `pieceObbs`) deve stare dentro il box
+ * base dell'ingombro e non compenetrare gli ostacoli.
  */
 
 /** Id convenzionale del box base nelle collisioni. */
@@ -46,7 +47,7 @@ export function checkCollisions(assembly: Pick<Assembly, "pieces">, envelope: En
   const tol = Math.max(tolerance, GEOMETRIC_EPS);
   const out: Collision[] = [];
   for (const p of assembly.pieces) {
-    const obb = pieceObb(p);
+    const obbs = pieceObbs(p);
     // sforamento del box base: per lato, massimo eccesso dei vertici
     const excess: [Side, number][] = [
       ["sinistro", 0],
@@ -56,7 +57,7 @@ export function checkCollisions(assembly: Pick<Assembly, "pieces">, envelope: En
       ["pavimento", 0],
       ["soffitto", 0],
     ];
-    for (const v of obbVertices(obb)) {
+    for (const v of obbs.flatMap(obbVertices)) {
       excess[0][1] = Math.max(excess[0][1], -v.x);
       excess[1][1] = Math.max(excess[1][1], v.x - L);
       excess[2][1] = Math.max(excess[2][1], -v.y);
@@ -74,7 +75,7 @@ export function checkCollisions(assembly: Pick<Assembly, "pieces">, envelope: En
         message: `${p.id} esce dall'ingombro sul lato ${side} di ${fmt(depth)} mm`,
       });
     for (const o of obstacles) {
-      const pen = obbAabbPenetration(obb, o.box);
+      const pen = Math.max(...obbs.map((obb) => obbAabbPenetration(obb, o.box)));
       if (pen > tol)
         out.push({ pieceId: p.id, obstacleId: o.obstacleId, depth: pen, message: `${p.id} interferisce con ${o.obstacle.type} ${o.obstacleId} (${fmt(pen)} mm)` });
     }

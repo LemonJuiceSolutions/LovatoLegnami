@@ -1,9 +1,9 @@
 import type { Assembly, Piece, PieceType } from "../components/types";
-import { type Mat4, axisOf, invertRigid, multiply } from "../math/mat4";
-import { obbAabbPenetration, obbFromPose } from "../math/obb";
+import { type Mat4, axisOf, fromBasis, invertRigid, multiply } from "../math/mat4";
+import { type OBB, obbAabbPenetration, obbFromPose } from "../math/obb";
 import { aabb } from "../math/aabb";
-import { type Vec3, cross, dot, vec3 } from "../math/vec3";
-import { type ClearHeight, type FloorHeightFn, minClearHeight, pieceObb } from "./bounds";
+import { type Vec3, cross, dot, neg, vec3 } from "../math/vec3";
+import { type ClearHeight, type FloorHeightFn, minClearHeight, pieceObb, pieceObbs } from "./bounds";
 
 /**
  * Misure effettive dell'assieme calcolate da pezzi e pose (non dai parametri
@@ -143,22 +143,37 @@ function intersect3(a: HalfSpace, b: HalfSpace, c: HalfSpace): Vec3 | undefined 
   );
 }
 
+/** Posa (origine nel centro) e semi-dimensioni di un OBB, per l'enumerazione dei vertici. */
+const obbFrame = (o: OBB): { pose: Mat4; half: Vec3 } => ({ pose: fromBasis(o.center, o.axes[0], o.axes[2]), half: o.halfSize });
+
 /**
  * Intervallo lungo l'asse X locale di `p` dell'intersezione tra il box di `p`
  * e quello di `s` (con tolleranza), per enumerazione dei vertici del poliedro
- * intersezione; `undefined` se i box non si toccano.
+ * intersezione; `undefined` se i box non si toccano. Se `s` è curvo si usano i
+ * suoi box di segmento (`pieceObbs`) e si uniscono gli intervalli.
  */
 export function contactRange(p: Piece, s: Piece, tol = 0.5): { from: number; to: number } | undefined {
-  const rel = multiply(invertRigid(p.pose), s.pose);
+  const toLocal = invertRigid(p.pose);
   const [plo, phi] = localBounds(p);
-  const [slo, shi] = localBounds(s);
-  const sObb = obbFromPose(rel, vec3(s.length, s.section.b, s.section.h));
-  if (obbAabbPenetration(sObb, aabb(plo, phi)) < -tol) return undefined;
-  // prima con tolleranza numerica (intervallo esatto), poi con `tol` per i contatti quasi esatti
-  const range = vertexRange(plo, phi, rel, slo, shi, 1e-6) ?? vertexRange(plo, phi, rel, slo, shi, tol);
-  if (!range) return undefined;
-  return { from: Math.max(0, range.from), to: Math.min(p.length, range.to) };
+  let from = Infinity;
+  let to = -Infinity;
+  for (const o of pieceObbs(s)) {
+    const { pose, half } = obbFrame(o);
+    const rel = multiply(toLocal, pose);
+    const slo = neg(half);
+    const sObb = obbFromPose(rel, scaleBy2(half), slo);
+    if (obbAabbPenetration(sObb, aabb(plo, phi)) < -tol) continue;
+    // prima con tolleranza numerica (intervallo esatto), poi con `tol` per i contatti quasi esatti
+    const range = vertexRange(plo, phi, rel, slo, half, 1e-6) ?? vertexRange(plo, phi, rel, slo, half, tol);
+    if (!range) continue;
+    from = Math.min(from, range.from);
+    to = Math.max(to, range.to);
+  }
+  if (from > to) return undefined;
+  return { from: Math.max(0, from), to: Math.min(p.length, to) };
 }
+
+const scaleBy2 = (v: Vec3): Vec3 => vec3(2 * v.x, 2 * v.y, 2 * v.z);
 
 function vertexRange(plo: Vec3, phi: Vec3, rel: Mat4, slo: Vec3, shi: Vec3, tol: number): { from: number; to: number } | undefined {
   const hs = [
