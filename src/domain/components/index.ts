@@ -1,2 +1,4 @@
-// Modulo domain/components – API pubblica (vuoto finché non implementato).
-export {};
+// Modulo domain/components – API pubblica.
+export * from "./types";
+export * from "./errors";
+export * from "./schemas";
