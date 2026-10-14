@@ -101,7 +101,7 @@ Riferimenti: `specs/*/spec.md` per il comportamento atteso, `design.md` per arch
 
 - [x] 13.1 Test end-to-end di dominio+export in `src/export/__tests__/pipeline.test.ts`: genera entrambe le tipologie con parametri di default, valuta regole e collisioni (zero errori), produce distinta CSV e SAT (con B-rep neutra costruita da un generatore di box puro TS per non dipendere dal WASM) e passa il validatore; verificare che `npm test` passa.
 - [x] 13.2 Test geometry end-to-end: costruzione completa della monofalda di default nel kernel, estrazione B-rep, scrittura SAT reale e validazione, export STEP; verificare che `npm run test:geometry` passa e il tempo totale è < 60 s.
-- [ ] 13.3 Verifica manuale completa del flusso in `npm run dev`: carica esempio → modifica ostacolo → collisione evidenziata → "Adatta all'ingombro" → "Auto-dimensiona" → export SAT (unico e per pezzo), STEP, CSV → salva JSON → ricarica pagina (ripristino) → carica JSON; annotare in `src/export/sat/README.md` la checklist di validazione del SAT nel CAM della CNC con un file campione.
+- [x] 13.3 Verifica manuale completa del flusso in `npm run dev`: carica esempio → modifica ostacolo → collisione evidenziata → "Adatta all'ingombro" → "Auto-dimensiona" → export SAT (unico e per pezzo), STEP, CSV → salva JSON → ricarica pagina (ripristino) → carica JSON; annotare in `src/export/sat/README.md` la checklist di validazione del SAT nel CAM della CNC con un file campione.
 - [ ] 13.4 Eseguire `npm run lint`, `npm test`, `npm run test:geometry`, `npm run build` e verificare che tutti passano; aggiornare `README.md` di progetto con sezione "Configuratore pergole" (comandi, struttura cartelle, come aggiungere tipologie/regole, limiti noti).
 
 ## Workflow follow-up

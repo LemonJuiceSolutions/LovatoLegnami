@@ -164,6 +164,30 @@ Il CAM della macchina non è noto: il file va provato sul CAM reale.
    i test).
 6. Fissare le opzioni trovate come default (`DEFAULT_SAT_OPTIONS` / esempi della configurazione) e annotarle qui.
 
+### Checklist di validazione nel CAM della CNC (da compilare con il file campione)
+
+Dal configuratore: caricare l'esempio "Monofalda con grondaia", attendere "Solidi pronti", poi nel pannello
+Esportazioni usare **Confronta campione** (sceglie il `.sat` della macchina e mostra le differenze di
+`compareWithSample` con i suggerimenti) e **Verifica file** (riapre un `.sat` esportato con `validateSat`).
+
+- [ ] File campione accettato dalla macchina ricevuto (CAD d'origine, versione ACIS dell'header, unità).
+- [ ] "Confronta campione": nessuna differenza di severità `errore`; suggerimenti applicati alle opzioni SAT.
+- [ ] Assieme unico (`assieme-unico`): il CAM importa il file senza errori né avvisi di riparazione.
+- [ ] Ogni pezzo è un **solido chiuso** (non superfici), un body per pezzo, con il nome = id (`TVT-01`, …).
+- [ ] Unità in millimetri: lunghezza di un travetto e di un pilastro uguali alla distinta CSV (al decimo di mm).
+- [ ] Posizione nell'assieme: i pezzi si toccano come nel visualizzatore 3D (pilastro sotto la trave, travetti
+      sulla trave e sulla banchina).
+- [ ] Lavorazioni riconosciute: fori Ø14 della banchina passanti, becchi d'uccello e tagli a piombo dei travetti,
+      mezzo legno, tenoni e mortase (bifalda) con le quote del pezzo.
+- [ ] Un file per pezzo (`un-file-per-pezzo`, ZIP): ogni `<id>.sat` si importa da solo, nella posizione
+      dell'assieme (se il CAM vuole il pezzo nell'origine, annotarlo: oggi la posa è applicata alla geometria).
+- [ ] Versione: se il CAM rifiuta la 7.0 provare quella del campione (4.0 o 21.0) e ripetere la checklist.
+- [ ] Bifalda di default: stesso controllo a campione (colmo, puntoni con tenone, travetti speculari).
+- [ ] Opzioni definitive annotate qui sotto e impostate come default.
+
+Esito della prova (da compilare): CNC/CAM `________`, versione ACIS `____`, modalità file `____________`,
+nome body `sì/no`, data `__________`, note `______________________________`.
+
 ## Limiti (MVP)
 
 - **Superfici**: solo piane (`plane-surface`) e cilindriche (`cone-surface` con semiangolo 0); **curve**: solo rette
