@@ -735,14 +735,14 @@ export function wallAttachment(ctx: BuildContext, kind: WallAttachment, o: WallA
       const xWall = dot(local.normal, local.point) / local.normal.x; // ascissa dell'asse sul piano del muro
       const at = o.face === "testa-fine" ? xWall - WALL_BOLT_DISTANCE : xWall + WALL_BOLT_DISTANCE;
       steps.push(
-        { kind: "hardware", code, pieces: [b.ref], anchor },
+        { kind: "hardware", code, pieces: o.beams.map((x) => x.ref), anchor },
         { kind: "hardware", code: BOLT_STEP_CODE, pieces: [o.beams[0].ref, o.beams[1].ref], params: { face: "destra", at, offset: 0, diameter: o.boltDiameter ?? 12 } },
       );
       return steps;
     }
     case "staffa-inclinata-15":
     case "staffa-inclinata-25":
-      steps.push({ kind: "hardware", code: kind, pieces: [o.beams[0].ref], anchor });
+      steps.push({ kind: "hardware", code: kind, pieces: o.beams.map((x) => x.ref), anchor });
       return steps;
     case "scomparsa-17":
       if (o.beams.length !== 1) throw new ParamError("attaccoMuro", kind, "il supporto a scomparsa richiede una trave singola (costruzione carpenteria)");

@@ -88,10 +88,11 @@ export const DEFAULT_SPAN_TABLE = {
   },
   // tipologie-estese (E8). Tavola: luce della trave sandwich, valore per la COPPIA di tavole ai lati
   // dei pilastri (la regola misura ogni tavola, con gli appoggi nel bullone); valori dalle distinte
-  // T-A/T-C/T-E della ricerca (45×120 su ~3,4 m, 45×145 su ~4,4 m). DA VALIDARE CON UFFICIO TECNICO.
+  // T-A/T-B/T-C/T-E della ricerca (45×120 su ~3,4 m nelle libere e ~3,7 m dal pilastro alla staffa a
+  // muro nelle addossate da 4 m, 45×145 su ~4,4 m). DA VALIDARE CON UFFICIO TECNICO.
   tavola: {
     "45×90": 2500,
-    "45×120": 3600,
+    "45×120": 3800,
     "45×145": 4500,
   },
   // cantonali di padiglione/compluvio (gazebo T-H: 70×70 da ~2 m) e sezioni di carpenteria

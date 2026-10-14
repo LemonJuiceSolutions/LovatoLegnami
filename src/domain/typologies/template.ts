@@ -511,12 +511,13 @@ function expandHardwareStep(
       return { pieces: [...pieces], item: countItem(s.code, count, pieceIds), extras: [] };
     }
     if (spec.kind === "bullone") return fail(`usare lo step "${BOLT_STEP_CODE}" (la lunghezza è scelta dallo spessore serrato)`);
-    if (pieceIds.length !== 1) return fail("staffe e supporti si applicano a un solo pezzo");
+    // staffe e supporti: lavorazioni sul primo pezzo, gli altri (es. seconda tavola della sandwich) solo collegati
+    if (pieceIds.length < 1) return fail("staffe e supporti richiedono almeno un pezzo");
     const index = pieces.findIndex((p) => p.id === pieceIds[0]);
     const exp = expandBracket({ id: ids.nextHardware(spec.kind), code: s.code, piece: pieceIds[0], anchor: s.anchor, at: params.at }, pieces[index]);
     const out = [...pieces];
     out[index] = exp.piece;
-    return { pieces: out, item: exp.item, extras: exp.extras };
+    return { pieces: out, item: { ...exp.item, pieceIds: [...pieceIds] }, extras: exp.extras };
   } catch (e) {
     if (e instanceof HardwareError) return fail(e.message);
     throw e;

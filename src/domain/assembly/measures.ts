@@ -1,5 +1,5 @@
-import type { Assembly, Piece, PieceType } from "../components/types";
-import { type Mat4, axisOf, fromBasis, invertRigid, multiply } from "../math/mat4";
+import type { Assembly, HardwareItem, HardwareKind, Piece, PieceType } from "../components/types";
+import { type Mat4, applyToPoint, axisOf, fromBasis, invertRigid, multiply, originOf } from "../math/mat4";
 import { type OBB, obbAabbPenetration, obbFromPose } from "../math/obb";
 import { aabb } from "../math/aabb";
 import { type Vec3, cross, dot, neg, vec3 } from "../math/vec3";
@@ -25,7 +25,7 @@ import { type ClearHeight, type FloorHeightFn, minClearHeight, pieceObb, pieceOb
 
 /** Per ogni tipo di pezzo, i tipi che gli fanno da appoggio. Dati, estendibili. */
 export const SUPPORTERS: Readonly<Record<PieceType, readonly PieceType[]>> = {
-  trave: ["pilastro", "tavola", "monaco"],
+  trave: ["pilastro", "tavola", "monaco", "banchina"],
   colmo: ["puntone", "pilastro"],
   travetto: ["trave", "banchina", "colmo", "tavola", "mensola", "cantonale", "monaco"],
   puntone: ["trave", "colmo", "monaco", "tavola"],
@@ -33,7 +33,7 @@ export const SUPPORTERS: Readonly<Record<PieceType, readonly PieceType[]>> = {
   pilastro: [],
   controvento: [],
   // nuovi primitivi (tipologie-estese, E8)
-  tavola: ["pilastro", "arco"],
+  tavola: ["pilastro", "arco", "banchina"],
   cantonale: ["trave", "tavola", "monaco", "pilastro"],
   fascia: ["travetto", "mensola", "cantonale"],
   arco: [],
@@ -41,6 +41,14 @@ export const SUPPORTERS: Readonly<Record<PieceType, readonly PieceType[]>> = {
   mensola: [],
   grigliato: [],
 };
+
+/**
+ * Ferramenta che fa da appoggio ai pezzi collegati (E8): staffe a muro, nodi
+ * metallici e cuspidi. L'appoggio è puntuale, nella proiezione dell'origine
+ * della voce sull'asse del pezzo. Non vale per i `CANTILEVER_TYPES`
+ * (la mensola resta misurata come sbalzo).
+ */
+export const HARDWARE_SUPPORT_KINDS: readonly HardwareKind[] = ["staffa-muro", "giunto-vie", "cuspide"];
 
 /**
  * Tipi misurati anche senza appoggi nel modello (incastrati a muro): la luce
@@ -227,8 +235,8 @@ const horizontalFactor = (p: Piece): number => {
   return Math.hypot(x.x, x.y);
 };
 
-/** Luce, appoggi e sbalzi di un pezzo rispetto agli altri pezzi dell'assieme. */
-export function measureSpan(p: Piece, pieces: readonly Piece[], tol = 0.5): SpanMeasure {
+/** Luce, appoggi e sbalzi di un pezzo rispetto agli altri pezzi dell'assieme (e alla ferramenta d'appoggio). */
+export function measureSpan(p: Piece, pieces: readonly Piece[], tol = 0.5, hardware: readonly HardwareItem[] = []): SpanMeasure {
   const types = SUPPORTERS[p.type];
   const supports: SupportContact[] = [];
   for (const s of pieces) {
@@ -238,6 +246,12 @@ export function measureSpan(p: Piece, pieces: readonly Piece[], tol = 0.5): Span
     const at = (r.from + r.to) / 2;
     supports.push(r.lateral ? { pieceId: s.id, from: at, to: at, at } : { pieceId: s.id, from: r.from, to: r.to, at });
   }
+  if (!CANTILEVER_TYPES.includes(p.type))
+    for (const h of hardware) {
+      if (!h.pose || !HARDWARE_SUPPORT_KINDS.includes(h.kind) || !h.pieceIds.includes(p.id)) continue;
+      const at = Math.min(p.length, Math.max(0, applyToPoint(invertRigid(p.pose), originOf(h.pose)).x));
+      supports.push({ pieceId: h.id, from: at, to: at, at });
+    }
   supports.sort((a, b) => a.at - b.at || a.pieceId.localeCompare(b.pieceId));
   if (supports.length === 0)
     return { pieceId: p.id, type: p.type, supports, span: p.length, overhangStart: 0, overhangEnd: 0, overhang: 0 };
@@ -287,14 +301,18 @@ export function pieceSlope(p: Piece): number {
   return (Math.atan2(Math.abs(x.z), Math.hypot(x.x, x.y)) * 180) / Math.PI;
 }
 
+/** Assieme misurabile: i pezzi e, se presente, la ferramenta (appoggi delle staffe a muro e dei nodi). */
+export type MeasurableAssembly = Pick<Assembly, "pieces"> & { readonly hardware?: Assembly["hardware"] };
+
 /** Misure effettive dell'assieme (luci, interassi, sbalzi, altezza libera, pendenza). */
-export function measureAssembly(assembly: Pick<Assembly, "pieces">, options: MeasureOptions = {}): Measures {
+export function measureAssembly(assembly: MeasurableAssembly, options: MeasureOptions = {}): Measures {
   const tol = options.contactTolerance ?? 0.5;
   const pieces = assembly.pieces;
+  const hardware = assembly.hardware ?? [];
   // i pezzi curvi non hanno luce né sbalzo (E8) ma restano appoggi per gli altri
   const spans = pieces
     .filter((p) => !p.curve && (SUPPORTERS[p.type].length > 0 || CANTILEVER_TYPES.includes(p.type)))
-    .map((p) => measureSpan(p, pieces, tol));
+    .map((p) => measureSpan(p, pieces, tol, hardware));
   const joistGroups = measureJoistGroups(pieces);
   const spacings = joistGroups.flatMap((g) => (g.spacing === undefined ? [] : [g.spacing]));
   let maxOverhang: Measures["maxOverhang"];

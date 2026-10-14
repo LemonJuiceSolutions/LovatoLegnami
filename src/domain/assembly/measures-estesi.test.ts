@@ -15,7 +15,7 @@ const plank = (id: string, side: 1 | -1, length = 4000, x0 = 0) =>
 describe("appoggi dei nuovi tipi (E8)", () => {
   it("ogni tipo di pezzo ha una voce in SUPPORTERS (eventualmente vuota)", () => {
     for (const t of PIECE_TYPES) expect(SUPPORTERS[t], t).toBeDefined();
-    expect(SUPPORTERS.tavola).toEqual(["pilastro", "arco"]);
+    expect(SUPPORTERS.tavola).toEqual(["pilastro", "arco", "banchina"]);
     expect(SUPPORTERS.travetto).toEqual(expect.arrayContaining(["tavola", "mensola", "cantonale", "monaco"]));
     expect(SUPPORTERS.cantonale).toEqual(["trave", "tavola", "monaco", "pilastro"]);
     expect(SUPPORTERS.fascia).toEqual(["travetto", "mensola", "cantonale"]);
@@ -61,5 +61,19 @@ describe("appoggi dei nuovi tipi (E8)", () => {
     const t = m.spans.find((s) => s.pieceId === "TAV-01")!;
     expect(t.supports.map((s) => s.pieceId)).toEqual(["ARC-01"]);
     expect(m.spans.some((s) => s.pieceId === "ARC-01")).toBe(false);
+  });
+
+  it("staffa a muro collegata: appoggio puntuale nell'origine della voce (non per le mensole)", () => {
+    const t = plank("TAV-01", -1);
+    const pieces = [t, post("PIL-01", 300)];
+    const staffa = { id: "STM-01", code: "staffa-muro-listoni-paralleli-90", kind: "staffa-muro" as const, description: "", quantity: 1, pose: fromBasis(vec3(4000, -67.5, 2460), vec3(-1, 0, 0), vec3(0, 0, 1)), pieceIds: ["TAV-01"], machiningIds: [], params: {} };
+    const m = measureAssembly({ pieces, hardware: [staffa] }).spans.find((s) => s.pieceId === "TAV-01")!;
+    expect(m.supports.map((s) => s.pieceId)).toEqual(["PIL-01", "STM-01"]);
+    expect(m.span).toBeCloseTo(3700, 6);
+    expect(m.overhangEnd).toBe(0);
+    const mensola = createPiece({ id: "MEN-01", type: "mensola", section: { b: 90, h: 140 }, length: 1200, pose: fromBasis(vec3(0, 0, 2500), vec3(0, 1, 0), vec3(0, 0, 1)) });
+    const mm = measureAssembly({ pieces: [mensola], hardware: [{ ...staffa, pieceIds: ["MEN-01"] }] }).spans[0];
+    expect(mm.supports).toEqual([]);
+    expect(mm.span).toBe(1200);
   });
 });

@@ -1,5 +1,5 @@
 import type { FloorHeightFn } from "../assembly/bounds";
-import { type Measures, measureAssembly } from "../assembly/measures";
+import { type MeasurableAssembly, type Measures, measureAssembly } from "../assembly/measures";
 import { parseSectionLabel, sectionLabel } from "../components/sections";
 import type { Assembly, Piece, PieceType } from "../components/types";
 import type {
@@ -202,7 +202,7 @@ export function evaluateRule(rule: Rule, assembly: Pick<Assembly, "pieces">, mea
  * Valuta tutte le regole del set sull'assieme. L'assieme è valido (esportabile)
  * se nessuna violazione ha severità `errore`.
  */
-export function evaluateRules(assembly: Pick<Assembly, "pieces">, ruleSet: RuleSet, options: EvaluateOptions = {}): RuleEvaluation {
+export function evaluateRules(assembly: MeasurableAssembly, ruleSet: RuleSet, options: EvaluateOptions = {}): RuleEvaluation {
   const measures = options.measures ?? measureAssembly(assembly, { floorHeightAt: options.floorHeightAt });
   const violations = ruleSet.rules.flatMap((r) => evaluateRule(r, assembly, measures));
   return { violations, valid: !violations.some((v) => v.severity === "errore"), measures };
