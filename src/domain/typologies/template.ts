@@ -16,6 +16,7 @@ import {
   isMachiningType,
   isPieceType,
   type Assembly,
+  type DardoDiGioveJoint,
   type HardwareItem,
   type Joint,
   type LateralFace,
@@ -237,14 +238,18 @@ export interface RepeatStep {
 export type JointStep = { readonly kind: "joint"; readonly a: string; readonly b: string } & (
   | { readonly type: "tenone-mortasa"; readonly params: TenoneMortasaJoint["params"] }
   | { readonly type: "mezzo-legno"; readonly params?: Readonly<Record<string, never>> }
+  | { readonly type: "dardo-di-giove"; readonly params: DardoDiGioveJoint["params"] }
 );
 
-/** Lavorazione su un pezzo già posizionato (per `ref`). */
-export interface MachiningStep {
-  readonly kind: "machining";
-  readonly target: string;
-  readonly spec: Resolvable<MachiningSpec>;
-}
+/**
+ * Lavorazione su un pezzo già posizionato (per `ref`): `spec` costante o dal
+ * contesto, oppure `fromPiece` calcolata dal pezzo posizionato (posa,
+ * lunghezza, lavorazioni già applicate), es. un taglio di testa su un piano.
+ */
+export type MachiningStep = { readonly kind: "machining"; readonly target: string } & (
+  | { readonly spec: Resolvable<MachiningSpec>; readonly fromPiece?: never }
+  | { readonly fromPiece: (piece: Piece, ctx: BuildContext) => MachiningSpec; readonly spec?: never }
+);
 
 /** Codice dello step `hardware` per il bullone passante su più strati (lunghezza scelta dal catalogo). */
 export const BOLT_STEP_CODE = "bullone-passante";
@@ -377,7 +382,7 @@ export function catalogProblems(steps: readonly FlatStep[], ctx: BuildContext): 
       problems.push(`giunto fuori catalogo: ${JSON.stringify(s.type)}`);
     if (s.kind === "hardware" && s.code !== BOLT_STEP_CODE && s.code !== AUTO_JOINT_CODE && !hasHardware(s.code))
       problems.push(`ferramenta fuori catalogo: ${JSON.stringify(s.code)}`);
-    if (s.kind === "machining") {
+    if (s.kind === "machining" && s.spec !== undefined) {
       const t = (resolve(s.spec, ctx) as { type?: unknown }).type;
       if (!isMachiningType(t))
         problems.push(`lavorazione fuori catalogo: ${JSON.stringify(t)} (ammesse: ${MACHINING_TYPES.join(", ")})`);
@@ -435,7 +440,7 @@ export function buildAssembly(
       }
       case "machining": {
         const i = pieceOf(s.target, "lavorazione");
-        pieces[i] = addMachining(pieces[i], resolve(s.spec, ctx));
+        pieces[i] = addMachining(pieces[i], s.fromPiece ? s.fromPiece(pieces[i], ctx) : resolve(s.spec, ctx));
         break;
       }
       case "hardware": {
@@ -450,9 +455,11 @@ export function buildAssembly(
         const b = pieces[pieceOf(s.b, "giunto")].id;
         const id = ids.nextJoint();
         joints.push(
-          s.type === "tenone-mortasa"
-            ? { id, type: s.type, pieceA: a, pieceB: b, params: { ...s.params } }
-            : { id, type: "mezzo-legno", pieceA: a, pieceB: b, params: {} },
+          s.type === "mezzo-legno"
+            ? { id, type: "mezzo-legno", pieceA: a, pieceB: b, params: {} }
+            : s.type === "tenone-mortasa"
+              ? { id, type: s.type, pieceA: a, pieceB: b, params: { ...s.params } }
+              : { id, type: s.type, pieceA: a, pieceB: b, params: { ...s.params } },
         );
         break;
       }
