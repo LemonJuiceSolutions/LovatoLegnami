@@ -5,3 +5,4 @@ export * from "./schemas";
 export * from "./sections";
 export * from "./machinings";
 export * from "./joints";
+export * from "./serialize";

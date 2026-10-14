@@ -214,3 +214,19 @@ export interface MezzoLegnoJoint extends JointBase {
 }
 
 export type Joint = TenoneMortasaJoint | MezzoLegnoJoint;
+
+/** Valore di un parametro di tipologia (numeri in mm/gradi, sezioni come etichetta "b×h"). */
+export type ParamValue = number | string | boolean;
+
+/**
+ * Assieme generato da una tipologia: pezzi posizionati, giunti (già espansi
+ * nelle lavorazioni dei pezzi) e metadati. Definito qui perché la
+ * serializzazione (`serialize.ts`) lo valida; `domain/assembly` lo riesporta.
+ */
+export interface Assembly {
+  readonly typologySlug: string;
+  readonly params: Readonly<Record<string, ParamValue>>;
+  readonly pieces: readonly Piece[];
+  readonly joints: readonly Joint[];
+  readonly meta: Readonly<Record<string, ParamValue>>;
+}

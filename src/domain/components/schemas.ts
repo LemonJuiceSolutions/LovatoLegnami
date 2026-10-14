@@ -7,6 +7,7 @@ import {
   MACHINING_TYPES,
   PIECE_FAMILIES,
   PIECE_TYPES,
+  type Assembly,
   type Joint,
   type Machining,
   type MachiningSpec,
@@ -203,3 +204,39 @@ export function createPiece(input: PieceInput): Piece {
     machinings: input.machinings ?? [],
   });
 }
+
+export const ParamValueSchema = z.union([finite(), z.string(), z.boolean()]);
+
+/** Assieme: oltre ai campi verifica id univoci e riferimenti dei giunti a pezzi esistenti. */
+export const AssemblySchema: z.ZodType<Assembly> = z
+  .object({
+    typologySlug: z.string().min(1, "slug tipologia obbligatorio"),
+    params: z.record(ParamValueSchema),
+    pieces: z.array(PieceSchema),
+    joints: z.array(JointSchema),
+    meta: z.record(ParamValueSchema),
+  })
+  .strict()
+  .superRefine((a, ctx) => {
+    const ids = new Set<string>();
+    a.pieces.forEach((p, i) => {
+      if (ids.has(p.id))
+        ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["pieces", i, "id"], message: `id pezzo duplicato: ${p.id}` });
+      ids.add(p.id);
+    });
+    const jointIds = new Set<string>();
+    a.joints.forEach((j, i) => {
+      if (jointIds.has(j.id))
+        ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["joints", i, "id"], message: `id giunto duplicato: ${j.id}` });
+      jointIds.add(j.id);
+      for (const key of ["pieceA", "pieceB"] as const)
+        if (!ids.has(j[key]))
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ["joints", i, key],
+            message: `il giunto ${j.id} riferisce il pezzo inesistente ${j[key]}`,
+          });
+    });
+  });
+
+export const parseAssembly = (data: unknown): Assembly => parseWith(AssemblySchema, data, "Assieme non valido");
