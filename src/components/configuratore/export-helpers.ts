@@ -1,5 +1,5 @@
 import { exportSat, validateSat, type SatExportResult } from "@/export/sat"
-import { selectPieceResults, type ConfiguratoreState } from "@/stores/configuratore-store"
+import { selectPieceResults, selectSolidsReady, type ConfiguratoreState } from "@/stores/configuratore-store"
 
 /**
  * Logica pura del pannello esportazioni: SAT dallo stato corrente,
@@ -19,6 +19,8 @@ export function exportProblems(state: Pick<ConfiguratoreState, "derived">): stri
 export function satFromState(state: ConfiguratoreState, date: Date = new Date()): SatExportResult {
   const assembly = state.derived.assembly
   if (!assembly) throw new Error("nessun assieme da esportare")
+  // I solidi devono essere quelli dell'assieme corrente (stessi id ma geometria diversa altrimenti).
+  if (!selectSolidsReady(state)) throw new Error("solidi non aggiornati: attendere la fine della costruzione")
   return exportSat(assembly.pieces, selectPieceResults(state), { ...state.config.exportOptions.sat, date })
 }
 
