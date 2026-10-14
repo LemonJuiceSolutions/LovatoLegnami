@@ -12,6 +12,7 @@ function portale(): Assembly {
   return {
     typologySlug: "test",
     params: {},
+    hardware: [],
     pieces: [
       pil("PIL-01", 60),
       pil("PIL-02", 2940),

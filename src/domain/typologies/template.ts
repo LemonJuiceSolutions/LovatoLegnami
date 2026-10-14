@@ -363,6 +363,7 @@ export function buildAssembly(
       params,
       pieces: expandJoints(joints, pieces),
       joints,
+      hardware: [],
       meta: template.meta?.(ctx) ?? {},
     }),
   );

@@ -28,6 +28,7 @@ function sample(): Assembly {
     params: { larghezza: 4000, pendenza: 0, sezioneTrave: "160×200", controventi: true },
     pieces: expandJoints(joints, [trave, puntone]),
     joints,
+    hardware: [],
     meta: { generatore: "test", schemaVersion: 1 },
   };
 }
@@ -43,7 +44,14 @@ describe("serializzazione assieme", () => {
 
   it("chiavi in ordine stabile indipendente dall'ordine di inserimento", () => {
     const a = sample();
-    const reordered: Assembly = { meta: a.meta, joints: a.joints, pieces: a.pieces, params: a.params, typologySlug: a.typologySlug };
+    const reordered: Assembly = {
+      meta: a.meta,
+      hardware: a.hardware,
+      joints: a.joints,
+      pieces: a.pieces,
+      params: a.params,
+      typologySlug: a.typologySlug,
+    };
     expect(toJSON(reordered)).toBe(toJSON(a));
   });
 

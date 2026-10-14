@@ -4,12 +4,14 @@ import {
   CURVED_PIECE_TYPES,
   FACES,
   FAMILY_OF,
+  HARDWARE_KINDS,
   JOINT_TYPES,
   MACHINING_TYPES,
   PIECE_FAMILIES,
   PIECE_TYPES,
   type Assembly,
   type Curve,
+  type HardwareItem,
   type Joint,
   type Machining,
   type MachiningSpec,
@@ -275,13 +277,38 @@ export function createPiece(input: PieceInput): Piece {
 
 export const ParamValueSchema = z.union([finite(), z.string(), z.boolean()]);
 
-/** Assieme: oltre ai campi verifica id univoci e riferimenti dei giunti a pezzi esistenti. */
-export const AssemblySchema: z.ZodType<Assembly> = z
+export const HardwareKindSchema = enumWithValue(HARDWARE_KINDS, "tipo di ferramenta");
+
+/** Voce dell'elenco ferramenta. */
+export const HardwareItemSchema: z.ZodType<HardwareItem> = z
+  .object({
+    id: z.string().min(1, "id obbligatorio"),
+    code: z.string().min(1, "codice obbligatorio"),
+    kind: HardwareKindSchema,
+    description: z.string(),
+    quantity: finite().int("deve essere un intero").positive("deve essere maggiore di 0"),
+    pose: PoseSchema.optional(),
+    dims: z.object({ x: positive(), y: positive(), z: positive() }).strict().optional(),
+    pieceIds: z.array(z.string().min(1)),
+    machiningIds: z.array(z.string().min(1)),
+    params: z.record(ParamValueSchema),
+  })
+  .strict();
+
+export const parseHardwareItem = (data: unknown): HardwareItem => parseWith(HardwareItemSchema, data, "Voce di ferramenta non valida");
+
+/**
+ * Assieme: oltre ai campi verifica id univoci e riferimenti di giunti e
+ * ferramenta a pezzi e lavorazioni esistenti. `hardware` è facoltativo in
+ * lettura (default `[]`: file precedenti all'estensione) e sempre presente in uscita.
+ */
+export const AssemblySchema = z
   .object({
     typologySlug: z.string().min(1, "slug tipologia obbligatorio"),
     params: z.record(ParamValueSchema),
     pieces: z.array(PieceSchema),
     joints: z.array(JointSchema),
+    hardware: z.array(HardwareItemSchema).default([]),
     meta: z.record(ParamValueSchema),
   })
   .strict()
@@ -305,6 +332,29 @@ export const AssemblySchema: z.ZodType<Assembly> = z
             message: `il giunto ${j.id} riferisce il pezzo inesistente ${j[key]}`,
           });
     });
-  });
+    const machiningIds = new Set(a.pieces.flatMap((p) => p.machinings.map((m) => m.id)));
+    const hardwareIds = new Set<string>();
+    a.hardware.forEach((h, i) => {
+      if (hardwareIds.has(h.id) || jointIds.has(h.id))
+        ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["hardware", i, "id"], message: `id ferramenta duplicato: ${h.id}` });
+      hardwareIds.add(h.id);
+      h.pieceIds.forEach((id, k) => {
+        if (!ids.has(id))
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ["hardware", i, "pieceIds", k],
+            message: `la ferramenta ${h.id} riferisce il pezzo inesistente ${id}`,
+          });
+      });
+      h.machiningIds.forEach((id, k) => {
+        if (!machiningIds.has(id))
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ["hardware", i, "machiningIds", k],
+            message: `la ferramenta ${h.id} riferisce la lavorazione inesistente ${id}`,
+          });
+      });
+    });
+  }) as unknown as z.ZodType<Assembly>;
 
 export const parseAssembly = (data: unknown): Assembly => parseWith(AssemblySchema, data, "Assieme non valido");

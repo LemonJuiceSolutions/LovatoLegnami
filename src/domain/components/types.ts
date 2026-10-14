@@ -320,9 +320,49 @@ export type Joint = TenoneMortasaJoint | MezzoLegnoJoint | DardoDiGioveJoint;
 /** Valore di un parametro di tipologia (numeri in mm/gradi, sezioni come etichetta "b×h"). */
 export type ParamValue = number | string | boolean;
 
+/** Tipi di ferramenta strutturale (E3). */
+export const HARDWARE_KINDS = [
+  "bullone",
+  "vite",
+  "tassello",
+  "staffa-muro",
+  "staffa-terra",
+  "giunto-vie",
+  "cuspide",
+  "piastra",
+] as const;
+export type HardwareKind = (typeof HARDWARE_KINDS)[number];
+
+/**
+ * Voce dell'elenco ferramenta dell'assieme (E3). Definita qui (come
+ * `Assembly`) perché lo schema dell'assieme la valida; `domain/hardware` la
+ * riesporta. Viti e tasselli sono solo conteggi (una voce per codice, senza
+ * posa); le altre voci sono singole, con posa e pezzi collegati.
+ */
+export interface HardwareItem {
+  /** Id stabile per famiglia: `BUL-01`, `STM-01`, `VIT-01`, … */
+  readonly id: string;
+  /** Codice di catalogo (es. `bullone-m12x200`). */
+  readonly code: string;
+  readonly kind: HardwareKind;
+  readonly description: string;
+  /** Quantità (1 per le voci singole). */
+  readonly quantity: number;
+  /** Posa della ferramenta nel sistema assieme (assente per i conteggi). */
+  readonly pose?: Pose;
+  /** Ingombro nel sistema della ferramenta (mm), per i simboli del viewer. */
+  readonly dims?: { readonly x: number; readonly y: number; readonly z: number };
+  /** Pezzi collegati. */
+  readonly pieceIds: readonly string[];
+  /** Lavorazioni indotte sui pezzi (con `jointId` = id della voce). */
+  readonly machiningIds: readonly string[];
+  /** Parametri della voce (es. lunghezza scelta, angolo imposto, vie). */
+  readonly params: Readonly<Record<string, ParamValue>>;
+}
+
 /**
  * Assieme generato da una tipologia: pezzi posizionati, giunti (già espansi
- * nelle lavorazioni dei pezzi) e metadati. Definito qui perché la
+ * nelle lavorazioni dei pezzi), ferramenta e metadati. Definito qui perché la
  * serializzazione (`serialize.ts`) lo valida; `domain/assembly` lo riesporta.
  */
 export interface Assembly {
@@ -330,5 +370,7 @@ export interface Assembly {
   readonly params: Readonly<Record<string, ParamValue>>;
   readonly pieces: readonly Piece[];
   readonly joints: readonly Joint[];
+  /** Elenco ferramenta (vuoto per le tipologie senza ferramenta; default `[]` in lettura). */
+  readonly hardware: readonly HardwareItem[];
   readonly meta: Readonly<Record<string, ParamValue>>;
 }
