@@ -11,3 +11,6 @@ next-env.d.ts
 # OS
 .DS_Store
 Thumbs.db
+
+# Kernel OCCT copiato da scripts/copy-occt-wasm.mjs
+public/occt/
