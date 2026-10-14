@@ -3,3 +3,5 @@
 export * from "./config";
 export * from "./config-file";
 export * from "./configuratore-store";
+export * from "./kernel-slice";
+export * from "./examples";

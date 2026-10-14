@@ -13,6 +13,7 @@ import {
   type ValidationIssue,
 } from "@/domain";
 import { SatExportOptionsSchema, type SatExportOptions } from "@/export/sat/options";
+import type { PieceResult } from "@/geometry/protocol";
 import {
   EMPTY_DERIVED,
   carryOverParams,
@@ -22,6 +23,14 @@ import {
   type Derived,
 } from "./config";
 import { parseConfigFile } from "./config-file";
+import {
+  INITIAL_KERNEL_STATE,
+  kernelSlice,
+  solidsReady,
+  type KernelActions,
+  type KernelSliceOptions,
+  type KernelState,
+} from "./kernel-slice";
 
 /**
  * Store del configuratore (D10) senza React: `createConfiguratoreStore()`
@@ -31,6 +40,8 @@ import { parseConfigFile } from "./config-file";
  * - `config`: tipologia, parametri, ingombro, affondamento, opzioni export.
  * - `derived`: assieme, violazioni, collisioni, ricalcolati in modo sincrono
  *   a ogni cambio di `config` (le azioni passano tutte da `commit`).
+ * - `kernel`: stato del kernel geometrico e solidi per pezzo (`kernel-slice.ts`);
+ *   dopo `startKernel()` ogni nuovo assieme avvia `rebuild()` (debounce 300 ms).
  *
  * Le azioni sull'ingombro e sulle opzioni validano l'input: se non è valido
  * lo stato resta invariato e restituiscono `{ ok: false, error, issues }`.
@@ -74,14 +85,15 @@ export interface ConfiguratoreActions {
   resetConfig(typology?: string): void;
 }
 
-export interface ConfiguratoreState extends ConfiguratoreActions {
+export interface ConfiguratoreState extends ConfiguratoreActions, KernelActions {
   readonly config: ConfiguratoreConfig;
   readonly derived: Derived;
+  readonly kernel: KernelState;
 }
 
 export type ConfiguratoreStore = StoreApi<ConfiguratoreState>;
 
-export interface ConfiguratoreStoreOptions {
+export interface ConfiguratoreStoreOptions extends KernelSliceOptions {
   /** Configurazione iniziale (default `defaultConfig()`). */
   readonly initialConfig?: ConfiguratoreConfig;
   /** Regole costruttive (default `DEFAULT_LOVATO_RULES`). */
@@ -93,7 +105,7 @@ const OK: ActionResult = { ok: true };
 function failure(e: unknown): ActionResult {
   if (e instanceof ValidationError) return { ok: false, error: e.message, issues: e.issues };
   const message = e instanceof Error ? e.message : String(e);
-  return { ok: false, error: message, issues: [{ path: "", message }] };
+  return { ok: false, error: message, issues: [{ path: "(radice)", message }] };
 }
 
 /** Primo id `OST-nn` libero. */
@@ -111,7 +123,14 @@ export function configuratoreSlice(options: ConfiguratoreStoreOptions = {}) {
   return (
     set: StoreApi<ConfiguratoreState>["setState"],
     get: StoreApi<ConfiguratoreState>["getState"],
+    api: Pick<StoreApi<ConfiguratoreState>, "subscribe">,
   ): ConfiguratoreState => {
+    const kernel = kernelSlice<ConfiguratoreState>(set, get, options);
+    // Nuovo assieme (azioni, file, ripristino da storage) → nuova costruzione dei solidi.
+    api.subscribe((state, prev) => {
+      if (state.derived.assembly !== prev.derived.assembly && state.kernel.status !== "idle") kernel.rebuild();
+    });
+
     const commit = (config: ConfiguratoreConfig) =>
       set({ config, derived: computeDerived(config, get().derived, ruleSet) });
 
@@ -130,6 +149,8 @@ export function configuratoreSlice(options: ConfiguratoreStoreOptions = {}) {
     return {
       config: initialConfig,
       derived: computeDerived(initialConfig, EMPTY_DERIVED, ruleSet),
+      kernel: INITIAL_KERNEL_STATE,
+      ...kernel,
 
       setTypology(slug) {
         try {
@@ -281,3 +302,18 @@ export const selectWarnings = memoByDerived((d) => d.violations.filter((v) => v.
 /** Problemi che richiedono la conferma "esporta comunque" (errori o collisioni). */
 export const selectNeedsExportConfirmation = (s: ConfiguratoreState) =>
   s.derived.collisions.length > 0 || s.derived.violations.some((v) => v.severity === "errore");
+
+/** Solidi pronti per l'assieme corrente (abilita "Esporta SAT/STEP"). */
+export const selectSolidsReady = (s: ConfiguratoreState) => solidsReady(s.kernel, s.derived.assembly);
+
+const resultsCache = new WeakMap<KernelState, PieceResult[]>();
+/** Risultati del kernel nell'ordine dei pezzi dell'assieme costruito (per `exportSat`). */
+export const selectPieceResults = (s: ConfiguratoreState): PieceResult[] => {
+  let list = resultsCache.get(s.kernel);
+  if (!list) {
+    const { builtFor, results } = s.kernel;
+    list = (builtFor?.pieces ?? []).flatMap((p) => (results[p.id] ? [results[p.id]] : []));
+    resultsCache.set(s.kernel, list);
+  }
+  return list;
+};
