@@ -3,6 +3,12 @@ import { type FloorHeightFn, flatFloor } from "../assembly/bounds";
 import { expandJoints } from "../components/joints";
 import { addMachining } from "../components/machinings";
 import { createPiece, parseAssembly } from "../components/schemas";
+import { findHardware, hasHardware } from "../hardware/catalog";
+import { HardwareError } from "../hardware/errors";
+import { countItem, expandBolt, expandBracket, expandJointNode, isCountedKind, type HardwareExpansion } from "../hardware/expand";
+import { mergeHardware } from "../hardware/list";
+import type { HardwareAnchor } from "../hardware/types";
+import type { Vec3 } from "../math/vec3";
 import { parseSectionLabel, sectionLabel } from "../components/sections";
 import {
   JOINT_TYPES,
@@ -10,7 +16,9 @@ import {
   isMachiningType,
   isPieceType,
   type Assembly,
+  type HardwareItem,
   type Joint,
+  type LateralFace,
   type MachiningSpec,
   type ParamValue,
   type Piece,
@@ -238,7 +246,45 @@ export interface MachiningStep {
   readonly spec: Resolvable<MachiningSpec>;
 }
 
-export type BuildStep = PlaceStep | RepeatStep | JointStep | MachiningStep;
+/** Codice dello step `hardware` per il bullone passante su più strati (lunghezza scelta dal catalogo). */
+export const BOLT_STEP_CODE = "bullone-passante";
+/** Codice dello step `hardware` per un nodo metallico con voce scelta automaticamente (vie, sezione, angolo). */
+export const AUTO_JOINT_CODE = "giunto-vie";
+
+/**
+ * Parametri dello step `hardware`, secondo il codice:
+ * - `bullone-passante`: `face`, `at`, `offset` sul primo pezzo e `diameter`;
+ * - staffe/supporti/piastre: `at` (solo con `anchor: "faccia"`);
+ * - giunti a N vie e cuspidi (o `giunto-vie` per la scelta automatica):
+ *   `point` (centro del nodo) e `line` (`joint` | `zincato`);
+ * - viti/tasselli: `count` (quantità conteggiata sui pezzi).
+ */
+export interface HardwareStepParams {
+  readonly face?: LateralFace;
+  readonly at?: number;
+  readonly offset?: number;
+  readonly diameter?: number;
+  readonly point?: Vec3;
+  readonly line?: "joint" | "zincato";
+  readonly count?: number;
+}
+
+/**
+ * Ferramenta (E4): eseguita in ordine come `machining`; le lavorazioni indotte
+ * vanno subito sui pezzi (`jointId` = id della voce), le voci si accumulano e
+ * sono fuse (`mergeHardware`) in `assembly.hardware`. `pieces` = ref dei pezzi
+ * collegati (per il bullone: nell'ordine di attraversamento).
+ */
+export interface HardwareStep {
+  readonly kind: "hardware";
+  /** Codice di catalogo, `bullone-passante` o `giunto-vie`. */
+  readonly code: string;
+  readonly pieces: readonly string[];
+  readonly anchor?: HardwareAnchor;
+  readonly params?: Resolvable<HardwareStepParams>;
+}
+
+export type BuildStep = PlaceStep | RepeatStep | JointStep | MachiningStep | HardwareStep;
 
 /**
  * Template di tipologia (D2): parametri dichiarati e funzione pura che
@@ -329,6 +375,8 @@ export function catalogProblems(steps: readonly FlatStep[], ctx: BuildContext): 
       problems.push(`primitivo fuori catalogo: ${JSON.stringify(s.type)} (ref ${s.ref})`);
     if (s.kind === "joint" && !(JOINT_TYPES as readonly string[]).includes(s.type))
       problems.push(`giunto fuori catalogo: ${JSON.stringify(s.type)}`);
+    if (s.kind === "hardware" && s.code !== BOLT_STEP_CODE && s.code !== AUTO_JOINT_CODE && !hasHardware(s.code))
+      problems.push(`ferramenta fuori catalogo: ${JSON.stringify(s.code)}`);
     if (s.kind === "machining") {
       const t = (resolve(s.spec, ctx) as { type?: unknown }).type;
       if (!isMachiningType(t))
@@ -360,6 +408,7 @@ export function buildAssembly(
   const pieces: Piece[] = [];
   const index = new Map<string, number>();
   const joints: Joint[] = [];
+  const hardware: HardwareItem[] = [];
   const pieceOf = (ref: string, what: string): number => {
     const id = byRef.get(ref);
     if (id === undefined) throw new TemplateError(template.slug, `${what}: riferimento a pezzo non posizionato "${ref}"`);
@@ -389,6 +438,13 @@ export function buildAssembly(
         pieces[i] = addMachining(pieces[i], resolve(s.spec, ctx));
         break;
       }
+      case "hardware": {
+        const refs = s.pieces.map((r) => pieces[pieceOf(r, `ferramenta ${s.code}`)].id);
+        const exp = expandHardwareStep(template.slug, s, resolve(s.params ?? {}, ctx), refs, pieces, ids);
+        exp.pieces.forEach((p, i) => (pieces[i] = p));
+        hardware.push(exp.item, ...exp.extras);
+        break;
+      }
       case "joint": {
         const a = pieces[pieceOf(s.a, "giunto")].id;
         const b = pieces[pieceOf(s.b, "giunto")].id;
@@ -409,10 +465,55 @@ export function buildAssembly(
       params,
       pieces: expandJoints(joints, pieces),
       joints,
-      hardware: [],
+      hardware: mergeHardware(hardware),
       meta: template.meta?.(ctx) ?? {},
     }),
   );
+}
+
+/** Espande uno step `hardware` già risolto (id dei pezzi) con le funzioni di `domain/hardware`. */
+function expandHardwareStep(
+  slug: string,
+  s: HardwareStep,
+  params: HardwareStepParams,
+  pieceIds: readonly string[],
+  pieces: readonly Piece[],
+  ids: ReturnType<typeof createIdGenerator>,
+): HardwareExpansion {
+  const fail = (reason: string): never => {
+    throw new TemplateError(slug, `ferramenta ${s.code} su ${pieceIds.join(", ") || "nessun pezzo"}: ${reason}`);
+  };
+  try {
+    if (s.code === BOLT_STEP_CODE) {
+      const { face, at, offset = 0, diameter } = params;
+      if (!face || at === undefined || diameter === undefined) return fail("servono face, at e diameter");
+      return expandBolt({ id: ids.nextHardware("bullone"), pieces: pieceIds, face, at, offset, diameter }, pieces);
+    }
+    if (s.code === AUTO_JOINT_CODE) {
+      if (!params.point) return fail("serve il centro del nodo (point)");
+      return expandJointNode({ id: ids.nextHardware("giunto-vie"), point: params.point, pieces: pieceIds, line: params.line }, pieces, ids);
+    }
+    const spec = findHardware(s.code);
+    if (spec.kind === "giunto-vie" || spec.kind === "cuspide") {
+      if (!params.point) return fail("serve il centro del nodo (point)");
+      return expandJointNode({ id: ids.nextHardware(spec.kind), point: params.point, pieces: pieceIds, code: s.code, line: params.line }, pieces, ids);
+    }
+    if (isCountedKind(spec.kind)) {
+      const count = params.count ?? 1;
+      if (!Number.isInteger(count) || count < 1) return fail(`quantità non valida: ${count}`);
+      return { pieces: [...pieces], item: countItem(s.code, count, pieceIds), extras: [] };
+    }
+    if (spec.kind === "bullone") return fail(`usare lo step "${BOLT_STEP_CODE}" (la lunghezza è scelta dallo spessore serrato)`);
+    if (pieceIds.length !== 1) return fail("staffe e supporti si applicano a un solo pezzo");
+    const index = pieces.findIndex((p) => p.id === pieceIds[0]);
+    const exp = expandBracket({ id: ids.nextHardware(spec.kind), code: s.code, piece: pieceIds[0], anchor: s.anchor, at: params.at }, pieces[index]);
+    const out = [...pieces];
+    out[index] = exp.piece;
+    return { pieces: out, item: exp.item, extras: exp.extras };
+  } catch (e) {
+    if (e instanceof HardwareError) return fail(e.message);
+    throw e;
+  }
 }
 
 /** Sostituisce `-0` con `0` ovunque: l'assieme sopravvive identico al round-trip JSON. */
