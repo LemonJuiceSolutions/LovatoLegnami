@@ -102,7 +102,11 @@ const facePoint = (frame: FaceFrame, x: number, offset: number): Vec3 =>
   add(add(vec3(x, 0, 0), scale(frame.n, frame.dist)), scale(frame.w, offset));
 
 type ToolBuilder<M extends Machining> = (m: M, p: PieceSolidInput) => Shape3D;
-type ToolBuilders = { [K in Machining["type"]]: ToolBuilder<Extract<Machining, { type: K }>> };
+/** Lavorazioni il cui utensile non è ancora implementato nel kernel (task 8.3 di `tipologie-estese`). */
+type PendingTools = "asola-lama";
+type ToolBuilders = { [K in Exclude<Machining["type"], PendingTools>]: ToolBuilder<Extract<Machining, { type: K }>> } & {
+  [K in PendingTools]?: ToolBuilder<Extract<Machining, { type: K }>>;
+};
 
 const deg = (a: number): number => (a * Math.PI) / 180;
 

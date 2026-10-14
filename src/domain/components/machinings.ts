@@ -82,6 +82,17 @@ function applicabilityProblem(piece: Piece, m: MachiningSpec): string | undefine
       if (m.length >= L - EPS) return `lunghezza del tenone ${fmt(m.length)} non inferiore alla lunghezza del pezzo (${fmt(L)})`;
       return undefined;
     }
+    case "asola-lama": {
+      const head = m.face === "testa-inizio" ? 0 : L;
+      if (Math.abs(m.at - head) > EPS) return `l'asola deve partire dalla testa (${m.face} ⇒ at=${fmt(head)})`;
+      if (m.width >= b - EPS) return `width ${fmt(m.width)} non inferiore alla base della sezione (${fmt(b)})`;
+      if (m.height >= h - EPS) return `height ${fmt(m.height)} non inferiore all'altezza della sezione (${fmt(h)})`;
+      if (m.depth >= thickness - EPS) return `depth ${fmt(m.depth)} non inferiore alla lunghezza del pezzo (${fmt(thickness)})`;
+      const off = m.offset ?? 0;
+      if (Math.abs(off) + m.height / 2 > h / 2 + EPS)
+        return `offset ${fmt(off)}: l'asola (alta ${fmt(m.height)}) esce dalla sezione (altezza ${fmt(h)})`;
+      return undefined;
+    }
     case "taglio-testa": {
       const a2 = m.angle2 ?? 0;
       if (Math.abs(m.angle) >= 90 || Math.abs(a2) >= 90) return `angolo di taglio non valido (deve essere in (−90°, 90°))`;

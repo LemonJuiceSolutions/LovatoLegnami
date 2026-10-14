@@ -104,6 +104,8 @@ export const MACHINING_TYPES = [
   "becco-uccello",
   "foro",
   "taglio-testa",
+  // estensione `tipologie-estese` (E2)
+  "asola-lama",
 ] as const;
 export type MachiningType = (typeof MACHINING_TYPES)[number];
 
@@ -203,7 +205,23 @@ export interface TaglioTesta extends MachiningBase {
   readonly angle2?: number;
 }
 
-export type Machining = MezzoLegno | Tenone | Mortasa | BeccoUccello | Foro | TaglioTesta;
+/**
+ * Asola per lama (E2): tasca rettangolare praticata dalla testa `face`, larga
+ * `width` lungo Y locale, alta `height` lungo Z locale e profonda `depth` lungo
+ * X verso l'interno del pezzo; centrata sulla sezione salvo lo scostamento
+ * `offset` lungo Z (lame eccentriche). `at` coincide con la testa
+ * (0 per `testa-inizio`, lunghezza per `testa-fine`), come per il tenone.
+ */
+export interface AsolaLama extends MachiningBase {
+  readonly type: "asola-lama";
+  readonly face: HeadFace;
+  readonly width: number;
+  readonly height: number;
+  readonly depth: number;
+  readonly offset?: number;
+}
+
+export type Machining = MezzoLegno | Tenone | Mortasa | BeccoUccello | Foro | TaglioTesta | AsolaLama;
 
 /** Lavorazione richiesta, senza `id`/`pieceId` (assegnati da `createMachining`). */
 type DistributiveOmit<T, K extends PropertyKey> = T extends unknown ? Omit<T, K> : never;

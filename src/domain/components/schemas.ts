@@ -88,6 +88,14 @@ const specShapes = {
     depth: positive().optional(),
   },
   "taglio-testa": { type: z.literal("taglio-testa"), face: headFace, angle: finite(), angle2: finite().optional() },
+  "asola-lama": {
+    type: z.literal("asola-lama"),
+    face: headFace,
+    width: positive(),
+    height: positive(),
+    depth: positive(),
+    offset: finite().optional(),
+  },
 } as const;
 
 const machiningTypeErrorMap: z.ZodErrorMap = (issue, ctx) =>
@@ -107,6 +115,7 @@ export const MachiningSpecSchema = z.discriminatedUnion(
     z.object({ ...base, ...specShapes["becco-uccello"] }).strict(),
     z.object({ ...base, ...specShapes.foro }).strict(),
     z.object({ ...base, ...specShapes["taglio-testa"] }).strict(),
+    z.object({ ...base, ...specShapes["asola-lama"] }).strict(),
   ],
   { errorMap: machiningTypeErrorMap },
 ) as unknown as z.ZodType<MachiningSpec>;
@@ -122,6 +131,7 @@ export const MachiningSchema = z.discriminatedUnion(
     z.object({ ...idFields, ...base, ...specShapes["becco-uccello"] }).strict(),
     z.object({ ...idFields, ...base, ...specShapes.foro }).strict(),
     z.object({ ...idFields, ...base, ...specShapes["taglio-testa"] }).strict(),
+    z.object({ ...idFields, ...base, ...specShapes["asola-lama"] }).strict(),
   ],
   { errorMap: machiningTypeErrorMap },
 ) as unknown as z.ZodType<Machining>;
