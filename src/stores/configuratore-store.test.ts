@@ -75,6 +75,17 @@ describe("store configuratore – config e derived", () => {
     expect(defaultConfig().envelope).toBe(defaultConfig("addossata-monofalda").envelope);
   });
 
+  it("le opzioni di export non rigenerano l'assieme (nessuna nuova costruzione dei solidi)", () => {
+    const store = createConfiguratoreStore();
+    const before = store.getState().derived;
+    expect(store.getState().setExportOption("producer", "CAM X")).toEqual({ ok: true });
+    expect(store.getState().setExportOption("fileMode", "un-file-per-pezzo")).toEqual({ ok: true });
+    expect(store.getState().config.exportOptions.sat.producer).toBe("CAM X");
+    expect(store.getState().derived).toBe(before);
+    store.getState().setParam("larghezza", 5000);
+    expect(store.getState().derived.assembly).not.toBe(before.assembly);
+  });
+
   it("parametro comune non ammesso dalla nuova tipologia torna al default", () => {
     const store = createConfiguratoreStore({ initialConfig: defaultConfig("autoportante-bifalda") });
     store.getState().setParam("pendenza", 34);

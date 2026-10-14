@@ -136,8 +136,16 @@ export function configuratoreSlice(options: ConfiguratoreStoreOptions = {}) {
       if (state.derived.assembly !== prev.derived.assembly && state.kernel.status !== "idle") kernel.rebuild();
     });
 
-    const commit = (config: ConfiguratoreConfig) =>
-      set({ config, derived: computeDerived(config, get().derived, ruleSet) });
+    const commit = (config: ConfiguratoreConfig) => {
+      const prev = get().config;
+      // Le opzioni di export non cambiano l'assieme: niente rigenerazione né nuova costruzione dei solidi.
+      const sameGeometry =
+        config.typology === prev.typology &&
+        config.params === prev.params &&
+        config.envelope === prev.envelope &&
+        config.embedment === prev.embedment;
+      set({ config, derived: sameGeometry ? get().derived : computeDerived(config, get().derived, ruleSet) });
+    };
 
     const update = (patch: Partial<ConfiguratoreConfig>) => commit({ ...get().config, ...patch });
 
