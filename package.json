@@ -9,9 +9,11 @@
     "prebuild": "node scripts/copy-occt-wasm.mjs",
     "start": "next start",
     "lint": "next lint",
-    "test": "vitest run",
-    "test:watch": "vitest",
-    "postinstall": "node scripts/copy-occt-wasm.mjs"
+    "test": "vitest run --project unit",
+    "test:watch": "vitest --project unit",
+    "postinstall": "node scripts/copy-occt-wasm.mjs",
+    "pretest:geometry": "node scripts/copy-occt-wasm.mjs",
+    "test:geometry": "vitest run --project geometry"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.82.0",
