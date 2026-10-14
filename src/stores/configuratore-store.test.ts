@@ -133,3 +133,19 @@ describe("store configuratore – config e derived", () => {
     expect(store.getState().config).toEqual(defaultConfig());
   });
 });
+
+describe("store configuratore – selezione dei pezzi", () => {
+  it("seleziona i pezzi, mantiene il riferimento se invariata e azzera al cambio di configurazione", () => {
+    const store = createConfiguratoreStore();
+    expect(store.getState().selection).toEqual([]);
+    store.getState().selectPieces(["TRV-01", "PIL-01"]);
+    const sel = store.getState().selection;
+    expect(sel).toEqual(["TRV-01", "PIL-01"]);
+    store.getState().selectPieces(["TRV-01", "PIL-01"]);
+    expect(store.getState().selection).toBe(sel);
+    store.getState().setParam("larghezza", 5000);
+    expect(store.getState().selection).toBe(sel);
+    store.getState().resetConfig();
+    expect(store.getState().selection).toEqual([]);
+  });
+});

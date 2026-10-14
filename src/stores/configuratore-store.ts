@@ -83,12 +83,16 @@ export interface ConfiguratoreActions {
   loadConfig(config: ConfiguratoreConfig): void;
   /** Torna alla configurazione di default (della tipologia indicata). */
   resetConfig(typology?: string): void;
+  /** Seleziona i pezzi (pannello esiti, viewer); `[]` annulla la selezione. */
+  selectPieces(ids: readonly string[]): void;
 }
 
 export interface ConfiguratoreState extends ConfiguratoreActions, KernelActions {
   readonly config: ConfiguratoreConfig;
   readonly derived: Derived;
   readonly kernel: KernelState;
+  /** Id dei pezzi selezionati (stato di interfaccia, non persistito). */
+  readonly selection: readonly string[];
 }
 
 export type ConfiguratoreStore = StoreApi<ConfiguratoreState>;
@@ -101,6 +105,7 @@ export interface ConfiguratoreStoreOptions extends KernelSliceOptions {
 }
 
 const OK: ActionResult = { ok: true };
+const NO_SELECTION: readonly string[] = [];
 
 function failure(e: unknown): ActionResult {
   if (e instanceof ValidationError) return { ok: false, error: e.message, issues: e.issues };
@@ -150,11 +155,13 @@ export function configuratoreSlice(options: ConfiguratoreStoreOptions = {}) {
       config: initialConfig,
       derived: computeDerived(initialConfig, EMPTY_DERIVED, ruleSet),
       kernel: INITIAL_KERNEL_STATE,
+      selection: NO_SELECTION,
       ...kernel,
 
       setTypology(slug) {
         try {
           update({ typology: slug, params: carryOverParams(get().config.params, slug) });
+          set({ selection: NO_SELECTION });
           return OK;
         } catch (e) {
           return failure(e);
@@ -222,9 +229,16 @@ export function configuratoreSlice(options: ConfiguratoreStoreOptions = {}) {
       },
       loadConfig(config) {
         commit(config);
+        set({ selection: NO_SELECTION });
       },
       resetConfig(typology) {
         commit(defaultConfig(typology));
+        set({ selection: NO_SELECTION });
+      },
+      selectPieces(ids) {
+        const current = get().selection;
+        if (ids.length === current.length && ids.every((id, i) => id === current[i])) return;
+        set({ selection: ids.length === 0 ? NO_SELECTION : [...ids] });
       },
     };
   };

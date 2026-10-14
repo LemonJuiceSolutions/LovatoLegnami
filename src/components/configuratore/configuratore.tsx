@@ -9,6 +9,7 @@ import { configuratoreStore } from "@/stores/use-configuratore"
 import { KernelStatusBadge } from "./kernel-status"
 import { EnvelopeForm } from "./envelope-form"
 import { ParamsPanel } from "./params-panel"
+import { ResultsPanel } from "./results-panel"
 import { ViewerSlot } from "./viewer-slot"
 
 /**
@@ -146,5 +147,5 @@ export function Configuratore() {
     return () => configuratoreStore.getState().stopKernel()
   }, [])
 
-  return <ConfiguratoreLayout params={<ParamsPanel envelope={<EnvelopeForm />} />} />
+  return <ConfiguratoreLayout params={<ParamsPanel envelope={<EnvelopeForm />} />} results={<ResultsPanel />} />
 }
