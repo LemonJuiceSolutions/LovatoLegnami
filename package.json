@@ -9,8 +9,8 @@
     "prebuild": "node scripts/copy-occt-wasm.mjs",
     "start": "next start",
     "lint": "next lint",
-    "test": "vitest run --project unit",
-    "test:watch": "vitest --project unit",
+    "test": "vitest run --project unit --project dom",
+    "test:watch": "vitest --project unit --project dom",
     "postinstall": "node scripts/copy-occt-wasm.mjs",
     "pretest:geometry": "node scripts/copy-occt-wasm.mjs",
     "test:geometry": "vitest run --project geometry"
@@ -49,12 +49,15 @@
     "zustand": "^5.0.15"
   },
   "devDependencies": {
+    "@testing-library/dom": "^10.4.2",
+    "@testing-library/react": "^16.3.3",
     "@types/node": "^25.4.0",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
     "autoprefixer": "^10.4.27",
     "eslint": "^8.57.0",
     "eslint-config-next": "^14.2.0",
+    "jsdom": "^26.1.0",
     "postcss": "^8.5.8",
     "tailwindcss": "^3.4.0",
     "tailwindcss-animate": "^1.0.7",

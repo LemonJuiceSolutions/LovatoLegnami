@@ -7,6 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { cn } from "@/lib/utils"
 import { configuratoreStore } from "@/stores/use-configuratore"
 import { KernelStatusBadge } from "./kernel-status"
+import { ParamsPanel } from "./params-panel"
 import { ViewerSlot } from "./viewer-slot"
 
 /**
@@ -144,5 +145,5 @@ export function Configuratore() {
     return () => configuratoreStore.getState().stopKernel()
   }, [])
 
-  return <ConfiguratoreLayout />
+  return <ConfiguratoreLayout params={<ParamsPanel />} />
 }
