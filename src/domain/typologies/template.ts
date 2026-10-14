@@ -347,11 +347,22 @@ export function buildAssembly(
     }
   }
 
-  return parseAssembly({
-    typologySlug: template.slug,
-    params,
-    pieces: expandJoints(joints, pieces),
-    joints,
-    meta: template.meta?.(ctx) ?? {},
-  });
+  return parseAssembly(
+    withoutNegativeZero({
+      typologySlug: template.slug,
+      params,
+      pieces: expandJoints(joints, pieces),
+      joints,
+      meta: template.meta?.(ctx) ?? {},
+    }),
+  );
+}
+
+/** Sostituisce `-0` con `0` ovunque: l'assieme sopravvive identico al round-trip JSON. */
+function withoutNegativeZero<T>(value: T): T {
+  if (typeof value === "number") return (value === 0 ? 0 : value) as T;
+  if (Array.isArray(value)) return value.map(withoutNegativeZero) as T;
+  if (value !== null && typeof value === "object")
+    return Object.fromEntries(Object.entries(value).map(([k, v]) => [k, withoutNegativeZero(v)])) as T;
+  return value;
 }
