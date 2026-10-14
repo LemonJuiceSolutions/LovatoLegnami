@@ -1,4 +1,5 @@
-import { FAMILY_OF, PIECE_FAMILIES, isPieceType, type PieceFamily, type PieceType } from "../components/types";
+import { FAMILY_OF, HARDWARE_KINDS, PIECE_FAMILIES, isPieceType, type HardwareKind, type PieceFamily, type PieceType } from "../components/types";
+import { HARDWARE_FAMILY_OF, type HardwareFamily, formatHardwareId, isHardwareFamily } from "../hardware/ids";
 
 /** Numero a due cifre minime (`7` → `"07"`, `123` → `"123"`). */
 const pad2 = (n: number): string => String(n).padStart(2, "0");
@@ -34,10 +35,15 @@ export interface IdGenerator {
   nextPiece(familyOrType: PieceFamily | PieceType): string;
   /** Prossimo id di giunto. */
   nextJoint(): string;
+  /** Prossimo id di ferramenta per famiglia (o per tipo di ferramenta): `BUL-01`, `STT-01`, … */
+  nextHardware(familyOrKind: HardwareFamily | HardwareKind): string;
 }
+
+const isHardwareKind = (v: string): v is HardwareKind => (HARDWARE_KINDS as readonly string[]).includes(v);
 
 export function createIdGenerator(): IdGenerator {
   const counters = new Map<PieceFamily, number>();
+  const hardware = new Map<HardwareFamily, number>();
   let joints = 0;
   return {
     nextPiece(familyOrType) {
@@ -50,6 +56,13 @@ export function createIdGenerator(): IdGenerator {
     nextJoint() {
       joints += 1;
       return formatJointId(joints);
+    },
+    nextHardware(familyOrKind) {
+      const family = isHardwareKind(familyOrKind) ? HARDWARE_FAMILY_OF[familyOrKind] : familyOrKind;
+      if (!isHardwareFamily(family)) throw new Error(`famiglia o tipo di ferramenta sconosciuto: ${String(familyOrKind)}`);
+      const n = (hardware.get(family) ?? 0) + 1;
+      hardware.set(family, n);
+      return formatHardwareId(family, n);
     },
   };
 }
