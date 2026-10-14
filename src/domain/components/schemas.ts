@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { ValidationError, issuesFromZod } from "./errors";
 import {
+  CURVED_PIECE_TYPES,
   FACES,
   FAMILY_OF,
   JOINT_TYPES,
@@ -8,6 +9,7 @@ import {
   PIECE_FAMILIES,
   PIECE_TYPES,
   type Assembly,
+  type Curve,
   type Joint,
   type Machining,
   type MachiningSpec,
@@ -36,6 +38,19 @@ export const PieceFamilySchema = enumWithValue(PIECE_FAMILIES, "famiglia");
 export const FaceSchema = enumWithValue(FACES, "faccia");
 
 export const SectionSchema: z.ZodType<Section> = z.object({ b: positive(), h: positive() }).strict();
+
+const fmtMm = (n: number): string => String(Math.round(n * 10) / 10).replace(".", ",");
+
+/** Asse curvo (E1): raggio in mm, angolo sotteso in gradi (0, 360). */
+export const CurveSchema: z.ZodType<Curve> = z
+  .object({ radius: positive(), sweep: positive().lt(360, "deve essere minore di 360°") })
+  .strict();
+
+/** Sviluppo dell'asse curvo: `radius · sweep` in radianti (mm). */
+export const curveLength = (c: Curve): number => (c.radius * c.sweep * Math.PI) / 180;
+
+/** Tolleranza tra `length` e sviluppo dell'asse di un pezzo curvo (mm). */
+export const CURVE_LENGTH_TOLERANCE = 1;
 
 export const PoseSchema: z.ZodType<Pose> = z.array(finite()).length(16, "la posa deve avere 16 valori");
 
@@ -121,9 +136,32 @@ export const PieceSchema: z.ZodType<Piece> = z
     pose: PoseSchema,
     label: z.string(),
     machinings: z.array(MachiningSchema),
+    curve: CurveSchema.optional(),
   })
   .strict()
   .superRefine((p, ctx) => {
+    const curved = CURVED_PIECE_TYPES.includes(p.type);
+    if (p.curve && !curved)
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["curve"],
+        message: `curvatura non ammessa sul tipo ${p.type}: solo ${CURVED_PIECE_TYPES.join(", ")} ammette la curvatura`,
+      });
+    else if (!p.curve && curved)
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["curve"],
+        message: `il tipo ${p.type} richiede la curvatura (raggio e angolo sotteso)`,
+      });
+    else if (p.curve) {
+      const dev = curveLength(p.curve);
+      if (Math.abs(dev - p.length) > CURVE_LENGTH_TOLERANCE)
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["length"],
+          message: `la lunghezza ${fmtMm(p.length)} non corrisponde allo sviluppo dell'asse curvo (${fmtMm(dev)} = R${fmtMm(p.curve.radius)} · ${fmtMm(p.curve.sweep)}°, tolleranza ${CURVE_LENGTH_TOLERANCE} mm)`,
+        });
+    }
     if (FAMILY_OF[p.type] !== p.family)
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
@@ -188,6 +226,7 @@ export interface PieceInput {
   readonly pose: Pose;
   readonly label?: string;
   readonly machinings?: readonly Machining[];
+  readonly curve?: Curve;
 }
 
 /** Crea e valida un pezzo; la famiglia è derivata dal tipo, l'etichetta di default è l'id. */
@@ -202,6 +241,7 @@ export function createPiece(input: PieceInput): Piece {
     pose: input.pose,
     label: input.label ?? input.id,
     machinings: input.machinings ?? [],
+    ...(input.curve ? { curve: input.curve } : {}),
   });
 }
 

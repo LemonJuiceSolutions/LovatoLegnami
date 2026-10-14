@@ -18,11 +18,34 @@ export const PIECE_TYPES = [
   "colmo",
   "controvento",
   "banchina",
+  // estensione `tipologie-estese` (E1)
+  "tavola",
+  "arco",
+  "cantonale",
+  "monaco",
+  "mensola",
+  "fascia",
+  "grigliato",
 ] as const;
 export type PieceType = (typeof PIECE_TYPES)[number];
 
 /** Famiglia del pezzo = prefisso degli id stabili `<FAM>-<nn>` (D2). */
-export const PIECE_FAMILIES = ["PIL", "TRV", "TVT", "PNT", "COL", "CTV", "BNC"] as const;
+export const PIECE_FAMILIES = [
+  "PIL",
+  "TRV",
+  "TVT",
+  "PNT",
+  "COL",
+  "CTV",
+  "BNC",
+  "TAV",
+  "ARC",
+  "CAN",
+  "MON",
+  "MEN",
+  "FAS",
+  "GRG",
+] as const;
 export type PieceFamily = (typeof PIECE_FAMILIES)[number];
 
 export const FAMILY_OF: Readonly<Record<PieceType, PieceFamily>> = {
@@ -33,7 +56,17 @@ export const FAMILY_OF: Readonly<Record<PieceType, PieceFamily>> = {
   colmo: "COL",
   controvento: "CTV",
   banchina: "BNC",
+  tavola: "TAV",
+  arco: "ARC",
+  cantonale: "CAN",
+  monaco: "MON",
+  mensola: "MEN",
+  fascia: "FAS",
+  grigliato: "GRG",
 };
+
+/** Tipi di pezzo che ammettono (e richiedono) l'asse curvo `curve`. */
+export const CURVED_PIECE_TYPES: readonly PieceType[] = ["arco"];
 
 export const isPieceType = (v: unknown): v is PieceType =>
   typeof v === "string" && (PIECE_TYPES as readonly string[]).includes(v);
@@ -176,6 +209,18 @@ export type Machining = MezzoLegno | Tenone | Mortasa | BeccoUccello | Foro | Ta
 type DistributiveOmit<T, K extends PropertyKey> = T extends unknown ? Omit<T, K> : never;
 export type MachiningSpec = DistributiveOmit<Machining, "id" | "pieceId">;
 
+/**
+ * Asse curvo di un pezzo (E1): arco di cerchio nel piano locale X–Z che parte
+ * dall'origine tangente a +X e curva verso +Z (centro di curvatura in
+ * `(0, 0, radius)`). `sweep` è l'angolo sotteso in gradi; la lunghezza del
+ * pezzo è lo sviluppo dell'asse `radius · sweep(rad)`. La sezione resta `b`
+ * lungo Y e `h` radiale; `at` delle lavorazioni è la coordinata curvilinea.
+ */
+export interface Curve {
+  readonly radius: number;
+  readonly sweep: number;
+}
+
 export interface Piece {
   readonly id: string;
   readonly type: PieceType;
@@ -185,6 +230,8 @@ export interface Piece {
   readonly pose: Pose;
   readonly label: string;
   readonly machinings: readonly Machining[];
+  /** Asse curvo: presente solo (e sempre) per i tipi in `CURVED_PIECE_TYPES`. */
+  readonly curve?: Curve;
 }
 
 export const JOINT_TYPES = ["tenone-mortasa", "mezzo-legno"] as const;

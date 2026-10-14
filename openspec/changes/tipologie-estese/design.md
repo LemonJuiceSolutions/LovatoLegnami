@@ -145,3 +145,7 @@ Additivo. `fromJSON` accetta file senza `hardware` (default `[]`) e senza `curve
 - Valori reali di ingombro/inserimento dei giunti JOINT e delle piastre gazebo (non pubblicati sul sito): oggi stimati dai disegni quotati (`A/B/C`), da confermare su un giunto fisico; cambiano solo i dati di `hardware/catalog.ts`.
 - Se Lovato vuole offrire anche il monaco poligonale (6/8 lati) lavorato a CNC: richiederebbe sezioni non rettangolari, da valutare come change separata.
 - Nomenclatura di produzione per la ferramenta (codici interni Lovato vs codici del fornitore): oggi codici descrittivi nostri; solo dati.
+
+## Note di implementazione
+
+- **Primitivi estesi (1.1)**: `PIECE_TYPES`/`PIECE_FAMILIES` estesi in coda (14 tipi), `CURVED_PIECE_TYPES = ["arco"]`, `Piece.curve?: Curve {radius, sweep (gradi, (0, 360))}`. Nello schema del pezzo: `curve` su altri tipi → issue su `curve` ("solo arco ammette la curvatura"), `arco` senza `curve` → issue su `curve`, `|length − radius·sweep(rad)| > 1` → issue su `length` con lo sviluppo nel messaggio. Helper `curveLength(curve)` e `CURVE_LENGTH_TOLERANCE` in `components/schemas.ts`. `SUPPORTERS` ha voci vuote per i nuovi tipi (completate in 3.4); colori/etichette delle nuove famiglie aggiunti a `viewer/theme-colors.ts` (necessari perché `FAMILY_COLORS` è un `Record<PieceFamily, …>`). Nota per 8.1: `PieceGeometryInputSchema` (protocollo kernel) è un `z.object` non strict e oggi **scarta** `curve`: va aggiunto lì e in `toGeometryInput`.

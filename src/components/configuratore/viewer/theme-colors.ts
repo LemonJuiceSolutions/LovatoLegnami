@@ -123,6 +123,13 @@ export const FAMILY_COLORS: Readonly<Record<PieceFamily, string>> = {
   COL: "#6f4521",
   CTV: "#c4925a",
   BNC: "#9c7a54",
+  TAV: "#c08a4a",
+  ARC: "#7d4f26",
+  CAN: "#94592a",
+  MON: "#5e3a1c",
+  MEN: "#b5824a",
+  FAS: "#e0c194",
+  GRG: "#cfae86",
 }
 
 export const FAMILY_LABELS: Readonly<Record<PieceFamily, string>> = {
@@ -133,6 +140,13 @@ export const FAMILY_LABELS: Readonly<Record<PieceFamily, string>> = {
   COL: "Colmo",
   CTV: "Controventi",
   BNC: "Banchina",
+  TAV: "Tavole",
+  ARC: "Archi",
+  CAN: "Cantonali",
+  MON: "Monaci",
+  MEN: "Mensole",
+  FAS: "Fasce",
+  GRG: "Grigliati",
 }
 
 export const OBSTACLE_LABELS: Readonly<Record<ObstacleType, string>> = {

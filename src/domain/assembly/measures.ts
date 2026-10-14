@@ -32,6 +32,14 @@ export const SUPPORTERS: Readonly<Record<PieceType, readonly PieceType[]>> = {
   banchina: [],
   pilastro: [],
   controvento: [],
+  // nuovi primitivi (tipologie-estese): appoggi completati dal task 3.4 (E8)
+  tavola: [],
+  arco: [],
+  cantonale: [],
+  monaco: [],
+  mensola: [],
+  fascia: [],
+  grigliato: [],
 };
 
 /** Zona d'appoggio di un supporto lungo l'asse X locale del pezzo (mm). */
