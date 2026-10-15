@@ -57,6 +57,9 @@ const DEV_DEFAULTS = {
   OFFICE_EMAIL: "ufficio@localhost",
 } as const;
 
+/** Segreto di sviluppo delle sessioni (anche per il middleware edge, che non usa `getEnv`). */
+export const DEV_AUTH_SECRET: string = DEV_DEFAULTS.AUTH_SECRET;
+
 /** Obbligatorie solo in produzione. */
 const REQUIRED_IN_PRODUCTION = ["DATABASE_URL", "AUTH_SECRET", "NEXT_PUBLIC_SITE_URL", "EMAIL_FROM", "OFFICE_EMAIL"] as const;
 

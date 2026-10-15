@@ -2,6 +2,11 @@ import { fileURLToPath } from "node:url";
 import { defineConfig } from "vitest/config";
 
 const alias = { "@": fileURLToPath(new URL("./src", import.meta.url)) };
+/**
+ * `next-auth` importa `next/server` senza estensione (Next 14 non ha `exports`): lo si fa
+ * passare da Vite, che risolve il modulo come il bundler di Next.
+ */
+const server = { deps: { inline: ["next-auth"] } };
 
 /**
  * Quattro progetti (D11, P13): `unit` (rapido, dominio ed export puri), `dom`
@@ -19,6 +24,7 @@ export default defineConfig({
         test: {
           name: "unit",
           environment: "node",
+          server,
           include: ["src/**/*.test.ts"],
           exclude: ["**/node_modules/**", "**/*.geometry.test.ts", "**/*.db.test.ts"],
         },
@@ -52,6 +58,7 @@ export default defineConfig({
         test: {
           name: "db",
           environment: "node",
+          server,
           include: ["src/**/*.db.test.ts"],
           exclude: ["**/node_modules/**"],
           testTimeout: 30_000,
