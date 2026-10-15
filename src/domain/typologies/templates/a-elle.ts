@@ -222,8 +222,10 @@ export const aElle: TypologyTemplate = {
       return vec3(p.x, p.y, zPlane(g, s / Math.SQRT2));
     };
     const tEave = (g.uEdge + g.sbalzo) * Math.SQRT2; // angolo della gronda
-    const top = onLine(-(sv.b + sv.h)); // oltre l'angolo dei muri (poi tagliato sui muri)
-    const foot = onLine(tEave + sv.b); // oltre l'angolo della gronda (poi tagliato sulle gronde)
+    // teste del box oltre gli angoli quanto basta perché i due tagli asportino tutta la sezione
+    const ext = sv.b / 2 + sv.h / 2 + 10;
+    const top = onLine(-ext); // oltre l'angolo dei muri (poi tagliato sui muri)
+    const foot = onLine(tEave + ext); // oltre l'angolo della gronda (poi tagliato sulle gronde)
     const Xv = normalize(sub(top, foot));
     const Zv = normalize(sub(up, scale(Xv, Xv.z)));
     const slopeV = radToDeg(Math.asin(Xv.z));

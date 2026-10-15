@@ -51,7 +51,8 @@ interface NodeInfo {
 /**
  * Geometria del telaio a giunti metallici (E5, ricerca T-D "pergola moderna"):
  *
- * - griglia di nodi `(campate + 1) × (campateProfondita + 1)` con interassi
+ * - griglia di nodi `(campate + 1) × (campateProfondita + 1)` (facce esterne dei
+ *   pilastri d'angolo sugli assi x = 0 e y = 0) con interassi
  *   `larghezza / campate` lungo X e `profondita / campateProfondita` lungo Y;
  *   ogni nodo è il centro di un giunto (quota `altezza + h/2`, intradosso delle
  *   aste orizzontali a `altezza`);
@@ -88,11 +89,13 @@ function geometry(ctx: BuildContext) {
   if (bayX < MIN_BAY) throw new ParamError("campate", nx, `interasse dei pilastri di ${Math.round(bayX)} mm: servono almeno ${MIN_BAY} mm`);
   if (bayY < MIN_BAY)
     throw new ParamError("campateProfondita", ny, `interasse delle file di ${Math.round(bayY)} mm: servono almeno ${MIN_BAY} mm`);
-  const xs = Array.from({ length: nx + 1 }, (_, i) => i * bayX);
-  const ys = Array.from({ length: ny + 1 }, (_, j) => j * bayY);
-  const zNode = (y: number): number => H + s.h / 2 + y * t;
+  // origine sulle facce esterne dei pilastri d'angolo (pianta nel quadrante positivo)
+  const pad = s.b / 2;
+  const xs = Array.from({ length: nx + 1 }, (_, i) => pad + i * bayX);
+  const ys = Array.from({ length: ny + 1 }, (_, j) => pad + j * bayY);
+  const zNode = (y: number): number => H + s.h / 2 + (y - pad) * t;
   const wallRow = fissaggio === "addossata" ? ny : -1;
-  return { W, P, H, nx, ny, forma, fissaggio, s, sectionValue, slope, t, bayX, bayY, xs, ys, zNode, wallRow };
+  return { W, P, H, nx, ny, forma, fissaggio, s, sectionValue, slope, t, bayX, bayY, pad, xs, ys, zNode, wallRow };
 }
 
 type Geometry = ReturnType<typeof geometry>;
@@ -204,7 +207,7 @@ export const telaioGiunti: TypologyTemplate = {
     }
 
     // aste lungo Y (colonne e traversi): tra due nodi, o dal nodo al muro con la staffa per listone
-    const wall = plane(vec3(0, g.P, 0), vec3(0, -1, 0));
+    const wall = plane(vec3(0, g.pad + g.P, 0), vec3(0, -1, 0));
     const wallCode = (): string => {
       const code = hardwareFor("staffa-muro", s).find((h) => h.code.startsWith("staffa-listone-"))?.code;
       if (!code) throw new ParamError("fissaggio", g.fissaggio, `nessuna staffa per listone ${sectionLabel(s)} a catalogo`);
@@ -221,7 +224,7 @@ export const telaioGiunti: TypologyTemplate = {
       }
       // al muro: lo spigolo superiore della testa sul piano del muro (asse oltre il muro di (h/2)·sin α)
       const sn = Math.sin(degToRad(g.slope));
-      const yEnd = g.P + (s.h / 2) * sn;
+      const yEnd = g.pad + g.P + (s.h / 2) * sn;
       const b = vec3(x, yEnd, g.zNode(yEnd));
       const beam = bar(ref, a, b, reduction(front.spec), 0);
       steps.push(placeStep(beam, label));

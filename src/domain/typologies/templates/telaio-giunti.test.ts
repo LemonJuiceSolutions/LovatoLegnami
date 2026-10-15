@@ -48,8 +48,8 @@ describe("telaio-giunti", () => {
     const a = generate(SLUG, { ...moderna, forma: "monofalda-15" });
     const posts = ofType(a, "pilastro");
     const yOf = (p: Piece) => applyToPoint(p.pose, vec3(0, 0, 0)).y;
-    const front = posts.filter((p) => yOf(p) < 1);
-    const back = posts.filter((p) => yOf(p) > 1);
+    const front = posts.filter((p) => yOf(p) < 100);
+    const back = posts.filter((p) => yOf(p) > 100);
     expect(back[0].length - front[0].length).toBeCloseTo(2580 * Math.tan((15 * Math.PI) / 180), 6);
     expect(codes(a, "giunto-joint-3a-").sort()).toEqual([...Array(2).fill("giunto-joint-3a-vie-90-105"), ...Array(2).fill("giunto-joint-3a-vie-90-75")]);
     const inclined = ofType(a, "trave").filter((p) => Math.abs(axisOf(p.pose, 0).z) > 1e-6);

@@ -105,14 +105,20 @@ function geometry(ctx: BuildContext) {
   // vertici (CCW, lato 0 sul fronte) e centro
   let V: Vec3[];
   let O: Vec3;
+  // margine tra gli assi d'angolo e l'origine: la pianta (pilastri, sporgenze delle travi, piedi dei
+  // cantonali) resta nel quadrante positivo, come le altre tipologie (ingombro e adattamento)
+  const sp = ctx.section("sezionePilastro");
+  const sb = ctx.section("sezioneTrave");
+  const half0 = Math.max(sp.b, sp.h) / 2;
+  const pad = N === 4 ? (mode === "carpenteria" ? Math.max(ctx.num("sporgenzaAngoli"), half0) : half0) : half0 * Math.SQRT2 + sb.b + 50;
   if (N === 4) {
-    V = [vec3(0, 0, 0), vec3(W, 0, 0), vec3(W, D, 0), vec3(0, D, 0)];
-    O = vec3(W / 2, D / 2, 0);
+    V = [vec3(pad, pad, 0), vec3(pad + W, pad, 0), vec3(pad + W, pad + D, 0), vec3(pad, pad + D, 0)];
+    O = vec3(pad + W / 2, pad + D / 2, 0);
   } else {
     const rho = W / 2;
     const th = Array.from({ length: N }, (_, k) => -Math.PI / 2 - Math.PI / N + (2 * Math.PI * k) / N);
     const cx = rho * Math.max(...th.map((a) => Math.abs(Math.cos(a))));
-    O = vec3(cx, rho * Math.cos(Math.PI / N), 0);
+    O = vec3(pad + cx, pad + rho * Math.cos(Math.PI / N), 0);
     V = th.map((a) => add(O, scale(dir(a), rho)));
   }
   const sides = V.map((v, k) => {
@@ -374,7 +380,8 @@ export const gazeboPadiglione: TypologyTemplate = {
     let ridge: { a: Vec3; b: Vec3; d: Vec3 } | undefined;
     if (g.punta === "monaco") {
       if (g.rect) {
-        const [ta, tb] = g.W > g.D ? [vec3(g.half, g.half, 0), vec3(g.W - g.half, g.half, 0)] : [vec3(g.half, g.half, 0), vec3(g.half, g.D - g.half, 0)];
+        const r = Math.abs(g.W - g.D) / 2;
+        const [ta, tb] = g.W > g.D ? [vec3(g.O.x - r, g.O.y, 0), vec3(g.O.x + r, g.O.y, 0)] : [vec3(g.O.x, g.O.y - r, 0), vec3(g.O.x, g.O.y + r, 0)];
         const d = normalize(sub(tb, ta));
         ridge = { a: ta, b: tb, d };
         monaci.push({ ref: "monaco-0", center: sub(ta, scale(d, msz / 2)), theta: angleOf(d) }, { ref: "monaco-1", center: add(tb, scale(d, msz / 2)), theta: angleOf(d) });
