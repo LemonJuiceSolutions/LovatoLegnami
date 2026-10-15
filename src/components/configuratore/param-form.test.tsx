@@ -30,3 +30,44 @@ describe("ParamForm", () => {
     expect(derived.assembly).toBe(before)
   })
 })
+
+describe("ParamForm – campi a scelta e condizionati", () => {
+  beforeEach(() => configuratoreStore.getState().resetConfig("portale-sandwich"))
+
+  const field = (name: string) => document.querySelector(`[data-param="${name}"]`)
+
+  it("enum come select con le etichette delle opzioni", () => {
+    render(<ParamForm />)
+    expect(field("costruzione")).toBeTruthy()
+    expect(screen.getByLabelText("Forma").textContent).toBe("Piana")
+  })
+
+  it("forma = piana nasconde testaPilastro e il valore resta nello store", () => {
+    act(() => configuratoreStore.getState().setParams({ forma: "monofalda", direzionePendenza: "larghezza", testaPilastro: "inclinata" }))
+    render(<ParamForm />)
+    expect(field("testaPilastro")).toBeTruthy()
+    expect(field("pendenza")).toBeTruthy()
+    act(() => configuratoreStore.getState().setParam("forma", "piana"))
+    expect(field("testaPilastro")).toBeNull()
+    expect(field("pendenza")).toBeNull()
+    expect(configuratoreStore.getState().config.params.testaPilastro).toBe("inclinata")
+  })
+
+  it("cambio costruzione → carpenteria dal select: assieme rigenerato, nessun bullone nella ferramenta", () => {
+    render(<ParamForm />)
+    const before = configuratoreStore.getState().derived.assembly
+    expect(configuratoreStore.getState().derived.hardwareRows.some((r) => r.kind === "bullone")).toBe(true)
+    expect(field("sezioneTavola")).toBeTruthy()
+    expect(field("sezioneTrave")).toBeNull()
+    const trigger = screen.getByLabelText("Costruzione")
+    fireEvent.keyDown(trigger, { key: "Enter" })
+    fireEvent.click(screen.getByRole("option", { name: "Carpenteria" }))
+    const { config, derived } = configuratoreStore.getState()
+    expect(config.params.costruzione).toBe("carpenteria")
+    expect(derived.assembly).not.toBe(before)
+    expect(derived.assembly?.params.costruzione).toBe("carpenteria")
+    expect(derived.hardwareRows.some((r) => r.kind === "bullone")).toBe(false)
+    expect(field("sezioneTavola")).toBeNull()
+    expect(field("sezioneTrave")).toBeTruthy()
+  })
+})

@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Slider } from "@/components/ui/slider"
 import { Switch } from "@/components/ui/switch"
 import { getTypology, type ParamSpec, type ParamValue, type TypologyTemplate } from "@/domain"
+import { selectHiddenParams } from "@/stores/configuratore-store"
 import { useConfiguratore } from "@/stores/use-configuratore"
 import { NumberField } from "./fields"
 import { TypologyChooser } from "./typology-picker"
@@ -16,7 +17,8 @@ import { formatRange, groupParams, numberParamError, sectionOptions, unitLabel }
 /**
  * Form parametrico (spec `configuratore-ui`, "Form parametrico per tipologia"):
  * selettore della tipologia con miniature (`typology-picker.tsx`) e campi generati dai `ParamSpec` del
- * template (unità, min/max/step/default). Un valore fuori limite è scritto
+ * template (unità, min/max/step/default; `enum` come select con etichette;
+ * campi con `visibleWhen` falso nascosti senza perderne il valore). Un valore fuori limite è scritto
  * nello store (`derived.paramErrors`), mostrato inline e non rigenera l'assieme.
  */
 
@@ -71,6 +73,42 @@ function ParamField({ spec, value, storeError }: { spec: ParamSpec; value: Param
           <Switch id={id} checked={value === true} onCheckedChange={(v) => setParam(spec.name, v)} />
         </div>
       )
+    case "enum": {
+      const current = typeof value === "string" ? value : spec.default
+      const known = spec.options.some((o) => o.value === current)
+      const selected = spec.options.find((o) => o.value === current)
+      return (
+        <div className="space-y-1.5" data-param={spec.name}>
+          <Label htmlFor={id} className="text-xs font-medium">
+            {spec.label}
+          </Label>
+          <Select value={current} onValueChange={(v) => setParam(spec.name, v)}>
+            <SelectTrigger id={id} className="h-9" aria-invalid={storeError ? true : undefined}>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {!known && (
+                <SelectItem value={current} disabled>
+                  {current} (non ammesso)
+                </SelectItem>
+              )}
+              {spec.options.map((o) => (
+                <SelectItem key={o.value} value={o.value}>
+                  {o.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          {storeError ? (
+            <p className="text-xs text-destructive">{storeError}</p>
+          ) : (
+            (selected?.description ?? spec.description) && (
+              <p className="text-xs text-muted-foreground">{selected?.description ?? spec.description}</p>
+            )
+          )}
+        </div>
+      )
+    }
     case "section": {
       const current = typeof value === "string" ? value : spec.default
       return (
@@ -102,9 +140,11 @@ export function ParamFields({ part }: { part: "main" | "sections" }) {
   const typology = useConfiguratore((s) => s.config.typology)
   const params = useConfiguratore((s) => s.config.params)
   const paramErrors = useConfiguratore((s) => s.derived.paramErrors)
+  const hidden = useConfiguratore(selectHiddenParams)
   const template = useTemplate(typology)
   if (!template) return null
-  const specs = groupParams(template.params)[part]
+  // `visibleWhen` falso: campo nascosto, il valore resta nello store
+  const specs = groupParams(template.params)[part].filter((spec) => !hidden.includes(spec.name))
 
   return (
     <div className="space-y-4">
