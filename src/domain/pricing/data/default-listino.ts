@@ -17,8 +17,23 @@ import { parsePriceList, type PriceList, type PriceListInput, type PriceListVers
 /** Area della sezione in m². */
 const areaM2 = (s: Section): number => (s.b * s.h) / 1e6;
 
+/**
+ * Sezioni usate dai template o dai preset ma assenti da `SECTION_CATALOG` (che resta il
+ * catalogo delle scelte del configuratore): mensole 90×140 della pensilina, travi e
+ * cantonale 120×160 della pergola a L, monaco 250×250 del gazebo ottagonale. Emerse dal
+ * test dei preset (4.9) — DA VALIDARE con l'ufficio la disponibilità commerciale.
+ */
+export const EXTRA_PRICED_SECTIONS: readonly Section[] = [
+  { b: 90, h: 140 },
+  { b: 120, h: 160 },
+  { b: 250, h: 250 },
+];
+
+/** Sezioni con voci di listino (lunghezze, sfrido minimo, curvi): catalogo + sezioni dei template. */
+export const PRICED_SECTIONS: readonly Section[] = [...SECTION_CATALOG, ...EXTRA_PRICED_SECTIONS];
+
 const bySection = <T>(value: (s: Section) => T): Record<string, T> =>
-  Object.fromEntries(SECTION_CATALOG.map((s) => [sectionLabel(s), value(s)]));
+  Object.fromEntries(PRICED_SECTIONS.map((s) => [sectionLabel(s), value(s)]));
 
 /** Riferimento per il prezzo dei curvi: abete lamellare al m³ (DA VALIDARE). */
 const CURVED_BASE_PER_M3 = 65_000;
