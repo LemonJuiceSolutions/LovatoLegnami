@@ -1,7 +1,9 @@
-import { z } from "zod";
-import { ValidationError, formatPath } from "@/domain/components/errors";
+import { ValidationError } from "@/domain/components/errors";
+import { parsePresets } from "@/domain/presets/schema";
+import type { Preset } from "@/domain/presets/types";
 import { parsePriceList, type PriceList } from "@/domain/pricing/types";
 import { loadRuleSet, type RuleSet } from "@/domain/rules/types";
+import { parseTypologySettings, type TypologySettings } from "@/domain/site/typology-settings";
 import type { Dataset } from "@/db/schema";
 import { DatasetValidationError } from "./errors";
 
@@ -13,30 +15,17 @@ import { DatasetValidationError } from "./errors";
 export interface DatasetDocuments {
   listino: PriceList;
   regole: RuleSet;
-  tipologie: unknown[];
-  preset: unknown[];
+  tipologie: TypologySettings;
+  preset: Preset[];
 }
 
 type Parser<T> = (data: unknown) => T;
 
-const fromZod =
-  <T>(schema: z.ZodType<T>): Parser<T> =>
-  (data) => {
-    const r = schema.safeParse(data);
-    if (!r.success)
-      throw new ValidationError(
-        "documento non valido",
-        r.error.issues.map((i) => ({ path: formatPath(i.path), message: i.message })),
-      );
-    return r.data;
-  };
-
 const PARSERS: { [D in Dataset]: Parser<DatasetDocuments[D]> } = {
   listino: parsePriceList,
   regole: loadRuleSet,
-  // Schemi definitivi nel task 6.5.
-  tipologie: fromZod(z.array(z.unknown())),
-  preset: fromZod(z.array(z.unknown())),
+  tipologie: (data) => parseTypologySettings(data),
+  preset: (data) => parsePresets(data),
 };
 
 /** Valida il documento dell'insieme; `DatasetValidationError` con i campi errati. */

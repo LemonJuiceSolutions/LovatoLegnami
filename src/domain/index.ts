@@ -20,5 +20,7 @@ export * from "./hardware";
 export * from "./presets";
 // Preventivazione: listino, taglio, fattori di cantiere, motore priceAssembly, viste, CSV
 export * from "./pricing";
+// Contenuti del sito: impostazioni delle tipologie (dataset `tipologie`)
+export * from "./site";
 // Matematica di base (vettori, matrici di posa, box)
 export * from "./math";
