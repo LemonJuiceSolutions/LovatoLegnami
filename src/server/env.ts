@@ -21,6 +21,27 @@ export type ServiceKind = {
   readonly storage: "blob" | "disk";
 };
 
+export interface RateLimitSetting {
+  readonly limit: number;
+  readonly windowMs: number;
+}
+
+/** Default: 5 invii ogni 10 minuti, 60 stime al minuto per IP. */
+export const DEFAULT_RATE_LIMITS = {
+  submit: { limit: 5, windowMs: 10 * 60_000 },
+  estimate: { limit: 60, windowMs: 60_000 },
+} as const satisfies Record<string, RateLimitSetting>;
+
+const rateLimit = z
+  .string()
+  .regex(/^\d{1,5}\/\d{1,6}$/, "forma attesa N/secondi (es. 5/600)")
+  .refine((v) => v.split("/").every((n) => Number(n) > 0), "valori maggiori di 0");
+const parseRateLimit = (v: string | undefined, fallback: RateLimitSetting): RateLimitSetting => {
+  if (!v) return fallback;
+  const [n, sec] = v.split("/").map(Number);
+  return { limit: n!, windowMs: sec! * 1000 };
+};
+
 export interface ServerEnv {
   readonly nodeEnv: string;
   readonly production: boolean;
@@ -33,6 +54,8 @@ export interface ServerEnv {
   readonly blobToken?: string;
   readonly adminEmail?: string;
   readonly analytics: boolean;
+  /** Limiti delle API pubbliche (`RATE_LIMIT_SUBMIT`, `RATE_LIMIT_ESTIMATE`, forma `N/secondi`). */
+  readonly rateLimits: { readonly submit: RateLimitSetting; readonly estimate: RateLimitSetting };
   readonly services: ServiceKind;
   /** Ripieghi locali attivi in produzione (es. email in console senza `RESEND_API_KEY`). */
   readonly warnings: readonly string[];
@@ -84,6 +107,8 @@ const EnvSchema = z.object({
   BLOB_READ_WRITE_TOKEN: z.string().optional(),
   ADMIN_EMAIL: z.string().email("indirizzo email non valido").optional(),
   NEXT_PUBLIC_ANALYTICS: z.enum(["0", "1"], { message: "valori ammessi: 0 o 1" }).optional(),
+  RATE_LIMIT_SUBMIT: rateLimit.optional(),
+  RATE_LIMIT_ESTIMATE: rateLimit.optional(),
 });
 
 /** Stringhe vuote (o di soli spazi) valgono come variabile assente. */
@@ -142,6 +167,10 @@ export function parseEnv(source: Readonly<Record<string, string | undefined>>): 
     blobToken: v.BLOB_READ_WRITE_TOKEN,
     adminEmail: v.ADMIN_EMAIL,
     analytics: v.NEXT_PUBLIC_ANALYTICS === "1",
+    rateLimits: {
+      submit: parseRateLimit(v.RATE_LIMIT_SUBMIT, DEFAULT_RATE_LIMITS.submit),
+      estimate: parseRateLimit(v.RATE_LIMIT_ESTIMATE, DEFAULT_RATE_LIMITS.estimate),
+    },
     services: {
       database: v.DATABASE_URL ? "postgres" : "pglite",
       email: v.RESEND_API_KEY ? "resend" : "console",
