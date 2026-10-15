@@ -2,6 +2,7 @@ import { z } from "zod";
 import { parseWith } from "../components/schemas";
 import { type AABB, aabb, aabbPenetrationDepth } from "../math/aabb";
 import { vec3 } from "../math/vec3";
+import { type EnvelopePlan, PLAN_CORNERS, PLAN_CORNER_LABELS, planIssues } from "./plan";
 
 /**
  * Ingombro del cliente (spec `ingombro-cliente`, D5): box base L×P×H con
@@ -65,6 +66,8 @@ export interface FloorSpec {
 
 export interface Envelope {
   readonly box: EnvelopeBox;
+  /** Pianta fuori squadra; assente = rettangolo del box (`planOf`). */
+  readonly plan?: EnvelopePlan;
   /** Lato del muro di appoggio per le tipologie addossate (default `posteriore`). */
   readonly wallSide: WallSide;
   readonly obstacles: readonly Obstacle[];
@@ -125,9 +128,13 @@ export const FloorSpecSchema = z
   })
   .strict();
 
+const planPoint = (i: number) => z.object({ x: num(`x dell'angolo ${PLAN_CORNER_LABELS[PLAN_CORNERS[i]]}`), y: num(`y dell'angolo ${PLAN_CORNER_LABELS[PLAN_CORNERS[i]]}`) }).strict();
+export const EnvelopePlanSchema = z.object({ corners: z.tuple([planPoint(0), planPoint(1), planPoint(2), planPoint(3)]).readonly() }).strict();
+
 export const EnvelopeSchema = z
   .object({
     box: EnvelopeBoxSchema,
+    plan: EnvelopePlanSchema.optional(),
     wallSide: enumOf(WALL_SIDES, "lato muro").default("posteriore"),
     obstacles: z.array(ObstacleSchema).default([]),
     floor: FloorSpecSchema.default({}),
@@ -139,6 +146,9 @@ export const EnvelopeSchema = z
       if (seen.has(o.id)) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["obstacles", i, "id"], message: `id ostacolo duplicato: ${o.id}` });
       seen.add(o.id);
     });
+    if (e.plan)
+      for (const issue of planIssues(e.plan, e.box))
+        ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["plan", "corners", issue.corner], message: issue.message });
   });
 
 /** Input accettato da `parseEnvelope` (campi con default facoltativi). */
