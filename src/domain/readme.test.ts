@@ -54,7 +54,7 @@ describe("README del dominio", () => {
     const quote = d.priceAssembly({
       assembly: d.generate("addossata-monofalda"),
       envelope: d.parseEnvelope({ box: { width: 6000, depth: 3600, height: 3800 } }),
-      options: { species: "abete", quality: "lamellare", treatment: "impregnante-incolore", covering: "policarbonato-alveolare", cap: "36100", access: "medio" },
+      options: { species: "abete", quality: "lamellare", treatment: "impregnante-incolore", covering: "policarbonato-alveolare", cap: "37100", access: "medio" },
       priceList: d.DEFAULT_PRICE_LIST,
       version: d.DEFAULT_PRICE_LIST_VERSION,
     });

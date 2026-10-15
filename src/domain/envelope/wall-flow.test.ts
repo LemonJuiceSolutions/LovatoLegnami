@@ -70,7 +70,7 @@ describe("piani dei muri nel flusso", () => {
     expect(f.planDeviationDeg).toBeCloseTo(5, 6);
     expect(f.wallDeviationDeg).toBeCloseTo(5, 6);
     expect(siteFactors(parseEnvelope({ box: env.box }), a)).toMatchObject({ planDeviationDeg: 0, wallDeviationDeg: 0 });
-    const q = priceAssembly({ assembly: a, envelope: env, options: { species: "abete", quality: "lamellare", cap: "36100" }, priceList: DEFAULT_PRICE_LIST, version: DEFAULT_PRICE_LIST_VERSION });
+    const q = priceAssembly({ assembly: a, envelope: env, options: { species: "abete", quality: "lamellare", cap: "37100" }, priceList: DEFAULT_PRICE_LIST, version: DEFAULT_PRICE_LIST_VERSION });
     expect(q.firedRules).toContain("fuorisquadra");
     expect(q.lines.find((l) => l.ruleId === "fuorisquadra")!.label).toMatch(/fuorisquadra 5°/);
   });

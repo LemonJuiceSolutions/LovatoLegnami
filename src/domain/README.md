@@ -226,7 +226,7 @@ const envelope = parseEnvelope({ box: { width: 6000, depth: 3600, height: 3800 }
 const quote = priceAssembly({
   assembly,
   envelope,
-  options: { species: "abete", quality: "lamellare", treatment: "impregnante-incolore", covering: "policarbonato-alveolare", cap: "36100", access: "medio" },
+  options: { species: "abete", quality: "lamellare", treatment: "impregnante-incolore", covering: "policarbonato-alveolare", cap: "37100", access: "medio" },
   priceList: DEFAULT_PRICE_LIST,
   version: DEFAULT_PRICE_LIST_VERSION,
 });

@@ -132,11 +132,11 @@ describe("fase complicazioni (4.3)", () => {
 });
 
 describe("fase trasporto (4.3)", () => {
-  it("CAP in zona Provincia (prefisso 36) → prezzo della zona per viaggio", () => {
-    const s = transportPhase(makeContext({ pieces: [] }, { options: { cap: "36100" } }), start({ labourBaseHours: 20 }));
+  it("CAP in zona Provincia di Verona (prefisso 37) → prezzo della zona per viaggio", () => {
+    const s = transportPhase(makeContext({ pieces: [] }, { options: { cap: "37100" } }), start({ labourBaseHours: 20 }));
     expect(s.warnings).toEqual([]);
     const [row] = s.lines;
-    expect(row.label).toBe("Trasporto – zona Provincia");
+    expect(row.label).toBe("Trasporto – zona Provincia di Verona");
     expect(row.quantity).toBe(2); // 20 h / (2 × 8) → 2 viaggi
     expect(row.amountCents).toBe(18_000);
   });
@@ -149,10 +149,11 @@ describe("fase trasporto (4.3)", () => {
   });
 
   it("km inseriti dall'ufficio prevalgono; viaggi contano anche le ore di complicazione", () => {
-    const s = transportPhase(makeContext({ pieces: [] }, { options: { cap: "36100", km: 55 } }), start({ labourBaseHours: 15, labourExtraHours: 2 }));
+    const s = transportPhase(makeContext({ pieces: [] }, { options: { cap: "37100", km: 55 } }), start({ labourBaseHours: 15, labourExtraHours: 2 }));
     expect(s.lines[0]).toMatchObject({ label: "Trasporto – 55 km", quantity: 2, unitPriceCents: 8_250, amountCents: 16_500 });
     expect(tripsFor(16, DEFAULT_PRICE_LIST.labour)).toBe(1);
     expect(tripsFor(16.1, DEFAULT_PRICE_LIST.labour)).toBe(2);
-    expect(zoneForCap(DEFAULT_PRICE_LIST.transport, "37121").zone.name).toBe("Province limitrofe");
+    expect(zoneForCap(DEFAULT_PRICE_LIST.transport, "37026").zone.name).toBe("Provincia di Verona");
+    expect(zoneForCap(DEFAULT_PRICE_LIST.transport, "36100").zone.name).toBe("Province limitrofe");
   });
 });

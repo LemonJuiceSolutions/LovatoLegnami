@@ -19,7 +19,7 @@ const quoteOf = (slug: string, options: Partial<PricingOptionsInput> = {}) => {
   return priceAssembly({
     assembly: a,
     envelope: envelopeFor(a),
-    options: { species: "abete", quality: "lamellare", treatment: "impregnante-incolore", covering: "policarbonato-alveolare", cap: "36100", ...options },
+    options: { species: "abete", quality: "lamellare", treatment: "impregnante-incolore", covering: "policarbonato-alveolare", cap: "37100", ...options },
     priceList: DEFAULT_PRICE_LIST,
     version: DEFAULT_PRICE_LIST_VERSION,
   });

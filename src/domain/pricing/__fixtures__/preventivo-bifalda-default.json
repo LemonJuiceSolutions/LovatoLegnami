@@ -843,11 +843,11 @@
           "category": "trasporto",
           "code": "trasporto",
           "explain": [
-            "CAP 36100 (prefisso 36) ⇒ zona \"Provincia\" (40 km)",
+            "CAP 37100 (prefisso 37) ⇒ zona \"Provincia di Verona\" (30 km)",
             "90,00 € a viaggio; 17,38 h di montaggio / (squadra di 2 × 8 h al giorno) ⇒ 2 viaggi",
             "listino v1 del 2026-01-01"
           ],
-          "label": "Trasporto – zona Provincia",
+          "label": "Trasporto – zona Provincia di Verona",
           "quantity": 2,
           "unit": "viaggi",
           "unitPriceCents": 9000,
@@ -1277,11 +1277,11 @@
       "category": "trasporto",
       "code": "trasporto",
       "explain": [
-        "CAP 36100 (prefisso 36) ⇒ zona \"Provincia\" (40 km)",
+        "CAP 37100 (prefisso 37) ⇒ zona \"Provincia di Verona\" (30 km)",
         "90,00 € a viaggio; 17,38 h di montaggio / (squadra di 2 × 8 h al giorno) ⇒ 2 viaggi",
         "listino v1 del 2026-01-01"
       ],
-      "label": "Trasporto – zona Provincia",
+      "label": "Trasporto – zona Provincia di Verona",
       "quantity": 2,
       "unit": "viaggi",
       "unitPriceCents": 9000,
@@ -1346,7 +1346,7 @@
   ],
   "options": {
     "access": "facile",
-    "cap": "36100",
+    "cap": "37100",
     "covering": "policarbonato-alveolare",
     "quality": "lamellare",
     "species": "abete",

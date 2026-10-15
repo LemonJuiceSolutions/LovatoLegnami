@@ -44,9 +44,9 @@ describe("CSV del listino (4.6)", () => {
 
   it("zone: prefissi separati da spazi, campi tra virgolette", () => {
     const csv = exportTable(DEFAULT_PRICE_LIST, "zone");
-    expect(csv).toContain("Province limitrofe;31 35 37;80;150,00\r\n");
-    const r = importTable(DEFAULT_PRICE_LIST, "zone", csv.replace("Province limitrofe;31 35 37", '"Province; limitrofe";31 35 37 38'));
-    expect(r.errors).toEqual(['campo transport.zones[3].capPrefixes[2]: prefisso CAP "38" già assegnato alla zona "Province; limitrofe"']);
+    expect(csv).toContain("Province limitrofe;25 35 36 38 45 46;80;150,00\r\n");
+    const r = importTable(DEFAULT_PRICE_LIST, "zone", csv.replace("Province limitrofe;25 35 36 38 45 46", '"Province; limitrofe";25 35 36 38 45 46 30'));
+    expect(r.errors).toEqual(['campo transport.zones[2].capPrefixes[2]: prefisso CAP "30" già assegnato alla zona "Province; limitrofe"']);
   });
 
   it("dialetto: virgolette doppie, a capo nei campi, numeri italiani", () => {

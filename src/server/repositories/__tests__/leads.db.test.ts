@@ -12,7 +12,7 @@ afterAll(() => closeDb());
 
 const snapshot = (total = 470_000) => ({ config: { typologySlug: "addossata-monofalda", params: {} }, quote: { totals: { totalCents: total } }, totalCents: total });
 const request = (name: string, now?: Date) => ({
-  customer: { name, email: `${name.toLowerCase().replace(/\s+/g, ".")}@esempio.it`, phone: "+39 333 1234567", address: "Via Roma 1, Vicenza" },
+  customer: { name, email: `${name.toLowerCase().replace(/\s+/g, ".")}@esempio.it`, phone: "+39 333 1234567", address: "Via Roma 1, Verona" },
   consent: { text: "Informativa privacy…", version: "2026-01", acceptedAt: "2026-10-15T08:00:00.000Z", ip: "203.0.113.7", userAgent: "Mozilla/5.0" },
   photos: [{ id: "foto-1", contentType: "image/jpeg" }],
   notes: "Chiamare dopo le 18",

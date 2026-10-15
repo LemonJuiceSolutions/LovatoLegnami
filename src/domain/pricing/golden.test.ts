@@ -37,7 +37,7 @@ const GOLDEN_OPTIONS = {
   quality: "lamellare",
   treatment: "impregnante-incolore",
   covering: "policarbonato-alveolare",
-  cap: "36100",
+  cap: "37100",
 } as const;
 
 const FIXTURES = [

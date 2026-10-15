@@ -14,7 +14,7 @@ const envelopeFor = (a: Pick<Assembly, "pieces">) => {
   const up = (v: number) => Math.ceil(v / 100) * 100;
   return parseEnvelope({ box: { width: up(b.max.x), depth: up(b.max.y), height: up(b.max.z) + 200 } });
 };
-const OPTIONS = { species: "abete", quality: "lamellare", treatment: "impregnante-incolore", covering: "policarbonato-alveolare", cap: "36100" };
+const OPTIONS = { species: "abete", quality: "lamellare", treatment: "impregnante-incolore", covering: "policarbonato-alveolare", cap: "37100" };
 const cost = (amountCents: number, category: QuoteLine["category"] = "legno"): QuoteLine => ({
   code: `x-${amountCents}`, category, label: "x", quantity: 1, unit: "pz", unitPriceCents: amountCents, amountCents, explain: [], visibility: "cliente",
 });
@@ -87,7 +87,7 @@ describe("priceAssembly (4.4)", () => {
 
   it("imponibile sotto il minimo d'ordine → riga adeguamento", () => {
     const a = { pieces: [piece("pilastro", 120, 120, 2400)] };
-    const q = priceAssembly({ assembly: a, envelope: envelopeFor(a), options: { species: "abete", quality: "lamellare", cap: "36100" }, priceList: DEFAULT_PRICE_LIST, version: DEFAULT_PRICE_LIST_VERSION });
+    const q = priceAssembly({ assembly: a, envelope: envelopeFor(a), options: { species: "abete", quality: "lamellare", cap: "37100" }, priceList: DEFAULT_PRICE_LIST, version: DEFAULT_PRICE_LIST_VERSION });
     const min = q.lines.find((l) => l.code === "minimo-ordine")!;
     expect(min.amountCents).toBeGreaterThan(0);
     expect(q.totals.taxableCents).toBe(DEFAULT_PRICE_LIST.minimumOrderCents);

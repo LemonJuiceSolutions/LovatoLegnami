@@ -260,12 +260,16 @@ export const DEFAULT_PRICE_LIST_DATA: PriceListInput = {
     },
   ],
   transport: {
-    // zone per prefisso di CAP — DA VALIDARE (sede ipotizzata in provincia di Vicenza)
+    // zone per prefisso di CAP — DA VALIDARE. Sede e piazzale a Settimo di Pescantina (VR):
+    // provincia di Verona, poi le province confinanti, poi anelli più lontani.
     zones: [
-      { name: "Provincia", capPrefixes: ["36"], km: 40, priceCents: 9_000 },
-      { name: "Province limitrofe", capPrefixes: ["31", "35", "37"], km: 80, priceCents: 15_000 },
-      { name: "Resto del Veneto", capPrefixes: ["30", "32", "45"], km: 120, priceCents: 20_000 },
-      { name: "Nord-Est", capPrefixes: ["33", "34", "38", "39"], km: 200, priceCents: 30_000 },
+      { name: "Provincia di Verona", capPrefixes: ["37"], km: 30, priceCents: 9_000 },
+      // Brescia, Padova, Vicenza, Trento, Rovigo, Mantova
+      { name: "Province limitrofe", capPrefixes: ["25", "35", "36", "38", "45", "46"], km: 80, priceCents: 15_000 },
+      // Bergamo, Cremona, Venezia, Treviso, Belluno
+      { name: "Veneto e Lombardia orientale", capPrefixes: ["24", "26", "30", "31", "32"], km: 140, priceCents: 20_000 },
+      // Milano, Friuli Venezia Giulia, Alto Adige, Emilia
+      { name: "Nord Italia", capPrefixes: ["20", "33", "34", "39", "40", "41", "42", "43", "44"], km: 220, priceCents: 30_000 },
       // ripiego per i CAP non elencati: avviso "zona da verificare"
       { name: "Fuori zona", capPrefixes: [], km: 300, priceCents: 45_000 },
     ],
