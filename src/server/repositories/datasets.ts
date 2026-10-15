@@ -190,6 +190,8 @@ async function userLabel(userId: string | null, db: DbOrTx): Promise<string> {
 export interface SaveDraftOptions {
   readonly notes?: string | null;
   readonly effectiveFrom?: string;
+  /** Azione del registro: `salva` (default) o `importa` (import CSV, 9.5). */
+  readonly auditAction?: "salva" | "importa";
 }
 
 /**
@@ -212,7 +214,7 @@ export async function saveDraft<D extends Dataset>(
       throw new ConcurrentEditError(await userLabel(draft.updatedBy, tx), draft.updatedAt);
     // Sempre strettamente crescente, anche con due salvataggi nello stesso millisecondo.
     const at = new Date(Math.max(Date.now(), draft.updatedAt.getTime() + 1));
-    return withAudit("salva", { userId, dataset, entity: ENTITY, entityId: draft.id })(tx, async () => {
+    return withAudit(options.auditAction ?? "salva", { userId, dataset, entity: ENTITY, entityId: draft.id })(tx, async () => {
       const [row] = await tx
         .update(datasetVersions)
         .set({
