@@ -2,8 +2,9 @@ import { describe, expect, it } from "vitest";
 import { identity, multiply, rotationZ, translation, type Mat4 } from "@/domain/math/mat4";
 import { vec3 } from "@/domain/math/vec3";
 import { checkBrepTopology } from "@/geometry/neutral-brep";
-import { boxBrep, pieceBoxBrep } from "@/geometry/neutral-brep-box";
+import { arcBrep, boxBrep, pieceBoxBrep } from "@/geometry/neutral-brep-box";
 import { boxWithOtherFace, holeBoxBrep } from "./__fixtures__/breps";
+import { validateSat } from "./validate";
 import { writeSat } from "./writer";
 
 const date = new Date(2026, 9, 14, 9, 30, 0);
@@ -204,5 +205,38 @@ describe("writeSat – facce cilindriche e superfici non supportate", () => {
     );
     const { errors } = writeSat([{ id: "X", brep: { ...b, edges: edges as never }, pose: identity() }], { date });
     expect(errors[0]).toMatchObject({ pieceId: "X", entity: "curva", entityType: "GeomAbs_BSplineCurve" });
+  });
+});
+
+describe("writeSat – pezzi curvi (arcBrep)", () => {
+  const sweep = (93 * Math.PI) / 180;
+  const arc = arcBrep({ b: 90, h: 90 }, 2400, sweep);
+
+  it("un arco → 1 body con 2 cone-surface, 4 ellipse-curve, 8 straight-curve, validatore senza errori", () => {
+    const pose: Mat4 = multiply(translation(vec3(500, 0, 0)), rotationZ(Math.PI / 2));
+    const { text, written, errors } = writeSat([{ id: "ARC-01", brep: arc, pose }], { date });
+    expect(errors).toEqual([]);
+    expect(written).toEqual(["ARC-01"]);
+    const c = countTypes(text);
+    expect(c.body).toBe(1);
+    expect(c["cone-surface"]).toBe(2);
+    expect(c["plane-surface"]).toBe(4);
+    expect(c["ellipse-curve"]).toBe(4);
+    expect(c["straight-curve"]).toBe(8);
+    expect(c.face).toBe(6);
+    expect(c.edge).toBe(12);
+    expect(c.vertex).toBe(8);
+    const v = validateSat(text);
+    expect(v.errors).toEqual([]);
+    expect(v.counts.body).toBe(1);
+    expect(v.bodies[0].name).toBe("ARC-01");
+    // spigoli circolari parziali: parametri 0 e sweep (non 2π)
+    expect(text).not.toMatch(/ 6\.28318530717959 /);
+  });
+
+  it.each(["4.0", "21.0"] as const)("versione %s: SAT dell'arco valido", (version) => {
+    const { text, errors } = writeSat([{ id: "ARC-01", brep: arc, pose: identity() }], { date, version });
+    expect(errors).toEqual([]);
+    expect(validateSat(text).errors).toEqual([]);
   });
 });
