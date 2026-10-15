@@ -1,2 +1,4 @@
-/** Modulo server `storage` (sito-preventivi): popolato dai task successivi. */
-export {};
+/** Modulo server `storage` (P7): archivio dei file, validazione delle immagini, accesso ai file delle richieste. */
+export * from "./storage";
+export * from "./images";
+export * from "./uploads";

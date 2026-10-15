@@ -309,3 +309,27 @@ export async function anonymize(leadId: string, userId: string | null): Promise<
     return { lead: row!, removedPhotos: Array.isArray(lead.photos) ? (lead.photos as unknown[]) : [] };
   });
 }
+
+/** Riferimento a un file caricato con la richiesta (`leads.photos`): foto del cliente o immagine della scena. */
+export interface UploadRef {
+  readonly id: string;
+  readonly kind: "foto" | "scena";
+  readonly contentType: string;
+  readonly size: number;
+}
+
+const isUploadRef = (v: unknown): v is UploadRef =>
+  typeof v === "object" && v !== null && typeof (v as UploadRef).id === "string" && ((v as UploadRef).kind === "foto" || (v as UploadRef).kind === "scena");
+
+/** Richiesta che contiene il file `uploadId` (ricerca per contenimento `jsonb`), con il riferimento. */
+export async function findByUploadId(uploadId: string): Promise<{ leadId: string; upload: UploadRef } | null> {
+  const db = await getDb();
+  const [row] = await db
+    .select({ id: leads.id, photos: leads.photos })
+    .from(leads)
+    .where(sql`${leads.photos} @> ${JSON.stringify([{ id: uploadId }])}::jsonb`)
+    .limit(1);
+  if (!row || !Array.isArray(row.photos)) return null;
+  const upload = (row.photos as unknown[]).find((p): p is UploadRef => isUploadRef(p) && p.id === uploadId);
+  return upload ? { leadId: row.id, upload } : null;
+}
