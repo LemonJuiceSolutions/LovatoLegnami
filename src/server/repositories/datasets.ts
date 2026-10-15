@@ -3,6 +3,7 @@ import { diffDocuments, type DiffEntry } from "@/domain/pricing/diff";
 import { isoDay } from "@/domain/pricing/types";
 import { getDb, type DbOrTx } from "@/db/client";
 import { datasetVersions, users, type Dataset, type DatasetStatus, type DatasetVersionRow } from "@/db/schema";
+import { record, withAudit } from "./audit";
 import { validateDataset, type DatasetDocuments } from "./dataset-schemas";
 import { ConcurrentEditError, NotFoundError } from "./errors";
 
@@ -122,9 +123,12 @@ export async function openDraft<D extends Dataset>(dataset: D, userId: string | 
         updatedAt: at,
       })
       .returning();
+    await record({ userId, dataset, entity: ENTITY, entityId: row!.id, action: "crea" }, tx);
     return toVersion<D>(row!);
   });
 }
+
+const ENTITY = "dataset_version";
 
 async function nextVersion(dataset: Dataset, db: DbOrTx): Promise<number> {
   const [r] = await db.select({ v: max(datasetVersions.version) }).from(datasetVersions).where(eq(datasetVersions.dataset, dataset));
@@ -162,6 +166,7 @@ export async function createVersion<D extends Dataset>(input: CreateVersionInput
       ...(input.status === "attiva" ? { publishedAt: at, publishedBy: input.userId ?? null } : {}),
     })
     .returning();
+  await record({ userId: input.userId ?? null, dataset: input.dataset, entity: ENTITY, entityId: row!.id, action: "crea" }, conn);
   return toVersion<D>(row!);
 }
 
@@ -207,18 +212,20 @@ export async function saveDraft<D extends Dataset>(
       throw new ConcurrentEditError(await userLabel(draft.updatedBy, tx), draft.updatedAt);
     // Sempre strettamente crescente, anche con due salvataggi nello stesso millisecondo.
     const at = new Date(Math.max(Date.now(), draft.updatedAt.getTime() + 1));
-    const [row] = await tx
-      .update(datasetVersions)
-      .set({
-        data: doc,
-        updatedAt: at,
-        updatedBy: userId,
-        ...(options.notes !== undefined ? { notes: options.notes } : {}),
-        ...(options.effectiveFrom !== undefined ? { effectiveFrom: options.effectiveFrom } : {}),
-      })
-      .where(eq(datasetVersions.id, draft.id))
-      .returning();
-    return toVersion<D>(row!);
+    return withAudit("salva", { userId, dataset, entity: ENTITY, entityId: draft.id })(tx, async () => {
+      const [row] = await tx
+        .update(datasetVersions)
+        .set({
+          data: doc,
+          updatedAt: at,
+          updatedBy: userId,
+          ...(options.notes !== undefined ? { notes: options.notes } : {}),
+          ...(options.effectiveFrom !== undefined ? { effectiveFrom: options.effectiveFrom } : {}),
+        })
+        .where(eq(datasetVersions.id, draft.id))
+        .returning();
+      return { result: toVersion<D>(row!), before: draft.data, after: doc };
+    });
   });
 }
 
@@ -235,6 +242,8 @@ export async function publishDraft<D extends Dataset>(dataset: D, userId: string
     const draft = await lockDraft(dataset, tx);
     const doc = validateDataset(dataset, draft.data);
     const at = new Date();
+    // Base del confronto: l'attiva con la stessa validità, altrimenti quella in vigore a quella data.
+    const previous = await getActive(dataset, draft.effectiveFrom, tx);
     const [archivedRow] = await tx
       .update(datasetVersions)
       .set({ status: "archiviata", updatedAt: at, updatedBy: userId })
@@ -245,6 +254,8 @@ export async function publishDraft<D extends Dataset>(dataset: D, userId: string
       .set({ status: "attiva", data: doc, publishedAt: at, publishedBy: userId, updatedAt: at, updatedBy: userId })
       .where(eq(datasetVersions.id, draft.id))
       .returning();
+    await record({ userId, dataset, entity: ENTITY, entityId: draft.id, action: "pubblica", diff: diffDocuments(previous?.data ?? null, doc) }, tx);
+    if (archivedRow) await record({ userId, dataset, entity: ENTITY, entityId: archivedRow.id, action: "archivia" }, tx);
     return {
       published: toVersion<D>(row!),
       archived: archivedRow ? ({ ...archivedRow, dataset } as DatasetVersionSummary<D>) : null,
