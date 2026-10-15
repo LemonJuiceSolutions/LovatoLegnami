@@ -392,8 +392,8 @@ tocca dataset già presenti né l'admin esistente. `ADMIN_EMAIL` è già in `.en
 (`tonslemonjuice@gmail.com`); `-e ADMIN_EMAIL=…` la sostituisce per un altro indirizzo.
 
 Nota: le pagine pubbliche generate al build non hanno i prezzi (al build il database non è
-raggiungibile); si rigenerano da sole alla prima visita e poi ogni 5 minuti
-(`revalidate = 300`). Se il seed è stato eseguito dopo che qualcuno aveva già visitato il
+raggiungibile); passati 5 minuti dal build la prima visita le rigenera con i dati del
+database (`revalidate = 300`; provato in locale: "Prezzo su richiesta" → prezzi "da …"). Se il seed è stato eseguito dopo che qualcuno aveva già visitato il
 sito, i prezzi "a partire da" compaiono entro 5 minuti (o subito con
 `dc up -d --force-recreate lovato-app`).
 
