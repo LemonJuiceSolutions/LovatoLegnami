@@ -3,10 +3,12 @@
 import * as React from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { LayoutDashboard, Sparkles, Ruler, Menu, X } from "lucide-react"
+import { LayoutDashboard, Sparkles, Ruler, Menu, X, Settings2 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
+import { canAccessAdmin } from "@/components/admin/admin-nav"
+import type { Actor } from "@/server/auth/permissions"
 
 interface NavItem {
   label: string
@@ -20,8 +22,12 @@ const navItems: NavItem[] = [
   { label: "AI ASSISTANT", href: "/ai", icon: Sparkles },
 ]
 
-export function Sidebar() {
+/** Voce dell'area admin: visibile solo a chi può aprire almeno una sezione (9.1). */
+const adminItem: NavItem = { label: "ADMIN", href: "/admin", icon: Settings2 }
+
+export function Sidebar({ user }: { user?: Actor } = {}) {
   const pathname = usePathname()
+  const items = canAccessAdmin(user) ? [...navItems, adminItem] : navItems
   const [mobileOpen, setMobileOpen] = React.useState(false)
 
   return (
@@ -69,7 +75,7 @@ export function Sidebar() {
 
         {/* Navigation */}
         <nav className="flex-1 space-y-1 p-3">
-          {navItems.map((item) => {
+          {items.map((item) => {
             const isActive =
               pathname === item.href || pathname.startsWith(item.href + "/")
             const Icon = item.icon

@@ -20,7 +20,7 @@ function AppShellContent({ user, children }: { user: NavUser; children: React.Re
 
   return (
     <div className="flex h-screen overflow-hidden relative">
-      <Sidebar />
+      <Sidebar user={user} />
       <div className={`flex flex-1 flex-col overflow-hidden relative z-10 transition-all duration-300 ${aiPanelOpen ? "mr-[400px]" : ""}`}>
         <NavHeader user={user} />
         <main className="flex-1 overflow-y-auto p-4 md:p-6 relative z-10">{children}</main>
