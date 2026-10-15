@@ -1,8 +1,8 @@
-import type { Machining, PieceType, Section } from "@/domain/components/types";
+import type { Curve, Machining, PieceType, Section } from "@/domain/components/types";
 
 /**
  * Cache dei solidi per pezzo (D6): la chiave dipende solo da tipo, sezione,
- * lunghezza e lavorazioni (senza id, pezzo, giunto né posa), così pezzi
+ * lunghezza, asse curvo (E6) e lavorazioni (senza id, pezzo, giunto né posa), così pezzi
  * identici in posizioni diverse — es. i travetti — condividono il solido.
  */
 
@@ -10,6 +10,7 @@ export interface CacheKeyInput {
   readonly type: PieceType;
   readonly section: Section;
   readonly length: number;
+  readonly curve?: Curve;
   readonly machinings: readonly Machining[];
 }
 
@@ -47,11 +48,15 @@ export function stableHash(text: string, seed = 0): string {
   return (4294967296 * (2097151 & h2) + (h1 >>> 0)).toString(16).padStart(14, "0");
 }
 
-/** Chiave di cache del pezzo: hash di tipo + sezione + lunghezza + lavorazioni. */
+/**
+ * Chiave di cache del pezzo: hash di tipo + sezione + lunghezza + `curve` +
+ * lavorazioni. `curve` assente non compare nel JSON canonico, quindi le chiavi
+ * dei pezzi dritti non cambiano.
+ */
 export function pieceCacheKey(piece: CacheKeyInput): string {
   const machinings = piece.machinings.map((m) => canonicalJson(m, NON_GEOMETRIC));
   return stableHash(
-    canonicalJson({ type: piece.type, section: piece.section, length: piece.length }) + "|" + machinings.join("|"),
+    canonicalJson({ type: piece.type, section: piece.section, length: piece.length, curve: piece.curve }) + "|" + machinings.join("|"),
   );
 }
 

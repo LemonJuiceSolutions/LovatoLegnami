@@ -1,6 +1,6 @@
 import { z } from "zod";
-import { MachiningSchema, PoseSchema, SectionSchema } from "@/domain/components/schemas";
-import { PIECE_TYPES, type Machining, type Pose, type PieceType, type Section } from "@/domain/components/types";
+import { CurveSchema, MachiningSchema, PoseSchema, SectionSchema } from "@/domain/components/schemas";
+import { PIECE_TYPES, type Curve, type Machining, type Pose, type PieceType, type Section } from "@/domain/components/types";
 import { NeutralBrepSchema, type NeutralBrep } from "./neutral-brep";
 
 /**
@@ -23,6 +23,8 @@ export interface PieceGeometryInput {
   readonly type: PieceType;
   readonly section: Section;
   readonly length: number;
+  /** Asse curvo (E1, solo `arco`): il solido è costruito per rivoluzione. */
+  readonly curve?: Curve;
   readonly machinings: readonly Machining[];
   readonly pose: Pose;
 }
@@ -161,6 +163,7 @@ export const PieceGeometryInputSchema: z.ZodType<PieceGeometryInput> = z.object(
   type: z.enum(PIECE_TYPES),
   section: SectionSchema,
   length: finite.positive(),
+  curve: CurveSchema.optional(),
   machinings: z.array(MachiningSchema),
   pose: PoseSchema,
 });

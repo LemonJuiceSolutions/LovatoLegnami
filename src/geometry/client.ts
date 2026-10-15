@@ -121,6 +121,7 @@ export const toGeometryInput = (p: Piece): PieceGeometryInput => ({
   type: p.type,
   section: p.section,
   length: p.length,
+  ...(p.curve ? { curve: p.curve } : {}),
   machinings: p.machinings,
   pose: p.pose,
 });

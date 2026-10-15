@@ -33,6 +33,14 @@ const mesh = () => ({
 });
 
 describe("protocollo kernel", () => {
+  it("conserva l'asse curvo dei pezzi ad arco (E6) e rifiuta curve non valide", () => {
+    const arc = { ...piece, id: "ARC-01", type: "arco" as const, machinings: [], curve: { radius: 2400, sweep: 93 } };
+    const req: BuildRequest = { kind: "build", id: 2, pieces: [arc] };
+    const parsed = BuildRequestSchema.parse(req);
+    expect(parsed.pieces[0].curve).toEqual({ radius: 2400, sweep: 93 });
+    expect(BuildRequestSchema.safeParse({ ...req, pieces: [{ ...arc, curve: { radius: 2400, sweep: 400 } }] }).success).toBe(false);
+  });
+
   it("accetta una BuildRequest valida", () => {
     const req: BuildRequest = { kind: "build", id: 1, pieces: [piece], options: { tolerance: 0.5 } };
     expect(BuildRequestSchema.safeParse(req).success).toBe(true);

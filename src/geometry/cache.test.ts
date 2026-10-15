@@ -23,6 +23,18 @@ describe("cache geometrica", () => {
     expect(pieceCacheKey({ ...p, machinings: p.machinings.map((m) => ({ ...m, at: m.at + 0.5 })) })).not.toBe(k);
   });
 
+  it("la chiave include l'asse curvo (E6) e non cambia per i pezzi dritti", () => {
+    const p = generate("addossata-monofalda").pieces[0];
+    const k = pieceCacheKey(p);
+    expect(pieceCacheKey({ ...p, curve: undefined })).toBe(k);
+    const arc = { ...p, type: "arco" as const, curve: { radius: 2400, sweep: 93 } };
+    const ka = pieceCacheKey(arc);
+    expect(ka).not.toBe(pieceCacheKey({ ...arc, curve: undefined }));
+    expect(pieceCacheKey({ ...arc, curve: { radius: 2400, sweep: 94 } })).not.toBe(ka);
+    expect(pieceCacheKey({ ...arc, curve: { radius: 2500, sweep: 93 } })).not.toBe(ka);
+    expect(pieceCacheKey({ ...arc, curve: { sweep: 93, radius: 2400 } })).toBe(ka);
+  });
+
   it("LRU: rimuove il meno usato e chiama onEvict", () => {
     const evicted: string[] = [];
     const c = new LruCache<number>(2, (_, k) => evicted.push(k));

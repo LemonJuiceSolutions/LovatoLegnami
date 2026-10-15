@@ -6,6 +6,7 @@ import {
   KernelExportError,
   KernelUnavailableError,
   createKernelClient,
+  toGeometryInput,
   type BuildProgress,
   type WorkerLike,
 } from "./client";
@@ -200,5 +201,15 @@ describe("createKernelClient", () => {
     w.emit({ kind: "error", id: null, phase: "init", message: "crash" });
     await expect(pendingExp).rejects.toBeInstanceOf(KernelUnavailableError);
     await expect(client.exportStep(assembly)).rejects.toBeInstanceOf(KernelUnavailableError);
+  });
+});
+
+describe("toGeometryInput", () => {
+  it("passa l'asse curvo dei pezzi ad arco e lo omette per i pezzi dritti", () => {
+    const assembly = generate("carport-arco");
+    const arc = assembly.pieces.find((p) => p.curve)!;
+    expect(toGeometryInput(arc).curve).toEqual(arc.curve);
+    const straight = assembly.pieces.find((p) => !p.curve)!;
+    expect("curve" in toGeometryInput(straight)).toBe(false);
   });
 });

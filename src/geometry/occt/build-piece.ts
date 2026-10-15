@@ -1,13 +1,14 @@
-import { Vector, basicFaceExtrusion, makeBox, makeCylinder, makePolygon, type Shape3D, type Solid } from "replicad";
-import type { Face, Machining, Section } from "@/domain/components/types";
+import { Vector, basicFaceExtrusion, makeBox, makeCylinder, makePolygon, revolution, type Shape3D, type Solid } from "replicad";
+import type { Curve, Face, Machining, Section } from "@/domain/components/types";
 import { add, cross, normalize, scale, vec3, type Vec3 } from "@/domain/math/vec3";
 import { occt } from "./init";
 
 /**
  * Costruzione del solido di un pezzo nel sistema LOCALE (D6): parallelepipedo
- * X ∈ [0, L], Y ∈ [−b/2, b/2], Z ∈ [−h/2, h/2] meno un solido-utensile per
- * lavorazione (`cut`). Gli utensili sporgono di `TOOL_OFFSET` oltre le facce del
- * pezzo che attraversano, per evitare facce complanari nelle booleane.
+ * X ∈ [0, L], Y ∈ [−b/2, b/2], Z ∈ [−h/2, h/2] (o, per i pezzi curvi, settore
+ * anulare per rivoluzione, E6) meno un solido-utensile per lavorazione
+ * (`cut`). Gli utensili sporgono di `TOOL_OFFSET` oltre le facce del pezzo che
+ * attraversano, per evitare facce complanari nelle booleane.
  */
 
 /** Sporgenza degli utensili oltre le facce del pezzo (mm). */
@@ -18,6 +19,8 @@ export interface PieceSolidInput {
   readonly id: string;
   readonly section: Section;
   readonly length: number;
+  /** Asse curvo (E1): solo `arco`; assente per i pezzi dritti. */
+  readonly curve?: Curve;
   readonly machinings: readonly Machining[];
 }
 
@@ -211,6 +214,37 @@ export function makeBaseBox(section: Section, length: number): Solid {
   return makeBox([0, -section.b / 2, -section.h / 2], [length, section.b / 2, section.h / 2]);
 }
 
+/**
+ * Solido di base di un pezzo curvo (E6): rivoluzione del rettangolo di sezione
+ * nel piano X = 0 (Y ∈ [−b/2, b/2], Z ∈ [−h/2, h/2]) attorno all'asse ∥ Y per
+ * `(0, 0, radius)`, di `sweep` gradi, nel verso che porta l'asse tangente a +X
+ * a curvare verso +Z (rotazione attorno a −Y). Facce: 2 cilindriche
+ * (intradosso `radius − h/2`, estradosso `radius + h/2`), 2 piane laterali e
+ * 2 piane di testa.
+ */
+export function makeBaseArc(section: Section, curve: Curve): Solid {
+  const { b, h } = section;
+  const face = makePolygon([
+    [0, -b / 2, -h / 2],
+    [0, b / 2, -h / 2],
+    [0, b / 2, h / 2],
+    [0, -b / 2, h / 2],
+  ]);
+  try {
+    const shape = revolution(face, [0, 0, curve.radius], [0, -1, 0], curve.sweep);
+    const solids = shape.solids;
+    if (solids.length !== 1) {
+      for (const s of solids) s.delete();
+      shape.delete();
+      throw new Error(`rivoluzione con ${solids.length} solidi`);
+    }
+    if (solids[0] !== shape) shape.delete();
+    return solids[0];
+  } finally {
+    face.delete();
+  }
+}
+
 /** Solido-utensile di una lavorazione (lancia se il tipo non ha procedura). */
 export function makeTool(m: Machining, piece: PieceSolidInput): Shape3D {
   const builder = (TOOLS as Record<string, ToolBuilder<Machining> | undefined>)[m.type];
@@ -249,10 +283,16 @@ export function isValidShape(shape: Shape3D): boolean {
 export function buildPieceSolid(piece: PieceSolidInput): Solid {
   if (!(piece.length > 0 && piece.section.b > 0 && piece.section.h > 0))
     throw new PieceBuildError(piece.id, "dimensioni non valide");
-  let solid: Solid = makeBaseBox(piece.section, piece.length);
+  let solid: Solid;
+  try {
+    solid = piece.curve ? makeBaseArc(piece.section, piece.curve) : makeBaseBox(piece.section, piece.length);
+  } catch (e) {
+    throw new PieceBuildError(piece.id, `costruzione del solido di base fallita: ${errorMessage(e)}`);
+  }
   for (const m of piece.machinings) {
     let tool: Shape3D | undefined;
     try {
+      if (piece.curve) throw new PieceBuildError(piece.id, "lavorazione non ancora supportata sui pezzi curvi", m);
       tool = makeTool(m, piece);
       const result = solid.cut(tool);
       const next = singleSolid(result, piece, m);
