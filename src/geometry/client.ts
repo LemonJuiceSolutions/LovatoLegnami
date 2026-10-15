@@ -108,7 +108,7 @@ export interface WorkerLike {
 export interface KernelClientOptions {
   /** Crea il worker (default: `kernel.worker.ts` come module worker). */
   readonly createWorker?: () => WorkerLike;
-  /** Base URL degli asset OCCT (default `/occt/`). */
+  /** Base URL degli asset OCCT (default `/occt/<versione>/`). */
   readonly assetBase?: string;
 }
 

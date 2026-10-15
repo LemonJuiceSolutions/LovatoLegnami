@@ -35,7 +35,7 @@ import {
 export interface KernelOptions {
   /** Invio dei messaggi al client (con i buffer trasferibili). */
   readonly post: (msg: WorkerMessage, transfer: ArrayBuffer[]) => void;
-  /** Factory OCCT (default: browser, da `/occt/`). */
+  /** Factory OCCT (default: browser, da `/occt/<versione>/`). */
   readonly factory?: OcctFactory;
   /** Capacità della cache (numero di solidi distinti). */
   readonly cacheSize?: number;

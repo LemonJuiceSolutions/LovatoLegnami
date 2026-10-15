@@ -50,7 +50,7 @@ export interface BuildOptions {
 
 export interface InitRequest {
   readonly kind: "init";
-  /** Base URL degli asset OCCT (default `/occt/`). */
+  /** Base URL degli asset OCCT (default `/occt/<versione>/`). */
   readonly assetBase?: string;
 }
 

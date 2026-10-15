@@ -86,7 +86,7 @@ seconda tabella della distinta CSV (`Codice;Descrizione;Quantità;Pezzi`).
 ### Comandi
 
 ```bash
-npm run dev             # copia il kernel OCCT in public/occt/ (predev) e avvia Next
+npm run dev             # copia il kernel OCCT in public/occt/<versione>/ (predev) e avvia Next
 npm test                # unit (dominio, export, store) + dom (componenti React, jsdom)
 npm run test:geometry   # kernel OCCT reale in Node: solidi, B-rep, SAT e STEP (~2 s, limite 60 s)
 npm run test:db         # repository, seed e API su PGlite in memoria
@@ -95,7 +95,7 @@ npm run lint
 npm run build           # copia il kernel (prebuild) e compila
 ```
 
-`public/occt/` (WASM ~23 MB) è generata da `scripts/copy-occt-wasm.mjs` e non è versionata.
+`public/occt/<versione>/` (WASM ~23 MB, cache immutabile di un anno) è generata da `scripts/copy-occt-wasm.mjs` e non è versionata.
 
 ### Struttura
 

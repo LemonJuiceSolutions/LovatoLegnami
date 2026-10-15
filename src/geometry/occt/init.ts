@@ -1,11 +1,13 @@
 import { setOC } from "replicad";
 import type { OpenCascadeInstance } from "replicad-opencascadejs";
+import { version as OCCT_PACKAGE_VERSION } from "replicad-opencascadejs/package.json";
 
 /**
  * Inizializzazione del kernel OpenCascade (WASM) come singleton (D6, D13).
  *
  * Nel browser (worker) la glue `replicad_single.js` e il `.wasm` sono serviti
- * da `public/occt/` (copiati da `scripts/copy-occt-wasm.mjs`) e caricati a
+ * da `public/occt/<versione>/` (copiati da `scripts/copy-occt-wasm.mjs`, P12: la
+ * versione del pacchetto nel percorso permette la cache immutabile) e caricati a
  * runtime con un `import()` ignorato da webpack + `locateFile`: il bundle non
  * contiene il WASM né la glue (che importa moduli `node:`). In Node (test
  * geometry) si passa `nodeOcctFactory` da `init-node.ts`, che carica il WASM
@@ -17,7 +19,7 @@ export type OcctFactory = (moduleArg: {
 }) => Promise<OpenCascadeInstance>;
 
 export interface InitOptions {
-  /** Base URL degli asset OCCT nel browser (default `/occt/`). */
+  /** Base URL degli asset OCCT nel browser (default `/occt/<versione>/`). */
   readonly assetBase?: string;
   /** Factory del modulo (default: import a runtime da `assetBase`). */
   readonly factory?: OcctFactory;
@@ -30,7 +32,10 @@ export class OcctInitError extends Error {
   }
 }
 
-export const DEFAULT_ASSET_BASE = "/occt/";
+/** Versione di `replicad-opencascadejs`: è anche la cartella degli asset in `public/occt/`. */
+export const OCCT_VERSION: string = OCCT_PACKAGE_VERSION;
+/** Percorso versionato degli asset OCCT (vedi `scripts/copy-occt-wasm.mjs`). */
+export const DEFAULT_ASSET_BASE = `/occt/${OCCT_VERSION}/`;
 const GLUE_FILE = "replicad_single.js";
 
 /** Factory per il browser: importa la glue da `assetBase` senza passare da webpack. */
