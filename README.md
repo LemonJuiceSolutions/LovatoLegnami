@@ -9,7 +9,25 @@ npm install
 npm run dev
 ```
 
-Apri http://localhost:3000 → `/dashboard`.
+Apri http://localhost:3000: `/` è il sito pubblico, l'area interna (`/dashboard`, `/configuratore`) richiede l'accesso.
+
+## Sito pubblico
+
+Route group `src/app/(site)`: home, `/pergole`, `/pergole/<seoSlug>`, `/galleria`, `/contatti`, `/privacy`, più
+`sitemap.xml`, `robots.txt` (in `src/app/robots.ts`) e immagine Open Graph (`/og.png`). Tema `.theme-site` in
+`src/app/(site)/site.css` (token shadcn ridefiniti con i colori Lovato, chiaro e scuro dal sistema), caratteri
+Fraunces + Archivo, componenti in `src/components/site/`. Tipologie visibili, testi, immagini e prezzo "a partire da"
+arrivano dal dataset `tipologie` attivo (`src/server/site/content.ts`), in cache con il tag `tipologie` (300 s): la
+pubblicazione dal back-office chiama `revalidateTag("tipologie")`. Dati aziendali in `src/components/site/company.ts`
+(telefono, email e via sovrascrivibili con `SITE_COMPANY_PHONE`, `SITE_COMPANY_EMAIL`, `SITE_COMPANY_STREET`).
+
+Budget delle pagine pubbliche, verificato dopo il build:
+
+```bash
+npm run build
+npm run test:bundle     # JS iniziale della home < 200 kB gzip; nessun three/@react-three/replicad/zustand
+                        # né listino seed nelle pagine (site) (escluso il wizard /preventivo)
+```
 
 ## AI
 
@@ -71,6 +89,8 @@ seconda tabella della distinta CSV (`Codice;Descrizione;Quantità;Pezzi`).
 npm run dev             # copia il kernel OCCT in public/occt/ (predev) e avvia Next
 npm test                # unit (dominio, export, store) + dom (componenti React, jsdom)
 npm run test:geometry   # kernel OCCT reale in Node: solidi, B-rep, SAT e STEP (~2 s, limite 60 s)
+npm run test:db         # repository, seed e API su PGlite in memoria
+npm run test:bundle     # dopo `npm run build`: budget e librerie vietate delle pagine del sito pubblico
 npm run lint
 npm run build           # copia il kernel (prebuild) e compila
 ```
