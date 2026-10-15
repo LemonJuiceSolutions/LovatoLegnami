@@ -11,7 +11,7 @@ npm run dev
 
 Apri http://localhost:3000: `/` è il sito pubblico, l'area interna (`/dashboard`, `/configuratore`) richiede l'accesso.
 
-## Sito pubblico
+## Sito pubblico e wizard
 
 Route group `src/app/(site)`: home, `/pergole`, `/pergole/<seoSlug>`, `/galleria`, `/contatti`, `/privacy`, più
 `sitemap.xml`, `robots.txt` (in `src/app/robots.ts`) e immagine Open Graph (`/og.png`). Tema `.theme-site` in
@@ -28,6 +28,51 @@ npm run build
 npm run test:bundle     # JS iniziale della home < 200 kB gzip; nessun three/@react-three/replicad/zustand
                         # né listino seed nelle pagine (site) (escluso il wizard /preventivo)
 ```
+
+Il wizard `/preventivo` (passi Modello, Misure, Spazio, Finiture, Prezzo, Contatti) traduce le risposte del cliente in
+una configurazione del configuratore (`src/components/wizard/`), mostra un 3D a box e il prezzo calcolato dal server
+(`POST /api/preventivo/stima`, solo vista cliente) con note in parole semplici (adattamenti all'ingombro, muro fuori
+squadra, lavorazioni di cantiere con soglie arrotondate). L'invio (`POST /api/preventivo`, multipart con foto
+ridimensionate nel browser) salva richiesta e istantanea del preventivo, invia conferma al cliente (con PDF e link
+`/p/<token>` valido 90 giorni) e notifica all'ufficio. Protezioni: rate limit per IP, campo trappola, tempo minimo di
+compilazione, consenso privacy versionato, foto verificate dai byte.
+
+## Back-office
+
+Area `/admin` (Auth.js con collegamento via email, solo utenti creati dall'admin; ruoli `admin`, `ufficio-tecnico`,
+`commerciale` in `src/server/auth/permissions.ts`): riepilogo, **Listino** per sezioni (form, import/export CSV),
+**Regole** costruttive, **Tipologie** del sito (testi, immagini, preset di riferimento), **Preset**, **Richieste**
+(stato, assegnazione, foto, PDF, reinvio email, anonimizzazione), **Utenti**, **Registro** delle modifiche e
+**Simula** (bozza contro versione attiva). Ogni dataset ha versioni con bozza, differenze e pubblicazione; pubblicare
+invalida la cache del sito e del catalogo pubblico. Da una richiesta, "Apri nel configuratore" carica la configurazione
+del cliente in `/configuratore?richiesta=<id>`, da cui si salva il **preventivo definitivo** (voci manuali, sconto,
+IVA) e lo si invia al cliente.
+
+## Preventivazione
+
+Motore puro in `src/domain/pricing/` (`priceAssembly`): fasi legno e sfrido (con piano di taglio sulle lunghezze
+commerciali), lavorazioni, ferramenta, trattamenti, copertura, montaggio, complicazioni di cantiere (regole del listino
+sui fattori calcolati dall'ingombro), trasporto per zona CAP, margini, sconti, minimo d'ordine, IVA e arrotondamento.
+Due viste: ufficio (righe con spiegazioni) e cliente (`customerView`: poche voci, fascia di indicatività, note). Lato
+server `src/server/quotes/` (catalogo attivo, stima, istantanea, definitivo, prezzo "a partire da" condiviso da admin e
+sito) e `src/server/pdf/` (PDF con `@react-pdf/renderer`). Fixture golden: `UPDATE_GOLDEN=1 npx vitest run
+src/domain/pricing/golden.test.ts`.
+
+## Database e ambienti
+
+Drizzle ORM (`src/db/schema.ts`, migrazioni in `drizzle/`). Senza `DATABASE_URL` si usa PGlite in-process
+(`.data/pglite/`, in memoria nei test), le email vanno in console e le foto in `.data/uploads/`; in produzione
+servono Postgres (Neon), Resend e Vercel Blob. Variabili in `.env.example`, validate all'avvio da
+`src/server/env.ts`.
+
+```bash
+npm run db:migrate                          # applica le migrazioni (PGlite o DATABASE_URL)
+ADMIN_EMAIL=nome@esempio.it npm run db:seed # versione 1 dei dataset (segnaposto DA VALIDARE) e primo admin
+npm run db:generate                         # nuova migrazione dopo una modifica dello schema (solo additiva)
+```
+
+In locale l'accesso al back-office usa il collegamento stampato nel terminale di `npm run dev`. Rilascio su Vercel,
+backup e rollback: **`docs/deploy.md`**. CI: `.github/workflows/ci.yml`.
 
 ## AI
 
@@ -89,7 +134,7 @@ seconda tabella della distinta CSV (`Codice;Descrizione;Quantità;Pezzi`).
 npm run dev             # copia il kernel OCCT in public/occt/<versione>/ (predev) e avvia Next
 npm test                # unit (dominio, export, store) + dom (componenti React, jsdom)
 npm run test:geometry   # kernel OCCT reale in Node: solidi, B-rep, SAT e STEP (~2 s, limite 60 s)
-npm run test:db         # repository, seed e API su PGlite in memoria
+npm run test:db         # repository, seed, API e flusso completo di una richiesta su PGlite in memoria
 npm run test:bundle     # dopo `npm run build`: budget e librerie vietate delle pagine del sito pubblico
 npm run lint
 npm run build           # copia il kernel (prebuild) e compila
@@ -107,6 +152,13 @@ npm run build           # copia il kernel (prebuild) e compila
 | `src/stores/` | Store zustand: configurazione, dati derivati, kernel, esempi, file JSON; `viewer-store.ts` per il 3D. |
 | `src/components/configuratore/` | UI (form parametri e ingombro, esiti, esportazioni, barra configurazione) e `viewer/` (react-three-fiber). |
 | `src/app/(app)/configuratore/` | Pagina Next (componente caricato solo lato client). |
+| `src/app/(site)/`, `src/components/site/`, `src/components/wizard/` | Sito pubblico e wizard del preventivo. |
+| `src/app/(admin)/admin/`, `src/components/admin/` | Back-office. |
+| `src/app/api/` | Route API: `preventivo/*` (pubbliche), `admin/*`, `uploads`, `immagini`, `auth`, `ai`. |
+| `src/server/` | Codice solo server: `env`, `auth`, `actions` (server action), `repositories`, `quotes`, `pdf`, `email` (outbox), `storage`, `site`, `routes`, `rate-limit`. |
+| `src/db/` | Schema Drizzle, client (Postgres/PGlite), migrazioni e seed. |
+| `docs/deploy.md` | Guida al rilascio su Vercel (Neon, Blob, Resend), rollback, ripristino, voci da confermare. |
+| `openspec/changes/sito-preventivi/` | Sito, wizard, back-office, preventivazione: proposta, design, specifiche, task e note dei gruppi. |
 | `openspec/changes/configuratore-pergole/` | Proposta, design (con le note di implementazione), specifiche e task. |
 | `openspec/changes/tipologie-estese/` | Tipologie estese, ferramenta, preset, pezzi curvi: proposta, design (note di implementazione), specifiche, task e ricerca sul catalogo. |
 
@@ -159,3 +211,14 @@ npm run build           # copia il kernel (prebuild) e compila
   come pannello pieno.
 - Cambiando tipologia l'ingombro resta quello precedente: possono comparire collisioni "esce dall'ingombro" finché
   non si usa "Ripristina", un preset o "Adatta all'ingombro".
+
+### Limiti noti e dati da validare (sito e preventivi)
+
+- **Listino, complicazioni, zone di trasporto, margini, minimo d'ordine e indicatività** sono segnaposto `DA VALIDARE`
+  del seed: vanno sostituiti dal back-office con i valori dell'ufficio.
+- Testo dell'informativa privacy, indirizzo (Via Meucci 2 o 4), logo SVG, fotografie e colori ufficiali da confermare
+  (elenco completo in `docs/deploy.md`, "Da confermare").
+- Nel wizard il CAP si chiede all'ultimo passo: il prezzo del passo "Prezzo" usa la zona di trasporto di ripiego e può
+  scendere dopo l'invio.
+- Rate limit in memoria per istanza (best effort su serverless).
+- Le foto in Vercel Blob non sono coperte dal backup del database.

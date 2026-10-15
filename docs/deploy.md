@@ -152,8 +152,8 @@ back-office deve rispondere da un dominio diverso da quello della richiesta.
 4. **Primo accesso admin**: aprire `https://<dominio>/accesso`, inserire `ADMIN_EMAIL`,
    aprire il collegamento ricevuto via email (valido pochi minuti, monouso). Se l'email
    non arriva: Resend → **Emails** (stato dell'invio) e Vercel → **Logs** (errori).
-5. Dal back-office: **Utenti** per creare gli altri account (commerciale, tecnico,
-   visualizzatore); **Listino**, **Regole**, **Tipologie** per sostituire i segnaposto e
+5. Dal back-office: **Utenti** per creare gli altri account (ruoli `admin`,
+   `ufficio-tecnico`, `commerciale`); **Listino**, **Regole**, **Tipologie** per sostituire i segnaposto e
    **pubblicare** (la pubblicazione aggiorna il sito in pochi secondi).
 6. Prova completa: richiesta di preventivo dal sito con una foto → email all'ufficio e al
    cliente → richiesta nel back-office → PDF.
