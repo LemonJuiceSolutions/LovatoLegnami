@@ -21,6 +21,8 @@ export default defineConfig({
     projects: [
       {
         resolve: { alias },
+        // JSX automatico anche qui: il PDF (`server/pdf/*.tsx`) è testato in Node.
+        esbuild: { jsx: "automatic" },
         test: {
           name: "unit",
           environment: "node",
