@@ -19,10 +19,12 @@ import {
   joistsOnBeams,
   numberParam,
   placeStep,
+  realWall,
   sectionParam,
   seatOffset,
   spread,
   wallAttachment,
+  wallPlate,
 } from "./shared";
 
 /** Interasse minimo tra due telai (mm). */
@@ -55,6 +57,11 @@ const imposed = (p: Readonly<Record<string, unknown>>) => WALL_SLOPE[p.attaccoMu
  *   distribuiti tra il pilastro e il muro e ruotati sulla falda;
  * - pendenza imposta dalla ferramenta per staffe inclinate e supporto a
  *   scomparsa (`WALL_SLOPE`), altrimenti `pendenza`.
+ *
+ * Con il muro reale (`ctx.wallPlane`, P4) la profondità vale nel punto del
+ * muro più vicino (`realWall`): telai e travetti non cambiano, le travi si
+ * allungano fino al muro con la testa tagliata sul suo piano (taglio
+ * composto) e la banchina segue il muro (`wallPlate`).
  */
 function geometry(ctx: BuildContext) {
   const W = ctx.num("larghezza");
@@ -91,6 +98,7 @@ export const addossataSandwich: TypologyTemplate = {
   category: "addossata",
   tags: ["addossata", "sandwich", "bullonata", "monofalda", "staffa a muro", "banchina", "MAXI"],
   reference: "T-B/T-C/T-F",
+  wallPlanes: 1,
   params: [
     numberParam("larghezza", "Larghezza (lungo il muro)", "mm", 2000, 12000, 3000, 50),
     numberParam("profondita", "Profondità (lunghezza delle travi)", "mm", 1500, 6000, 2000, 50),
@@ -134,24 +142,34 @@ export const addossataSandwich: TypologyTemplate = {
     const sp = ctx.section("sezionePilastro");
     const sj = ctx.section("sezioneTravetto");
     const t = Math.tan(g.a);
-    const wall = plane(vec3(0, g.yMuro, 0), vec3(0, -1, 0));
+    const implicitWall = plane(vec3(0, g.yMuro, 0), vec3(0, -1, 0));
+    // muro reale (fuorisquadra): telai e travetti invariati, travi fino al muro reale, banchina lungo il muro
+    const real = ctx.wallPlane ? realWall(ctx, implicitWall, ctx.wallPlane, [vec3(0, g.yMuro, 0), vec3(g.W, g.yMuro, 0)]) : undefined;
+    const wall = real ?? implicitWall;
+    const wallY = (x: number): number => (real ? real.point.y - (real.normal.x * (x - real.point.x)) / real.normal.y : g.yMuro);
     const steps: BuildStep[] = [];
 
     // banchina a muro: faccia posteriore sul muro, spigolo a valle sotto l'intradosso della trave
     let banchina: Placed | undefined;
     if (g.attach === "banchina") {
       const sb = ctx.section("sezioneBanchina");
-      const yEdge = g.yMuro - sb.b;
       const c = seatOffset(g.slope, [sb.b], g.sec);
-      const zEdge = g.H + (yEdge - g.yPost) * t + c / Math.cos(g.a);
-      banchina = { ref: "banchina", type: "banchina", section: sb, length: g.W, pose: fromBasis(vec3(0, g.yMuro - sb.b / 2, zEdge - sb.h / 2), vec3(1, 0, 0), vec3(0, 0, 1)) };
+      if (real) banchina = wallPlate("banchina", sb, real, 0, g.W, (y) => g.H + (y - g.yPost) * t + c / Math.cos(g.a)).placed;
+      else {
+        const yEdge = g.yMuro - sb.b;
+        const zEdge = g.H + (yEdge - g.yPost) * t + c / Math.cos(g.a);
+        banchina = { ref: "banchina", type: "banchina", section: sb, length: g.W, pose: fromBasis(vec3(0, g.yMuro - sb.b / 2, zEdge - sb.h / 2), vec3(1, 0, 0), vec3(0, 0, 1)) };
+      }
       steps.push(placeStep(banchina));
-      const m = Math.min(BANCHINA_ANCHOR_MARGIN, g.W / 4);
-      const n = Math.max(2, Math.ceil((g.W - 2 * m) / BANCHINA_ANCHOR_SPACING - 1e-9) + 1);
+      const lb = banchina.length;
+      const m = Math.min(BANCHINA_ANCHOR_MARGIN, lb / 4);
+      const n = Math.max(2, Math.ceil((lb - 2 * m) / BANCHINA_ANCHOR_SPACING - 1e-9) + 1);
       for (let i = 0; i < n; i++)
-        steps.push({ kind: "machining", target: "banchina", spec: { type: "foro", face: "sinistra", diameter: 12, offset: 0, at: m + (i * (g.W - 2 * m)) / (n - 1) } });
+        steps.push({ kind: "machining", target: "banchina", spec: { type: "foro", face: "sinistra", diameter: 12, offset: 0, at: m + (i * (lb - 2 * m)) / (n - 1) } });
       steps.push({ kind: "hardware", code: "tassello-10x85", pieces: ["banchina"], params: { count: n } });
     }
+    // semilarghezza in pianta del telaio (tavole + pilastro o trave singola)
+    const halfFrame = g.mode === "bullonata" ? sp.b / 2 + g.sec.b : g.sec.b / 2;
 
     // telai: trave dal fronte al muro su un pilastro
     const frames: PortalResult[] = g.frameXs.map((x, k) => {
@@ -159,7 +177,8 @@ export const addossataSandwich: TypologyTemplate = {
         prefix: `telaio-${k}`,
         start: { x, y: g.y0 },
         dir: { x: 0, y: 1 },
-        length: g.L,
+        // con il muro reale la trave si allunga fino al muro (spigolo superiore più lontano)
+        length: real ? g.L + (Math.max(wallY(x - halfFrame), wallY(x + halfFrame)) - g.yMuro) / Math.cos(g.a) : g.L,
         posts: [g.sbalzo],
         underside: g.H - g.sbalzo * t,
         slope: g.slope,

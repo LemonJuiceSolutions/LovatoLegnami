@@ -4,7 +4,7 @@ import { hardwareFor } from "../../hardware/catalog";
 import { applyToPoint, axisOf, degToRad, fromBasis, invertRigid, radToDeg } from "../../math/mat4";
 import { type Plane, intersectLinePlane, plane } from "../../math/plane";
 import { type Vec3, add, cross, dot, normalize, scale, sub, vec3 } from "../../math/vec3";
-import { ParamError, type BuildContext, type BuildStep, type TypologyTemplate } from "../template";
+import { ParamError, TemplateError, type BuildContext, type BuildStep, type TypologyTemplate } from "../template";
 import {
   type GroundAnchor,
   type Placed,
@@ -19,6 +19,7 @@ import {
   headCutOnPlane,
   joistScrewFor,
   joistSpaces,
+  lengthToPlane,
   numberParam,
   placeStep,
   sectionParam,
@@ -89,11 +90,50 @@ function geometry(ctx: BuildContext) {
   const beamTop = H + se.h;
   const uEdge = P + se.b / 2; // distanza dal muro dello spigolo esterno della trave di gronda
   const zWall = beamTop - seat + uEdge * t; // intradosso dei travetti sul piano del muro
-  const wings: Wing[] = [
-    { key: "A", origin: vec3(0, YA, 0), along: vec3(1, 0, 0), out: vec3(0, -1, 0), length: LA, wall: plane(vec3(0, YA, 0), vec3(0, -1, 0)) },
-    { key: "B", origin: vec3(0, 0, 0), along: vec3(0, 1, 0), out: vec3(1, 0, 0), length: LB, wall: plane(vec3(0, 0, 0), vec3(1, 0, 0)) },
-  ];
-  return { LA, LB, P, H, mode, attacco, slope, t, YA, se, sj, sbalzo, seat, beamTop, uEdge, zWall, wings };
+  const frame = lFrame(ctx, YA);
+  const wings: Wing[] = frame.custom
+    ? [
+        { key: "A", origin: frame.C, along: frame.dA, out: frame.nA, length: LA, wall: frame.wallA },
+        { key: "B", origin: add(frame.C, scale(frame.dB, LB)), along: scale(frame.dB, -1), out: frame.nB, length: LB, wall: frame.wallB },
+      ]
+    : [
+        { key: "A", origin: vec3(0, YA, 0), along: vec3(1, 0, 0), out: vec3(0, -1, 0), length: LA, wall: plane(vec3(0, YA, 0), vec3(0, -1, 0)) },
+        { key: "B", origin: vec3(0, 0, 0), along: vec3(0, 1, 0), out: vec3(1, 0, 0), length: LB, wall: plane(vec3(0, 0, 0), vec3(1, 0, 0)) },
+      ];
+  return { LA, LB, P, H, mode, attacco, slope, t, YA, se, sj, sbalzo, seat, beamTop, uEdge, zWall, wings, frame };
+}
+
+/**
+ * Riferimento dei due muri: angolo interno `C`, versori lungo i muri dall'angolo
+ * verso le teste delle ali (`dA`, `dB`) e normali entranti (`nA`, `nB`). Di
+ * default muro A posteriore (y = larghezzaB) e muro B sinistro (x = 0); con i
+ * muri reali (`ctx.wallPlane` = A, `ctx.wallPlane2` = B, fuorisquadra P4) gli
+ * orientamenti vengono dai piani e i muri passano per l'angolo interno, così
+ * profondità e lunghezze delle ali restano misurate dall'angolo.
+ */
+function lFrame(ctx: BuildContext, YA: number) {
+  const C = vec3(0, YA, 0);
+  const orient = (given: Plane | undefined, def: Vec3, label: string): Vec3 => {
+    if (!given) return def;
+    const n = normalize(given.normal);
+    if (Math.abs(n.z) > 1e-6) throw new TemplateError(ctx.slug, `il piano del ${label} deve essere verticale`);
+    if (dot(n, def) < Math.SQRT1_2) throw new TemplateError(ctx.slug, `il piano del ${label} non è compatibile con la tipologia a L (rotazione oltre 45°)`);
+    return n;
+  };
+  const custom = ctx.wallPlane !== undefined || ctx.wallPlane2 !== undefined;
+  const nA = orient(ctx.wallPlane, vec3(0, -1, 0), "muro A (posteriore)");
+  const nB = orient(ctx.wallPlane2, vec3(1, 0, 0), "muro B (sinistro)");
+  const dA = vec3(-nA.y + 0, nA.x + 0, 0);
+  const dB = vec3(nB.y + 0, -nB.x + 0, 0);
+  const det = nA.x * nB.y - nA.y * nB.x;
+  if (Math.abs(det) < 0.5) throw new TemplateError(ctx.slug, "i due muri devono formare un angolo tra 60° e 120°");
+  /** Punto in pianta a distanza `a` dal muro A e `b` dal muro B (dentro l'angolo). */
+  const at = (a: number, b: number, z = 0): Vec3 =>
+    custom ? vec3(C.x + (a * nB.y - b * nA.y) / det, C.y + (nA.x * b - nB.x * a) / det, z) : vec3(b, YA - a, z);
+  const ud = custom ? normalize(sub(at(1, 1), C)) : normalize(vec3(1, -1, 0));
+  let nd = custom ? vec3(-ud.y, ud.x, 0) : normalize(vec3(1, 1, 0));
+  if (dot(nd, nA) > 0) nd = scale(nd, -1); // verso l'ala A (lontano dalla sua normale entrante)
+  return { custom, C, nA, nB, dA, dB, at, ud, nd, wallA: plane(C, nA), wallB: plane(C, nB) };
 }
 
 type Geometry = ReturnType<typeof geometry>;
@@ -135,6 +175,7 @@ export const aElle: TypologyTemplate = {
   category: "addossata",
   tags: ["a L", "angolo", "compluvio", "addossata", "due muri", "banchina", "monofalda"],
   reference: "§3 estensioni",
+  wallPlanes: 2,
   params: [
     numberParam("larghezzaA", "Lunghezza ala A (muro posteriore)", "mm", 2000, 8000, 3600, 50, {
       description: "Dall'angolo interno dei muri alla testa dell'ala, lungo il muro posteriore.",
@@ -178,14 +219,26 @@ export const aElle: TypologyTemplate = {
       steps.push({ kind: "hardware", code, pieces, params: { count } });
 
     // --- pilastro d'angolo e travi di gronda incrociate -------------------------------------
-    const corner = vec3(P, YA - P, 0);
+    const fr = g.frame;
+    const corner = fr.custom ? fr.at(P, P) : vec3(P, YA - P, 0);
     const tenonLen = Math.min(60, se.h / 2 - 10);
     const post = columnStep(ctx, "pilastro", corner.x, corner.y, g.H + (carp ? tenonLen : 0), sp);
     steps.push(post);
     const zBeam = g.H + se.h / 2;
-    const beamA: Placed = { ref: "trave-A", type: "trave", section: se, length: g.LA, pose: fromBasis(vec3(0, YA - P, zBeam), vec3(1, 0, 0), up) };
-    const beamB: Placed = { ref: "trave-B", type: "trave", section: se, length: g.LB, pose: fromBasis(vec3(P, YA, zBeam), vec3(0, -1, 0), up) };
+    /** Trave di gronda a distanza P dal muro `own`, dall'altro muro (`other`, testa tagliata sul suo piano) alla testa dell'ala. */
+    const eaveBeam = (ref: string, start: Vec3, dir: Vec3, wingLength: number, other: Plane): Placed => {
+      const p0 = vec3(start.x, start.y, zBeam);
+      const back = lengthToPlane(p0, scale(dir, -1), up, se, other); // il box parte oltre l'altro muro
+      return { ref, type: "trave", section: se, length: wingLength - dot(dir, sub(start, fr.C)) + back, pose: fromBasis(sub(p0, scale(dir, back)), dir, up) };
+    };
+    const beamA: Placed = fr.custom
+      ? eaveBeam("trave-A", fr.at(P, 0), fr.dA, g.LA, fr.wallB)
+      : { ref: "trave-A", type: "trave", section: se, length: g.LA, pose: fromBasis(vec3(0, YA - P, zBeam), vec3(1, 0, 0), up) };
+    const beamB: Placed = fr.custom
+      ? eaveBeam("trave-B", fr.at(0, P), fr.dB, g.LB, fr.wallA)
+      : { ref: "trave-B", type: "trave", section: se, length: g.LB, pose: fromBasis(vec3(P, YA, zBeam), vec3(0, -1, 0), up) };
     steps.push(placeStep(beamA, "trave di gronda"), placeStep(beamB, "trave di gronda"));
+    if (fr.custom) steps.push(headCutOnPlane(beamA.ref, fr.wallB, "testa-inizio"), headCutOnPlane(beamB.ref, fr.wallA, "testa-inizio"));
     steps.push({ kind: "joint", type: "mezzo-legno", a: beamA.ref, b: beamB.ref });
     if (carp) steps.push({ kind: "joint", type: "tenone-mortasa", a: "pilastro", b: beamA.ref, params: { width: Math.round(sp.b / 3), height: Math.round((2 * sp.h) / 3), length: tenonLen, gap: 1 } });
     else screws(["pilastro", beamA.ref, beamB.ref]);
@@ -201,8 +254,22 @@ export const aElle: TypologyTemplate = {
       sb = ctx.section("sezioneBanchina");
       const c0 = seatOffset(g.slope, [sb.b], sj) / c;
       const zTopB = zPlane(g, sb.b) + c0;
-      const bA: Placed = { ref: "banchina-A", type: "banchina", section: sb, length: g.LA, pose: fromBasis(vec3(0, YA - sb.b / 2, zTopB - sb.h / 2), vec3(1, 0, 0), up) };
-      const bB: Placed = { ref: "banchina-B", type: "banchina", section: sb, length: YA - sb.b, pose: fromBasis(vec3(sb.b / 2, 0, zTopB - sb.h / 2), vec3(0, 1, 0), up) };
+      let bA: Placed;
+      let bB: Placed;
+      if (fr.custom) {
+        // A: dal muro B (entrambi gli spigoli dal lato interno) alla testa dell'ala, lungo il muro A
+        const b0 = sb.b;
+        const tA = Math.max(0, (-b0 * dot(fr.nB, fr.nA)) / dot(fr.nB, fr.dA));
+        const oA = add(add(fr.C, scale(fr.nA, b0 / 2)), scale(fr.dA, tA));
+        bA = { ref: "banchina-A", type: "banchina", section: sb, length: g.LA - tA, pose: fromBasis(vec3(oA.x, oA.y, zTopB - sb.h / 2), fr.dA, up) };
+        // B: dalla testa dell'ala fino alla faccia anteriore della banchina A
+        const tB = Math.max(b0 / dot(fr.nA, fr.dB), (b0 - b0 * dot(fr.nA, fr.nB)) / dot(fr.nA, fr.dB));
+        const oB = add(add(fr.C, scale(fr.nB, b0 / 2)), scale(fr.dB, g.LB));
+        bB = { ref: "banchina-B", type: "banchina", section: sb, length: g.LB - tB, pose: fromBasis(vec3(oB.x, oB.y, zTopB - sb.h / 2), scale(fr.dB, -1), up) };
+      } else {
+        bA = { ref: "banchina-A", type: "banchina", section: sb, length: g.LA, pose: fromBasis(vec3(0, YA - sb.b / 2, zTopB - sb.h / 2), vec3(1, 0, 0), up) };
+        bB = { ref: "banchina-B", type: "banchina", section: sb, length: YA - sb.b, pose: fromBasis(vec3(sb.b / 2, 0, zTopB - sb.h / 2), vec3(0, 1, 0), up) };
+      }
       for (const b of [bA, bB]) {
         steps.push(placeStep(b));
         const n = Math.max(2, Math.ceil(b.length / 600 - 1e-9) + 1);
@@ -214,14 +281,16 @@ export const aElle: TypologyTemplate = {
     }
 
     // --- compluvio sulla diagonale -------------------------------------------------------------
-    const ud = normalize(vec3(1, -1, 0)); // dall'angolo dei muri all'angolo delle gronde
-    const nd = normalize(vec3(1, 1, 0)); // verso l'ala A
-    const wallCorner = vec3(0, YA, 0);
+    const ud = fr.ud; // dall'angolo dei muri all'angolo delle gronde (bisettrice dei muri)
+    const nd = fr.nd; // verso l'ala A
+    const wallCorner = fr.C;
+    // distanza dai muri di un punto della bisettrice per unità di ascissa (1/√2 con muri ortogonali)
+    const k = fr.custom ? dot(ud, fr.nA) : Math.SQRT1_2;
     const onLine = (s: number): Vec3 => {
       const p = add(wallCorner, scale(ud, s));
-      return vec3(p.x, p.y, zPlane(g, s / Math.SQRT2));
+      return vec3(p.x, p.y, zPlane(g, fr.custom ? s * k : s / Math.SQRT2));
     };
-    const tEave = (g.uEdge + g.sbalzo) * Math.SQRT2; // angolo della gronda
+    const tEave = fr.custom ? (g.uEdge + g.sbalzo) / k : (g.uEdge + g.sbalzo) * Math.SQRT2; // angolo della gronda
     // teste del box oltre gli angoli quanto basta perché i due tagli asportino tutta la sezione
     const ext = sv.b / 2 + sv.h / 2 + 10;
     const top = onLine(-ext); // oltre l'angolo dei muri (poi tagliato sui muri)
@@ -238,20 +307,22 @@ export const aElle: TypologyTemplate = {
     };
     const yGronda = YA - g.uEdge - g.sbalzo;
     const xGronda = g.uEdge + g.sbalzo;
+    const uE = g.uEdge + g.sbalzo;
     steps.push(
       placeStep(valley, "compluvio"),
-      headCutOnPlane(valley.ref, plane(vec3(0, yGronda, 0), vec3(0, -1, 0)), "testa-inizio"),
-      headCutOnPlane(valley.ref, plane(vec3(xGronda, 0, 0), vec3(1, 0, 0)), "testa-inizio"),
+      headCutOnPlane(valley.ref, fr.custom ? plane(add(fr.C, scale(fr.nA, uE)), fr.nA) : plane(vec3(0, yGronda, 0), vec3(0, -1, 0)), "testa-inizio"),
+      headCutOnPlane(valley.ref, fr.custom ? plane(add(fr.C, scale(fr.nB, uE)), fr.nB) : plane(vec3(xGronda, 0, 0), vec3(1, 0, 0)), "testa-inizio"),
       headCutOnPlane(valley.ref, g.wings[0].wall, "testa-fine"),
       headCutOnPlane(valley.ref, g.wings[1].wall, "testa-fine"),
     );
     // sede sull'incrocio delle travi di gronda (vertice nell'angolo esterno dell'incrocio)
-    const vBeam = vec3(corner.x + se.b / 2, corner.y - se.b / 2, g.beamTop);
+    const vBeam = fr.custom ? fr.at(P + se.b / 2, P + se.b / 2, g.beamTop) : vec3(corner.x + se.b / 2, corner.y - se.b / 2, g.beamTop);
     if (carp) steps.push({ kind: "machining", target: valley.ref, fromPiece: beccoAt(vBeam, slopeV) });
     screws([valley.ref, beamA.ref, beamB.ref]);
     if (carp) {
       // sede sulle banchine (vertice nell'angolo delle loro facce anteriori)
-      const vB = vec3(sb!.b, YA - sb!.b, banchine.get("A")!.pose[11] + sb!.h / 2);
+      const zB = banchine.get("A")!.pose[11] + sb!.h / 2;
+      const vB = fr.custom ? fr.at(sb!.b, sb!.b, zB) : vec3(sb!.b, YA - sb!.b, zB);
       steps.push({ kind: "machining", target: valley.ref, fromPiece: beccoAt(vB, slopeV) });
       screws([valley.ref, "banchina-A", "banchina-B"]);
     } else {

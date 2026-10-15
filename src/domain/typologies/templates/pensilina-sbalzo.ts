@@ -15,8 +15,10 @@ import {
   headCutOnPlane,
   joistSpaces,
   joistsOnBeams,
+  lengthToPlane,
   numberParam,
   placeStep,
+  realWall,
   sectionParam,
   spread,
   wallAttachment,
@@ -44,6 +46,11 @@ const imposedSlope = (attacco: string): number | undefined => WALL_SLOPE[attacco
  *   sulle teste delle mensole (estradosso a filo dei travetti);
  * - saette opzionali sotto ogni mensola (750 a 45°) con staffa per listone al
  *   piede, sul muro.
+ *
+ * Con il muro reale (`ctx.wallPlane`, P4) sbalzo e quota d'attacco valgono nel
+ * punto del muro più vicino (`realWall`): le mensole restano parallele (stessa
+ * falda per i travetti) e arrivano al muro reale con la testa tagliata sul
+ * suo piano (taglio composto), il piede delle saette scivola sul muro.
  */
 function geometry(ctx: BuildContext) {
   const W = ctx.num("larghezza");
@@ -70,6 +77,7 @@ export const pensilinaSbalzo: TypologyTemplate = {
   tags: ["pensilina", "tettoia", "sbalzo", "mensole", "senza pilastri", "scomparsa", "staffa inclinata"],
   reference: "T-J",
   fitAliases: { profondita: "sbalzo" },
+  wallPlanes: 1,
   params: [
     numberParam("larghezza", "Larghezza (lungo il muro)", "mm", 1500, 8000, 4000, 50),
     numberParam("sbalzo", "Sbalzo (dal muro al fronte della fascia)", "mm", 500, 2000, 1200, 10),
@@ -108,7 +116,11 @@ export const pensilinaSbalzo: TypologyTemplate = {
     const [c, sn, t] = [Math.cos(g.a), Math.sin(g.a), Math.tan(g.a)];
     const X = vec3(0, c, sn); // in salita verso il muro
     const Z = vec3(0, -sn, c);
-    const wall = plane(vec3(0, g.S, 0), vec3(0, -1, 0));
+    const implicitWall = plane(vec3(0, g.S, 0), vec3(0, -1, 0));
+    // muro reale (fuorisquadra): sbalzo al punto del muro più vicino, mensole fino al muro reale
+    const real = ctx.wallPlane ? realWall(ctx, implicitWall, ctx.wallPlane, [vec3(0, g.S, 0), vec3(g.W, g.S, 0)]) : undefined;
+    const wall = real ?? implicitWall;
+    const wallY = (x: number): number => (real ? real.point.y - (real.normal.x * (x - real.point.x)) / real.normal.y : g.S);
     // faccia interna della fascia = taglio a piombo delle mensole; il box grezzo della mensola
     // (testa ortogonale all'asse) non deve sporgere oltre il fronte y = 0
     const yPlumb = Math.max(sf.b, sm.h * sn);
@@ -119,14 +131,9 @@ export const pensilinaSbalzo: TypologyTemplate = {
     const mensole: Placed[] = g.xs.map((x, i) => {
       const axisAtWall = add(vec3(x, g.S, g.H), scale(Z, sm.h / 2));
       const sStart = (yPlumb - g.S) / c;
-      const sEnd = sm.h * t;
-      return {
-        ref: `mensola-${i}`,
-        type: "mensola",
-        section: sm,
-        length: sEnd - sStart,
-        pose: fromBasis(add(axisAtWall, scale(X, sStart)), X, Z),
-      };
+      const origin = add(axisAtWall, scale(X, sStart));
+      const length = real ? lengthToPlane(origin, X, Z, sm, real) : sm.h * t - sStart;
+      return { ref: `mensola-${i}`, type: "mensola", section: sm, length, pose: fromBasis(origin, X, Z) };
     });
     for (const m of mensole) {
       steps.push(placeStep(m), headCutOnPlane(m.ref, front, "testa-inizio"));
@@ -178,8 +185,9 @@ export const pensilinaSbalzo: TypologyTemplate = {
       mensole.forEach((m, i) => {
         const bottom = plane(applyToPoint(m.pose, vec3(0, 0, -sm.h / 2)), Z);
         const x = g.xs[i];
-        const zUnder = g.H - run * t; // intradosso della mensola a `run` dal muro
-        const F = vec3(x, g.S, zUnder - run);
+        const yWall = wallY(x); // piede sul muro reale
+        const zUnder = g.H + (yWall - g.S) * t - run * t; // intradosso della mensola a `run` dal muro
+        const F = vec3(x, yWall, zUnder - run);
         const T = intersectLinePlane(F, ax, bottom).point;
         const ref = `saetta-${i}`;
         steps.push(

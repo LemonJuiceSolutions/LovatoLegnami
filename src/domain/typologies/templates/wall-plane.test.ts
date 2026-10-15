@@ -80,3 +80,79 @@ describe("addossata-monofalda con il muro reale", () => {
     expect(() => generate("addossata-monofalda", {}, { wallPlane: plane(vec3(0, 0, 0), vec3(1, 0, 0)) })).toThrow(/non è compatibile/);
   });
 });
+
+describe("addossata-sandwich e pensilina con il muro reale", () => {
+  it("senza opzione → assiemi identici", () => {
+    for (const slug of ["addossata-sandwich", "pensilina-sbalzo", "a-elle"]) expect(generate(slug, {}, {})).toEqual(generate(slug));
+  });
+
+  for (const attaccoMuro of ["listoni-paralleli", "banchina", "staffa-inclinata-15"]) {
+    it(`addossata-sandwich (${attaccoMuro}) con muro a 5° → teste delle tavole sul piano`, () => {
+      const params = { larghezza: 5000, attaccoMuro };
+      const base = generate("addossata-sandwich", params);
+      const wall = backWall(0, base.meta.yMuro as number, 5);
+      const a = generate("addossata-sandwich", params, { wallPlane: wall });
+      const beams = a.pieces.filter((p) => p.type === "tavola");
+      expect(beams.length).toBeGreaterThan(0);
+      for (const p of beams) {
+        const cut = headFine(p);
+        expect(Math.abs(cut.angle2 ?? 0)).toBeGreaterThan(4);
+        // la faccia di testa giace sul piano del muro: i vertici ritagliati più arretrati sono sul muro
+        const ds = pieceHullVertices(p).map((v) => signedDistance(wall, v));
+        expect(Math.min(...ds)).toBeCloseTo(0, 6);
+      }
+      expect(behind(a, wall)).toBeGreaterThanOrEqual(-1e-3);
+      // le travi dei telai a destra sono più lunghe (il muro si allontana)
+      expect(beams.at(-1)!.length).toBeGreaterThan(beams[0].length + 300);
+      // travetti e pilastri invariati
+      for (const t of ["travetto", "pilastro"]) expect(a.pieces.filter((p) => p.type === t)).toEqual(base.pieces.filter((p) => p.type === t));
+      if (attaccoMuro === "banchina") {
+        const b = a.pieces.find((p) => p.type === "banchina")!;
+        expect(deg(Math.atan2(axisOf(b.pose, 0).y, axisOf(b.pose, 0).x))).toBeCloseTo(5, 9);
+      }
+    });
+  }
+
+  it("pensilina-sbalzo con muro a 5° → mensole fino al muro con taglio composto", () => {
+    const params = { larghezza: 4000, saette: true };
+    const base = generate("pensilina-sbalzo", params);
+    const wall = backWall(0, 1200, 5);
+    const a = generate("pensilina-sbalzo", params, { wallPlane: wall });
+    const ms = a.pieces.filter((p) => p.type === "mensola");
+    for (const p of ms) {
+      expect(Math.abs(headFine(p).angle2 ?? 0)).toBeGreaterThan(4);
+      expect(Math.min(...pieceHullVertices(p).map((v) => signedDistance(wall, v)))).toBeCloseTo(0, 6);
+    }
+    expect(ms.at(-1)!.length).toBeGreaterThan(ms[0].length);
+    expect(behind(a, wall)).toBeGreaterThanOrEqual(-1e-3);
+    // piede delle saette sul muro reale
+    for (const p of a.pieces.filter((q) => q.type === "controvento"))
+      expect(Math.min(...pieceHullVertices(p).map((v) => signedDistance(wall, v)))).toBeCloseTo(0, 6);
+    expect(a.pieces.filter((p) => p.type === "travetto")).toEqual(base.pieces.filter((p) => p.type === "travetto"));
+  });
+});
+
+describe("a-elle con due muri reali", () => {
+  // muro A posteriore come di default, muro B ruotato di 2° verso l'ala A: muri a 88°
+  const wallA = plane(vec3(0, 3600, 0), vec3(0, -1, 0));
+  const wallB = plane(vec3(0, 0, 0), vec3(Math.cos(rad(2)), Math.sin(rad(2)), 0));
+  for (const costruzione of ["carpenteria", "bullonata"]) {
+    it(`muri a 88° (${costruzione}) → compluvio sulla bisettrice reale, travetti entro i piani`, () => {
+      const a = generate("a-elle", { costruzione }, { wallPlane: wallA, wallPlane2: wallB });
+      const valley = a.pieces.find((p) => p.type === "cantonale")!;
+      const X = axisOf(valley.pose, 0);
+      const plan = Math.atan2(X.y, X.x);
+      // bisettrice tra il muro A (direzione 0°) e il muro B (direzione −88°), percorsa verso l'angolo dei muri
+      expect(deg(plan)).toBeCloseTo(180 - 44, 6);
+      // ogni pezzo di legno sta dietro entrambi i piani (dentro l'angolo)
+      const corner = vec3(0, 3600, 0);
+      const realB = plane(corner, wallB.normal);
+      for (const w of [wallA, realB]) expect(behind(a, w)).toBeGreaterThanOrEqual(-1e-3);
+      const joists = a.pieces.filter((p) => p.type === "travetto");
+      expect(joists.length).toBeGreaterThan(8);
+      // travetti dell'ala B (posati per ultimi) perpendicolari al muro B reale
+      const jb = joists.at(-1)!;
+      expect(Math.abs(axisOf(jb.pose, 0).y * Math.cos(rad(2)) - axisOf(jb.pose, 0).x * Math.sin(rad(2)))).toBeLessThan(1e-9);
+    });
+  }
+});
