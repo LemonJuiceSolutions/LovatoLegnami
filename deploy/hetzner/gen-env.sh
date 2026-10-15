@@ -5,17 +5,18 @@
 #   deploy/hetzner/gen-env.sh            # crea il file (si rifiuta se esiste già)
 #   deploy/hetzner/gen-env.sh --force    # lo rigenera (copia di sicurezza del precedente)
 #
-# Variabili facoltative: SITE_URL (default https://lovato.91-98-45-4.sslip.io),
-# ADMIN_EMAIL (default tonslemonjuice@gmail.com).
+# Variabili facoltative: SITE_URL (default http://91.98.45.4:8081), EMAIL_DOMAIN
+# (default lovato.91-98-45-4.sslip.io), ADMIN_EMAIL (default tonslemonjuice@gmail.com).
 # ATTENZIONE: con --force la nuova POSTGRES_PASSWORD non vale per un database già
 # inizializzato (il volume lovato-db-data conserva la vecchia): vedi docs/deploy.md.
 set -euo pipefail
 
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 OUT="$DIR/.env.production"
-SITE_URL="${SITE_URL:-https://lovato.91-98-45-4.sslip.io}"
+SITE_URL="${SITE_URL:-http://91.98.45.4:8081}"
 ADMIN_EMAIL="${ADMIN_EMAIL:-tonslemonjuice@gmail.com}"
-HOST="${SITE_URL#https://}"; HOST="${HOST#http://}"; HOST="${HOST%%/*}"; HOST="${HOST%%:*}"
+# Dominio delle email: un IP non è un dominio valido per un mittente.
+HOST="${EMAIL_DOMAIN:-lovato.91-98-45-4.sslip.io}"
 
 command -v openssl >/dev/null || { echo "openssl non trovato" >&2; exit 1; }
 

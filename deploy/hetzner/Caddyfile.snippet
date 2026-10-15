@@ -15,4 +15,19 @@ configuratore.91-98-45-4.sslip.io {
 	redir @radice /configuratore 302
 	reverse_proxy 127.0.0.1:3310
 }
+
+# Accesso diretto per IP e porta, SOLO HTTP (scelta del proprietario, opzione B):
+# niente certificato su un IP nudo, quindi il traffico è in chiaro. Per il back-office
+# usare gli host HTTPS qui sopra.
+http://:8081 {
+	encode zstd gzip
+	reverse_proxy 127.0.0.1:3310
+}
+
+http://:8082 {
+	encode zstd gzip
+	@radice path /
+	redir @radice /configuratore 302
+	reverse_proxy 127.0.0.1:3310
+}
 # <<< lovato-legnami <<<

@@ -66,6 +66,11 @@ if grep -q '>>> lovato-legnami' "$CADDYFILE"; then
   fi
   exit 0
 fi
+for p in 8081 8082; do
+  if ss -tln | grep -qE "[:.]$p\b"; then
+    echo "porta $p già in uso sul server: blocco non aggiunto" >&2; exit 1
+  fi
+done
 BACKUP="$CADDYFILE.bak-$(date +%Y%m%d-%H%M%S)"
 cp -p "$CADDYFILE" "$BACKUP"
 echo "Copia di sicurezza: $BACKUP"
@@ -81,7 +86,11 @@ if ! systemctl reload caddy; then
   echo "systemctl reload caddy fallito: ripristinato $CADDYFILE." >&2
   exit 1
 fi
-echo "Caddy ricaricato con i due host di Lovato."
+echo "Caddy ricaricato con i due host di Lovato e le porte 8081/8082."
+if command -v ufw >/dev/null && ufw status | grep -q "Status: active"; then
+  ufw allow 8081/tcp && ufw allow 8082/tcp
+  echo "ufw: aperte 8081 e 8082."
+fi
 REMOTE
 
 step "5/5 Controlli"
@@ -102,11 +111,14 @@ check "wizard https://$SITE_HOST/preventivo" 200 "https://$SITE_HOST/preventivo"
 check "https://$CONF_HOST/ → /configuratore" 302 "https://$CONF_HOST/"
 check "https://$CONF_HOST/configuratore → /accesso" 307 "https://$CONF_HOST/configuratore"
 check "pagina di accesso https://$CONF_HOST/accesso" 200 "https://$CONF_HOST/accesso"
+check "sito http://$DEPLOY_HOST:8081/" 200 "http://$DEPLOY_HOST:8081/"
+check "http://$DEPLOY_HOST:8082/ → /configuratore" 302 "http://$DEPLOY_HOST:8082/"
+check "http://$DEPLOY_HOST:8082/accesso" 200 "http://$DEPLOY_HOST:8082/accesso"
 
 trap - ERR
 step "Rilascio $REV completato"
 cat <<EOF
-Sito:          https://$SITE_HOST/
-Configuratore: https://$CONF_HOST/
+Sito:          http://$DEPLOY_HOST:8081/   (anche https://$SITE_HOST/)
+Configuratore: http://$DEPLOY_HOST:8082/   (anche https://$CONF_HOST/, consigliato per l'accesso)
 Primo accesso: ssh $SSH_TARGET "cd $REMOTE_DIR && $COMPOSE exec lovato-app npm run admin:link -- <email> https://$CONF_HOST"
 EOF
