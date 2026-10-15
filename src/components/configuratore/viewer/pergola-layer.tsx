@@ -9,7 +9,8 @@ import { cn } from "@/lib/utils"
 import { configuratoreStore, useConfiguratore } from "@/stores/use-configuratore"
 import { PieceMesh } from "./piece-mesh"
 import { pieceCenter, pieceMessages, pieceSummary, piecesBounds, problemPieceIds } from "./piece-info"
-import { FAMILY_COLORS, type ViewerPalette } from "./theme-colors"
+import { FAMILY_COLORS } from "./piece-colors"
+import type { ViewerPalette } from "./theme-colors"
 import { usableKernelMesh } from "./viewer-helpers"
 
 /** Numero massimo di pezzi selezionati che mostrano l'etichetta (oltre, solo al passaggio del puntatore). */

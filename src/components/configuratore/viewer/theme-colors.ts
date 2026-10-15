@@ -1,4 +1,4 @@
-import type { ObstacleType, PieceFamily } from "@/domain"
+import type { ObstacleType } from "@/domain"
 
 /**
  * Colori del visualizzatore 3D derivati dal tema dell'app (variabili CSS
@@ -111,43 +111,8 @@ export function paletteFromTokens(read: (token: ThemeToken) => string | undefine
 export const DEFAULT_PALETTE: ViewerPalette = paletteFromTokens(() => undefined)
 
 /* ------------------------------------------------------------------ */
-/* Colori dei pezzi e degli ostacoli                                   */
+/* Colori degli ostacoli (quelli dei pezzi sono in `piece-colors.ts`)  */
 /* ------------------------------------------------------------------ */
-
-/** Toni legno per famiglia (pezzi strutturali): distinguibili ma coerenti. */
-export const FAMILY_COLORS: Readonly<Record<PieceFamily, string>> = {
-  PIL: "#8b5a2b",
-  TRV: "#b07a3e",
-  TVT: "#d9b27c",
-  PNT: "#a0662f",
-  COL: "#6f4521",
-  CTV: "#c4925a",
-  BNC: "#9c7a54",
-  TAV: "#c08a4a",
-  ARC: "#7d4f26",
-  CAN: "#94592a",
-  MON: "#5e3a1c",
-  MEN: "#b5824a",
-  FAS: "#e0c194",
-  GRG: "#cfae86",
-}
-
-export const FAMILY_LABELS: Readonly<Record<PieceFamily, string>> = {
-  PIL: "Pilastri",
-  TRV: "Travi",
-  TVT: "Travetti",
-  PNT: "Puntoni",
-  COL: "Colmo",
-  CTV: "Controventi",
-  BNC: "Banchina",
-  TAV: "Tavole",
-  ARC: "Archi",
-  CAN: "Cantonali",
-  MON: "Monaci",
-  MEN: "Mensole",
-  FAS: "Fasce",
-  GRG: "Grigliati",
-}
 
 export const OBSTACLE_LABELS: Readonly<Record<ObstacleType, string>> = {
   sottomuro: "Sottomuro",
