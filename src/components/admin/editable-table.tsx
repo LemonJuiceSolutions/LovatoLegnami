@@ -30,8 +30,10 @@ export interface Column<R> extends CellRules {
   /** Controllo aggiuntivo sul valore letto (messaggio d'errore o `null`). */
   readonly validate?: (value: unknown, row: R) => string | null
   readonly placeholder?: string
-  /** Testo della cella in sola lettura. */
+  /** Testo della cella in sola lettura (anche per la ricerca). */
   readonly display?: (row: R) => string
+  /** Contenuto della cella in sola lettura (es. un collegamento); prevale su `display`. */
+  readonly render?: (row: R) => React.ReactNode
   readonly width?: string
 }
 
@@ -329,7 +331,7 @@ const TableRow = React.memo(function TableRow<R extends Record<string, unknown>>
           onKeyDown: (e: React.KeyboardEvent) => p.onKeyDown(e, rowIndex, colIndex),
         }
         let control: React.ReactNode
-        if (col.kind === "readonly") control = <span className="block py-1.5">{col.display ? col.display(row.values) : formatCell(col, row.values[col.key])}</span>
+        if (col.kind === "readonly") control = col.render ? col.render(row.values) : <span className="block py-1.5">{col.display ? col.display(row.values) : formatCell(col, row.values[col.key])}</span>
         else if (col.kind === "switch") control = <Switch {...common} checked={row.values[col.key] === true} onCheckedChange={(v) => p.onUpdate(row.id, col.key, v)} />
         else if (col.kind === "select")
           control = (

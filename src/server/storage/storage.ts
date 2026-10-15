@@ -26,10 +26,11 @@ export interface FileStorage {
   delete(key: string): Promise<void>;
 }
 
-export const UPLOAD_PREFIXES = ["foto", "scena"] as const;
+/** `foto`/`scena`: file delle richieste (privati); `sito`: immagini delle tipologie caricate dall'admin (pubbliche, 9.7). */
+export const UPLOAD_PREFIXES = ["foto", "scena", "sito"] as const;
 export type UploadPrefix = (typeof UPLOAD_PREFIXES)[number];
 
-const KEY_RE = /^(foto|scena)\/[A-Za-z0-9_-]{32}$/;
+const KEY_RE = /^(foto|scena|sito)\/[A-Za-z0-9_-]{32}$/;
 const ID_RE = /^[A-Za-z0-9_-]{32}$/;
 
 export class StorageKeyError extends Error {
