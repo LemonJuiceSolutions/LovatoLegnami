@@ -147,7 +147,9 @@ export function createWizardStore(options: WizardStoreOptions = {}): WizardStore
             set({ answers: { ...get().answers, contatti: { ...get().answers.contatti, ...patch } } })
           },
           markSubmitted(summary) {
-            set({ submitted: summary, answers: DEFAULT_ANSWERS, step: "tipologia", derived: EMPTY_DERIVED })
+            // le risposte si azzerano sulla pagina di conferma (`reset`): azzerarle qui farebbe
+            // rimandare il wizard al passo 1 mentre si naviga verso la conferma
+            set({ submitted: summary })
           },
           reset() {
             set({ answers: DEFAULT_ANSWERS, step: "tipologia", derived: EMPTY_DERIVED })

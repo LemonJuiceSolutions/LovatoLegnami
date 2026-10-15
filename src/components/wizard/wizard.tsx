@@ -10,6 +10,7 @@ import { WIZARD_STEPS, stepIndex, stepPath, type WizardStep } from "./answers"
 import { StepIndicator } from "./step-indicator"
 import { normalizeFinishes } from "./finishes"
 import { StepFinishes } from "./step-finishes"
+import { StepContacts } from "./step-contacts"
 import { StepMeasures } from "./step-measures"
 import { StepSummary } from "./step-summary"
 import { takeSceneShot } from "./scene-capture"
@@ -184,14 +185,10 @@ function StepBody({ step }: { step: WizardStep }) {
         return <StepFinishes />
       case "riepilogo":
         return <StepSummary />
+      case "contatti":
+        return <StepContacts />
       default:
-        return (
-          <section aria-labelledby="passo-titolo">
-            <h1 id="passo-titolo" tabIndex={-1} className="site-display text-3xl outline-none">
-              {step}
-            </h1>
-          </section>
-        )
+        return null
     }
   })()
   if (step === "riepilogo") return content
