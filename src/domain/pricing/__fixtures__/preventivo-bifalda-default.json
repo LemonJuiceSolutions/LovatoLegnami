@@ -1,0 +1,1388 @@
+{
+  "cutPlan": {
+    "curved": [],
+    "groups": [
+      {
+        "barsLengthMm": 9000,
+        "barsVolumeM3": 0.09,
+        "costCents": 5850,
+        "key": "abete|lamellare|100×100",
+        "pieceIds": [
+          "CTV-01",
+          "CTV-02",
+          "CTV-03",
+          "CTV-04",
+          "CTV-05",
+          "CTV-06",
+          "CTV-07",
+          "CTV-08",
+          "CTV-09",
+          "CTV-10",
+          "CTV-11",
+          "CTV-12"
+        ],
+        "piecesLengthMm": 7988.225099,
+        "piecesVolumeM3": 0.079882,
+        "plan": {
+          "barCount": 2,
+          "bars": [
+            {
+              "cuts": [
+                {
+                  "id": "CTV-01",
+                  "length": 665.685425
+                },
+                {
+                  "id": "CTV-02",
+                  "length": 665.685425
+                },
+                {
+                  "id": "CTV-03",
+                  "length": 665.685425
+                },
+                {
+                  "id": "CTV-04",
+                  "length": 665.685425
+                },
+                {
+                  "id": "CTV-05",
+                  "length": 665.685425
+                },
+                {
+                  "id": "CTV-06",
+                  "length": 665.685425
+                },
+                {
+                  "id": "CTV-07",
+                  "length": 665.685425
+                }
+              ],
+              "length": 5000,
+              "offcut": 296.202025,
+              "priceCents": 3250,
+              "reusable": false
+            },
+            {
+              "cuts": [
+                {
+                  "id": "CTV-08",
+                  "length": 665.685425
+                },
+                {
+                  "id": "CTV-09",
+                  "length": 665.685425
+                },
+                {
+                  "id": "CTV-10",
+                  "length": 665.685425
+                },
+                {
+                  "id": "CTV-11",
+                  "length": 665.685425
+                },
+                {
+                  "id": "CTV-12",
+                  "length": 665.685425
+                }
+              ],
+              "length": 4000,
+              "offcut": 635.572875,
+              "priceCents": 2600,
+              "reusable": false
+            }
+          ],
+          "costCents": 5850,
+          "nonReusableWaste": 931.774901,
+          "nonRicavabili": [],
+          "reusableOffcut": 0
+        },
+        "pricing": "m3",
+        "quality": "lamellare",
+        "reusableOffcutCostCents": 0,
+        "reusableOffcuts": [],
+        "section": {
+          "b": 100,
+          "h": 100
+        },
+        "sectionLabel": "100×100",
+        "species": "abete",
+        "unitPriceCents": 65000,
+        "wastePct": 11.241943
+      },
+      {
+        "barsLengthMm": 27000,
+        "barsVolumeM3": 0.3888,
+        "costCents": 25272,
+        "key": "abete|lamellare|120×120",
+        "pieceIds": [
+          "PIL-01",
+          "PIL-02",
+          "PIL-03",
+          "PIL-04",
+          "PIL-05",
+          "PIL-06",
+          "PNT-01",
+          "PNT-02",
+          "PNT-03",
+          "PNT-04",
+          "PNT-05",
+          "PNT-06"
+        ],
+        "piecesLengthMm": 26741.866705,
+        "piecesVolumeM3": 0.385083,
+        "plan": {
+          "barCount": 2,
+          "bars": [
+            {
+              "cuts": [
+                {
+                  "id": "PIL-01",
+                  "length": 2400
+                },
+                {
+                  "id": "PIL-02",
+                  "length": 2400
+                },
+                {
+                  "id": "PIL-03",
+                  "length": 2400
+                },
+                {
+                  "id": "PNT-01",
+                  "length": 2056.977784
+                },
+                {
+                  "id": "PNT-02",
+                  "length": 2056.977784
+                },
+                {
+                  "id": "PNT-03",
+                  "length": 2056.977784
+                }
+              ],
+              "length": 13500,
+              "offcut": 89.066648,
+              "priceCents": 12636,
+              "reusable": false
+            },
+            {
+              "cuts": [
+                {
+                  "id": "PIL-04",
+                  "length": 2400
+                },
+                {
+                  "id": "PIL-05",
+                  "length": 2400
+                },
+                {
+                  "id": "PIL-06",
+                  "length": 2400
+                },
+                {
+                  "id": "PNT-04",
+                  "length": 2056.977784
+                },
+                {
+                  "id": "PNT-05",
+                  "length": 2056.977784
+                },
+                {
+                  "id": "PNT-06",
+                  "length": 2056.977784
+                }
+              ],
+              "length": 13500,
+              "offcut": 89.066648,
+              "priceCents": 12636,
+              "reusable": false
+            }
+          ],
+          "costCents": 25272,
+          "nonReusableWaste": 178.133295,
+          "nonRicavabili": [],
+          "reusableOffcut": 0
+        },
+        "pricing": "m3",
+        "quality": "lamellare",
+        "reusableOffcutCostCents": 0,
+        "reusableOffcuts": [],
+        "section": {
+          "b": 120,
+          "h": 120
+        },
+        "sectionLabel": "120×120",
+        "species": "abete",
+        "unitPriceCents": 65000,
+        "wastePct": 0.956049
+      },
+      {
+        "barsLengthMm": 18000,
+        "barsVolumeM3": 0.5184,
+        "costCents": 33696,
+        "key": "abete|lamellare|120×240",
+        "pieceIds": [
+          "TRV-01",
+          "TRV-02",
+          "COL-01"
+        ],
+        "piecesLengthMm": 15000,
+        "piecesVolumeM3": 0.432,
+        "plan": {
+          "barCount": 3,
+          "bars": [
+            {
+              "cuts": [
+                {
+                  "id": "COL-01",
+                  "length": 5000
+                }
+              ],
+              "length": 6000,
+              "offcut": 980,
+              "priceCents": 11232,
+              "reusable": false
+            },
+            {
+              "cuts": [
+                {
+                  "id": "TRV-01",
+                  "length": 5000
+                }
+              ],
+              "length": 6000,
+              "offcut": 980,
+              "priceCents": 11232,
+              "reusable": false
+            },
+            {
+              "cuts": [
+                {
+                  "id": "TRV-02",
+                  "length": 5000
+                }
+              ],
+              "length": 6000,
+              "offcut": 980,
+              "priceCents": 11232,
+              "reusable": false
+            }
+          ],
+          "costCents": 33696,
+          "nonReusableWaste": 2940,
+          "nonRicavabili": [],
+          "reusableOffcut": 0
+        },
+        "pricing": "m3",
+        "quality": "lamellare",
+        "reusableOffcutCostCents": 0,
+        "reusableOffcuts": [],
+        "section": {
+          "b": 120,
+          "h": 240
+        },
+        "sectionLabel": "120×240",
+        "species": "abete",
+        "unitPriceCents": 65000,
+        "wastePct": 16.666667
+      },
+      {
+        "barsLengthMm": 44500,
+        "barsVolumeM3": 0.5696,
+        "costCents": 37024,
+        "key": "abete|lamellare|80×160",
+        "pieceIds": [
+          "TVT-01",
+          "TVT-02",
+          "TVT-03",
+          "TVT-04",
+          "TVT-05",
+          "TVT-06",
+          "TVT-07",
+          "TVT-08",
+          "TVT-09",
+          "TVT-10",
+          "TVT-11",
+          "TVT-12",
+          "TVT-13",
+          "TVT-14",
+          "TVT-15",
+          "TVT-16"
+        ],
+        "piecesLengthMm": 42817.800924,
+        "piecesVolumeM3": 0.548068,
+        "plan": {
+          "barCount": 4,
+          "bars": [
+            {
+              "cuts": [
+                {
+                  "id": "TVT-01",
+                  "length": 2676.112558
+                },
+                {
+                  "id": "TVT-02",
+                  "length": 2676.112558
+                },
+                {
+                  "id": "TVT-03",
+                  "length": 2676.112558
+                },
+                {
+                  "id": "TVT-04",
+                  "length": 2676.112558
+                },
+                {
+                  "id": "TVT-05",
+                  "length": 2676.112558
+                }
+              ],
+              "length": 13500,
+              "offcut": 83.437211,
+              "priceCents": 11232,
+              "reusable": false
+            },
+            {
+              "cuts": [
+                {
+                  "id": "TVT-06",
+                  "length": 2676.112558
+                },
+                {
+                  "id": "TVT-07",
+                  "length": 2676.112558
+                },
+                {
+                  "id": "TVT-08",
+                  "length": 2676.112558
+                },
+                {
+                  "id": "TVT-09",
+                  "length": 2676.112558
+                },
+                {
+                  "id": "TVT-10",
+                  "length": 2676.112558
+                }
+              ],
+              "length": 13500,
+              "offcut": 83.437211,
+              "priceCents": 11232,
+              "reusable": false
+            },
+            {
+              "cuts": [
+                {
+                  "id": "TVT-11",
+                  "length": 2676.112558
+                },
+                {
+                  "id": "TVT-12",
+                  "length": 2676.112558
+                },
+                {
+                  "id": "TVT-13",
+                  "length": 2676.112558
+                },
+                {
+                  "id": "TVT-14",
+                  "length": 2676.112558
+                },
+                {
+                  "id": "TVT-15",
+                  "length": 2676.112558
+                }
+              ],
+              "length": 13500,
+              "offcut": 83.437211,
+              "priceCents": 11232,
+              "reusable": false
+            },
+            {
+              "cuts": [
+                {
+                  "id": "TVT-16",
+                  "length": 2676.112558
+                }
+              ],
+              "length": 4000,
+              "offcut": 1303.887442,
+              "priceCents": 3328,
+              "reusable": true
+            }
+          ],
+          "costCents": 37024,
+          "nonReusableWaste": 250.311633,
+          "nonRicavabili": [],
+          "reusableOffcut": 1303.887442
+        },
+        "pricing": "m3",
+        "quality": "lamellare",
+        "reusableOffcutCostCents": 1085,
+        "reusableOffcuts": [
+          1303.887442
+        ],
+        "section": {
+          "b": 80,
+          "h": 160
+        },
+        "sectionLabel": "80×160",
+        "species": "abete",
+        "unitPriceCents": 65000,
+        "wastePct": 3.780223
+      }
+    ],
+    "panels": [],
+    "quality": "lamellare",
+    "species": "abete",
+    "totals": {
+      "barsVolumeM3": 1.5668,
+      "costCents": 101842,
+      "piecesVolumeM3": 1.445033,
+      "wastePct": 7.7717
+    },
+    "warnings": []
+  },
+  "firedRules": [
+    "altezza"
+  ],
+  "groups": [
+    {
+      "amountCents": 93926,
+      "category": "legno",
+      "label": "Legno",
+      "lines": [
+        {
+          "amountCents": 5192,
+          "category": "legno",
+          "code": "legno-100×100",
+          "explain": [
+            "Abete, Lamellare (GL24h), sezione 100×100: 12 pezzi, 7,988 ml netti",
+            "0,079882 m³ × 650,00 €/m³",
+            "listino v1 del 2026-01-01"
+          ],
+          "label": "Legno – controventi 100×100",
+          "quantity": 0.079882,
+          "unit": "m³",
+          "unitPriceCents": 65000,
+          "visibility": "cliente"
+        },
+        {
+          "amountCents": 25030,
+          "category": "legno",
+          "code": "legno-120×120",
+          "explain": [
+            "Abete, Lamellare (GL24h), sezione 120×120: 12 pezzi, 26,742 ml netti",
+            "0,385083 m³ × 650,00 €/m³",
+            "listino v1 del 2026-01-01"
+          ],
+          "label": "Legno – pilastri e puntoni 120×120",
+          "quantity": 0.385083,
+          "unit": "m³",
+          "unitPriceCents": 65000,
+          "visibility": "cliente"
+        },
+        {
+          "amountCents": 28080,
+          "category": "legno",
+          "code": "legno-120×240",
+          "explain": [
+            "Abete, Lamellare (GL24h), sezione 120×240: 3 pezzi, 15 ml netti",
+            "0,432 m³ × 650,00 €/m³",
+            "listino v1 del 2026-01-01"
+          ],
+          "label": "Legno – travi e colmo 120×240",
+          "quantity": 0.432,
+          "unit": "m³",
+          "unitPriceCents": 65000,
+          "visibility": "cliente"
+        },
+        {
+          "amountCents": 35624,
+          "category": "legno",
+          "code": "legno-80×160",
+          "explain": [
+            "Abete, Lamellare (GL24h), sezione 80×160: 16 pezzi, 42,818 ml netti",
+            "0,548068 m³ × 650,00 €/m³",
+            "listino v1 del 2026-01-01"
+          ],
+          "label": "Legno – travetti 80×160",
+          "quantity": 0.548068,
+          "unit": "m³",
+          "unitPriceCents": 65000,
+          "visibility": "cliente"
+        }
+      ]
+    },
+    {
+      "amountCents": 7590,
+      "category": "sfrido",
+      "label": "Sfrido e recuperi",
+      "lines": [
+        {
+          "amountCents": 658,
+          "category": "sfrido",
+          "code": "sfrido-100×100",
+          "explain": [
+            "sfrido 11,2%: barre 0,09 m³ − pezzi 0,079882 m³",
+            "barre consumate: 1 × 5000 mm, 1 × 4000 mm (lama 4 mm, rifili 10 mm per testa)",
+            "listino v1 del 2026-01-01"
+          ],
+          "label": "Sfrido – controventi 100×100",
+          "quantity": 0.010118,
+          "unit": "m³",
+          "unitPriceCents": 65000,
+          "visibility": "cliente"
+        },
+        {
+          "amountCents": 242,
+          "category": "sfrido",
+          "code": "sfrido-120×120",
+          "explain": [
+            "sfrido 1%: barre 0,3888 m³ − pezzi 0,385083 m³",
+            "barre consumate: 2 × 13500 mm (lama 4 mm, rifili 10 mm per testa)",
+            "listino v1 del 2026-01-01"
+          ],
+          "label": "Sfrido – pilastri e puntoni 120×120",
+          "quantity": 0.003717,
+          "unit": "m³",
+          "unitPriceCents": 65000,
+          "visibility": "cliente"
+        },
+        {
+          "amountCents": 5616,
+          "category": "sfrido",
+          "code": "sfrido-120×240",
+          "explain": [
+            "sfrido 16,7%: barre 0,5184 m³ − pezzi 0,432 m³",
+            "barre consumate: 3 × 6000 mm (lama 4 mm, rifili 10 mm per testa)",
+            "listino v1 del 2026-01-01"
+          ],
+          "label": "Sfrido – travi e colmo 120×240",
+          "quantity": 0.0864,
+          "unit": "m³",
+          "unitPriceCents": 65000,
+          "visibility": "cliente"
+        },
+        {
+          "amountCents": 1400,
+          "category": "sfrido",
+          "code": "sfrido-80×160",
+          "explain": [
+            "sfrido 3,8%: barre 0,5696 m³ − pezzi 0,548068 m³",
+            "barre consumate: 3 × 13500 mm, 1 × 4000 mm (lama 4 mm, rifili 10 mm per testa)",
+            "listino v1 del 2026-01-01"
+          ],
+          "label": "Sfrido – travetti 80×160",
+          "quantity": 0.021532,
+          "unit": "m³",
+          "unitPriceCents": 65000,
+          "visibility": "cliente"
+        },
+        {
+          "amountCents": -326,
+          "category": "sfrido",
+          "code": "recupero-80×160",
+          "explain": [
+            "spezzoni riutilizzabili: 1303,887 mm (valore 10,85 €)",
+            "recupero 30% del valore",
+            "listino v1 del 2026-01-01"
+          ],
+          "label": "Recupero spezzoni – 80×160",
+          "quantity": 30,
+          "unit": "%",
+          "unitPriceCents": 1085,
+          "visibility": "cliente"
+        }
+      ]
+    },
+    {
+      "amountCents": 47461,
+      "category": "lavorazioni",
+      "label": "Lavorazioni CNC",
+      "lines": [
+        {
+          "amountCents": 1350,
+          "category": "lavorazioni",
+          "code": "cnc-pilastro-120×120",
+          "explain": [
+            "6 pezzi, nessuna lavorazione = 0 min base",
+            "proporzionale alla grandezza 0 min, movimentazione 6 × 1,5 min = 9 min",
+            "totale 9 min × 90,00 €/h",
+            "listino v1 del 2026-01-01"
+          ],
+          "label": "Lavorazioni CNC – pilastri 120×120",
+          "quantity": 0.15,
+          "unit": "h",
+          "unitPriceCents": 9000,
+          "visibility": "cliente"
+        },
+        {
+          "amountCents": 3449,
+          "category": "lavorazioni",
+          "code": "cnc-trave-120×240",
+          "explain": [
+            "2 pezzi: 6 × mortasa (3 min) = 18 min base",
+            "proporzionale alla grandezza 1,993 min, movimentazione 2 × 1,5 min = 3 min",
+            "totale 22,993 min × 90,00 €/h",
+            "listino v1 del 2026-01-01"
+          ],
+          "label": "Lavorazioni CNC – travi 120×240",
+          "quantity": 0.38321,
+          "unit": "h",
+          "unitPriceCents": 9000,
+          "visibility": "cliente"
+        },
+        {
+          "amountCents": 25200,
+          "category": "lavorazioni",
+          "code": "cnc-travetto-80×160",
+          "explain": [
+            "16 pezzi: 32 × taglio-testa (1,5 min), 32 × becco-uccello (3 min) = 144 min base",
+            "proporzionale alla grandezza 0 min, movimentazione 16 × 1,5 min = 24 min",
+            "totale 168 min × 90,00 €/h",
+            "listino v1 del 2026-01-01"
+          ],
+          "label": "Lavorazioni CNC – travetti 80×160",
+          "quantity": 2.8,
+          "unit": "h",
+          "unitPriceCents": 9000,
+          "visibility": "cliente"
+        },
+        {
+          "amountCents": 6138,
+          "category": "lavorazioni",
+          "code": "cnc-puntone-120×120",
+          "explain": [
+            "6 pezzi: 12 × tenone (2,5 min) = 30 min base",
+            "proporzionale alla grandezza 1,92 min, movimentazione 6 × 1,5 min = 9 min",
+            "totale 40,92 min × 90,00 €/h",
+            "listino v1 del 2026-01-01"
+          ],
+          "label": "Lavorazioni CNC – puntoni 120×120",
+          "quantity": 0.682,
+          "unit": "h",
+          "unitPriceCents": 9000,
+          "visibility": "cliente"
+        },
+        {
+          "amountCents": 3224,
+          "category": "lavorazioni",
+          "code": "cnc-colmo-120×240",
+          "explain": [
+            "1 pezzo: 6 × mortasa (3 min) = 18 min base",
+            "proporzionale alla grandezza 1,993 min, movimentazione 1 × 1,5 min = 1,5 min",
+            "totale 21,493 min × 90,00 €/h",
+            "listino v1 del 2026-01-01"
+          ],
+          "label": "Lavorazioni CNC – colmo 120×240",
+          "quantity": 0.35821,
+          "unit": "h",
+          "unitPriceCents": 9000,
+          "visibility": "cliente"
+        },
+        {
+          "amountCents": 8100,
+          "category": "lavorazioni",
+          "code": "cnc-controvento-100×100",
+          "explain": [
+            "12 pezzi: 24 × taglio-testa (1,5 min) = 36 min base",
+            "proporzionale alla grandezza 0 min, movimentazione 12 × 1,5 min = 18 min",
+            "totale 54 min × 90,00 €/h",
+            "listino v1 del 2026-01-01"
+          ],
+          "label": "Lavorazioni CNC – controventi 100×100",
+          "quantity": 0.9,
+          "unit": "h",
+          "unitPriceCents": 9000,
+          "visibility": "cliente"
+        }
+      ]
+    },
+    {
+      "amountCents": 33169,
+      "category": "trattamenti",
+      "label": "Trattamenti",
+      "lines": [
+        {
+          "amountCents": 33169,
+          "category": "trattamenti",
+          "code": "trattamento-impregnante-incolore",
+          "explain": [
+            "superficie sviluppata di 43 pezzi (perimetro della sezione × lunghezza): 47,384 m²",
+            "47,384 m² × 7,00 €/m²",
+            "listino v1 del 2026-01-01"
+          ],
+          "label": "Trattamento – Impregnante incolore",
+          "quantity": 47.383926,
+          "unit": "m²",
+          "unitPriceCents": 700,
+          "visibility": "cliente"
+        }
+      ]
+    },
+    {
+      "amountCents": 117804,
+      "category": "copertura",
+      "label": "Copertura",
+      "lines": [
+        {
+          "amountCents": 117804,
+          "category": "copertura",
+          "code": "copertura-policarbonato-alveolare",
+          "explain": [
+            "falda in pianta 5 × 4,92 m = 24,6 m², pendenza 20° ⇒ 26,179 m² reali",
+            "26,179 m² × 45,00 €/m²",
+            "listino v1 del 2026-01-01"
+          ],
+          "label": "Copertura – Policarbonato alveolare 16 mm",
+          "quantity": 26.178773,
+          "unit": "m²",
+          "unitPriceCents": 4500,
+          "visibility": "cliente"
+        }
+      ]
+    },
+    {
+      "amountCents": 66360,
+      "category": "montaggio",
+      "label": "Montaggio",
+      "lines": [
+        {
+          "amountCents": 47040,
+          "category": "montaggio",
+          "code": "montaggio-pezzi",
+          "explain": [
+            "6 × PIL (25 min), 2 × TRV (30 min), 16 × TVT (12 min), 6 × PNT (20 min), 1 × COL (30 min), 12 × CTV (10 min) = 672 min",
+            "11,2 h × 42,00 €/h",
+            "listino v1 del 2026-01-01"
+          ],
+          "label": "Montaggio – posa dei pezzi",
+          "quantity": 11.2,
+          "unit": "h",
+          "unitPriceCents": 4200,
+          "visibility": "cliente"
+        },
+        {
+          "amountCents": 6720,
+          "category": "montaggio",
+          "code": "montaggio-giunti",
+          "explain": [
+            "12 × tenone-mortasa (8 min) = 96 min",
+            "1,6 h × 42,00 €/h",
+            "listino v1 del 2026-01-01"
+          ],
+          "label": "Montaggio – giunti",
+          "quantity": 1.6,
+          "unit": "h",
+          "unitPriceCents": 4200,
+          "visibility": "cliente"
+        },
+        {
+          "amountCents": 12600,
+          "category": "montaggio",
+          "code": "montaggio-allestimento",
+          "explain": [
+            "tempo fisso di cantiere 3 h × 42,00 €/h",
+            "listino v1 del 2026-01-01"
+          ],
+          "label": "Montaggio – allestimento del cantiere",
+          "quantity": 3,
+          "unit": "h",
+          "unitPriceCents": 4200,
+          "visibility": "cliente"
+        }
+      ]
+    },
+    {
+      "amountCents": 31636,
+      "category": "complicazioni",
+      "label": "Complicazioni di cantiere",
+      "lines": [
+        {
+          "amountCents": 6636,
+          "category": "complicazioni",
+          "code": "complicazione-altezza",
+          "explain": [
+            "condizione: altezza massima 3516,4 mm > 3500 mm",
+            "10% delle ore base (15,8 h) = 1,58 h × 42,00 €/h",
+            "montaggio sopra i 3,5 m",
+            "listino v1 del 2026-01-01"
+          ],
+          "label": "Complicazione: lavoro in quota 3516,4 mm",
+          "quantity": 1.58,
+          "ruleId": "altezza",
+          "unit": "h",
+          "unitPriceCents": 4200,
+          "visibility": "cliente"
+        },
+        {
+          "amountCents": 25000,
+          "category": "complicazioni",
+          "code": "ponteggio",
+          "explain": [
+            "altezza massima 3516 mm > soglia di ponteggio 3500 mm",
+            "importo fisso 250,00 €",
+            "listino v1 del 2026-01-01"
+          ],
+          "label": "Trabattello/ponteggio",
+          "quantity": 1,
+          "unit": "pz",
+          "unitPriceCents": 25000,
+          "visibility": "cliente"
+        }
+      ]
+    },
+    {
+      "amountCents": 18000,
+      "category": "trasporto",
+      "label": "Trasporto",
+      "lines": [
+        {
+          "amountCents": 18000,
+          "category": "trasporto",
+          "code": "trasporto",
+          "explain": [
+            "CAP 36100 (prefisso 36) ⇒ zona \"Provincia\" (40 km)",
+            "90,00 € a viaggio; 17,38 h di montaggio / (squadra di 2 × 8 h al giorno) ⇒ 2 viaggi",
+            "listino v1 del 2026-01-01"
+          ],
+          "label": "Trasporto – zona Provincia",
+          "quantity": 2,
+          "unit": "viaggi",
+          "unitPriceCents": 9000,
+          "visibility": "cliente"
+        }
+      ]
+    },
+    {
+      "amountCents": 114484,
+      "category": "margine",
+      "label": "Margini",
+      "lines": [
+        {
+          "amountCents": 89985,
+          "category": "margine",
+          "code": "margine-materiali",
+          "explain": [
+            "30% di 2.999,50 € (legno, sfrido, lavorazioni, ferramenta, trattamenti, copertura)",
+            "listino v1 del 2026-01-01"
+          ],
+          "label": "Margine materiali",
+          "quantity": 30,
+          "unit": "%",
+          "unitPriceCents": 299950,
+          "visibility": "ufficio"
+        },
+        {
+          "amountCents": 24499,
+          "category": "margine",
+          "code": "margine-manodopera",
+          "explain": [
+            "25% di 979,96 € (montaggio, complicazioni)",
+            "listino v1 del 2026-01-01"
+          ],
+          "label": "Margine manodopera",
+          "quantity": 25,
+          "unit": "%",
+          "unitPriceCents": 97996,
+          "visibility": "ufficio"
+        }
+      ]
+    },
+    {
+      "amountCents": -125,
+      "category": "adeguamenti",
+      "label": "Adeguamenti",
+      "lines": [
+        {
+          "amountCents": -125,
+          "category": "adeguamenti",
+          "code": "arrotondamento",
+          "explain": [
+            "totale 6.471,25 € arrotondato al passo di 10,00 €: 6.470,00 €",
+            "listino v1 del 2026-01-01"
+          ],
+          "label": "Arrotondamento",
+          "quantity": 1,
+          "unit": "€",
+          "unitPriceCents": -125,
+          "visibility": "cliente"
+        }
+      ]
+    },
+    {
+      "amountCents": 116695,
+      "category": "iva",
+      "label": "IVA",
+      "lines": [
+        {
+          "amountCents": 116695,
+          "category": "iva",
+          "code": "iva-ordinaria",
+          "explain": [
+            "22% di 5.304,30 € di imponibile",
+            "listino v1 del 2026-01-01"
+          ],
+          "label": "IVA ordinaria 22%",
+          "quantity": 22,
+          "unit": "%",
+          "unitPriceCents": 530430,
+          "visibility": "cliente"
+        }
+      ]
+    }
+  ],
+  "indicativityPct": 10,
+  "lines": [
+    {
+      "amountCents": 5192,
+      "category": "legno",
+      "code": "legno-100×100",
+      "explain": [
+        "Abete, Lamellare (GL24h), sezione 100×100: 12 pezzi, 7,988 ml netti",
+        "0,079882 m³ × 650,00 €/m³",
+        "listino v1 del 2026-01-01"
+      ],
+      "label": "Legno – controventi 100×100",
+      "quantity": 0.079882,
+      "unit": "m³",
+      "unitPriceCents": 65000,
+      "visibility": "cliente"
+    },
+    {
+      "amountCents": 658,
+      "category": "sfrido",
+      "code": "sfrido-100×100",
+      "explain": [
+        "sfrido 11,2%: barre 0,09 m³ − pezzi 0,079882 m³",
+        "barre consumate: 1 × 5000 mm, 1 × 4000 mm (lama 4 mm, rifili 10 mm per testa)",
+        "listino v1 del 2026-01-01"
+      ],
+      "label": "Sfrido – controventi 100×100",
+      "quantity": 0.010118,
+      "unit": "m³",
+      "unitPriceCents": 65000,
+      "visibility": "cliente"
+    },
+    {
+      "amountCents": 25030,
+      "category": "legno",
+      "code": "legno-120×120",
+      "explain": [
+        "Abete, Lamellare (GL24h), sezione 120×120: 12 pezzi, 26,742 ml netti",
+        "0,385083 m³ × 650,00 €/m³",
+        "listino v1 del 2026-01-01"
+      ],
+      "label": "Legno – pilastri e puntoni 120×120",
+      "quantity": 0.385083,
+      "unit": "m³",
+      "unitPriceCents": 65000,
+      "visibility": "cliente"
+    },
+    {
+      "amountCents": 242,
+      "category": "sfrido",
+      "code": "sfrido-120×120",
+      "explain": [
+        "sfrido 1%: barre 0,3888 m³ − pezzi 0,385083 m³",
+        "barre consumate: 2 × 13500 mm (lama 4 mm, rifili 10 mm per testa)",
+        "listino v1 del 2026-01-01"
+      ],
+      "label": "Sfrido – pilastri e puntoni 120×120",
+      "quantity": 0.003717,
+      "unit": "m³",
+      "unitPriceCents": 65000,
+      "visibility": "cliente"
+    },
+    {
+      "amountCents": 28080,
+      "category": "legno",
+      "code": "legno-120×240",
+      "explain": [
+        "Abete, Lamellare (GL24h), sezione 120×240: 3 pezzi, 15 ml netti",
+        "0,432 m³ × 650,00 €/m³",
+        "listino v1 del 2026-01-01"
+      ],
+      "label": "Legno – travi e colmo 120×240",
+      "quantity": 0.432,
+      "unit": "m³",
+      "unitPriceCents": 65000,
+      "visibility": "cliente"
+    },
+    {
+      "amountCents": 5616,
+      "category": "sfrido",
+      "code": "sfrido-120×240",
+      "explain": [
+        "sfrido 16,7%: barre 0,5184 m³ − pezzi 0,432 m³",
+        "barre consumate: 3 × 6000 mm (lama 4 mm, rifili 10 mm per testa)",
+        "listino v1 del 2026-01-01"
+      ],
+      "label": "Sfrido – travi e colmo 120×240",
+      "quantity": 0.0864,
+      "unit": "m³",
+      "unitPriceCents": 65000,
+      "visibility": "cliente"
+    },
+    {
+      "amountCents": 35624,
+      "category": "legno",
+      "code": "legno-80×160",
+      "explain": [
+        "Abete, Lamellare (GL24h), sezione 80×160: 16 pezzi, 42,818 ml netti",
+        "0,548068 m³ × 650,00 €/m³",
+        "listino v1 del 2026-01-01"
+      ],
+      "label": "Legno – travetti 80×160",
+      "quantity": 0.548068,
+      "unit": "m³",
+      "unitPriceCents": 65000,
+      "visibility": "cliente"
+    },
+    {
+      "amountCents": 1400,
+      "category": "sfrido",
+      "code": "sfrido-80×160",
+      "explain": [
+        "sfrido 3,8%: barre 0,5696 m³ − pezzi 0,548068 m³",
+        "barre consumate: 3 × 13500 mm, 1 × 4000 mm (lama 4 mm, rifili 10 mm per testa)",
+        "listino v1 del 2026-01-01"
+      ],
+      "label": "Sfrido – travetti 80×160",
+      "quantity": 0.021532,
+      "unit": "m³",
+      "unitPriceCents": 65000,
+      "visibility": "cliente"
+    },
+    {
+      "amountCents": -326,
+      "category": "sfrido",
+      "code": "recupero-80×160",
+      "explain": [
+        "spezzoni riutilizzabili: 1303,887 mm (valore 10,85 €)",
+        "recupero 30% del valore",
+        "listino v1 del 2026-01-01"
+      ],
+      "label": "Recupero spezzoni – 80×160",
+      "quantity": 30,
+      "unit": "%",
+      "unitPriceCents": 1085,
+      "visibility": "cliente"
+    },
+    {
+      "amountCents": 1350,
+      "category": "lavorazioni",
+      "code": "cnc-pilastro-120×120",
+      "explain": [
+        "6 pezzi, nessuna lavorazione = 0 min base",
+        "proporzionale alla grandezza 0 min, movimentazione 6 × 1,5 min = 9 min",
+        "totale 9 min × 90,00 €/h",
+        "listino v1 del 2026-01-01"
+      ],
+      "label": "Lavorazioni CNC – pilastri 120×120",
+      "quantity": 0.15,
+      "unit": "h",
+      "unitPriceCents": 9000,
+      "visibility": "cliente"
+    },
+    {
+      "amountCents": 3449,
+      "category": "lavorazioni",
+      "code": "cnc-trave-120×240",
+      "explain": [
+        "2 pezzi: 6 × mortasa (3 min) = 18 min base",
+        "proporzionale alla grandezza 1,993 min, movimentazione 2 × 1,5 min = 3 min",
+        "totale 22,993 min × 90,00 €/h",
+        "listino v1 del 2026-01-01"
+      ],
+      "label": "Lavorazioni CNC – travi 120×240",
+      "quantity": 0.38321,
+      "unit": "h",
+      "unitPriceCents": 9000,
+      "visibility": "cliente"
+    },
+    {
+      "amountCents": 25200,
+      "category": "lavorazioni",
+      "code": "cnc-travetto-80×160",
+      "explain": [
+        "16 pezzi: 32 × taglio-testa (1,5 min), 32 × becco-uccello (3 min) = 144 min base",
+        "proporzionale alla grandezza 0 min, movimentazione 16 × 1,5 min = 24 min",
+        "totale 168 min × 90,00 €/h",
+        "listino v1 del 2026-01-01"
+      ],
+      "label": "Lavorazioni CNC – travetti 80×160",
+      "quantity": 2.8,
+      "unit": "h",
+      "unitPriceCents": 9000,
+      "visibility": "cliente"
+    },
+    {
+      "amountCents": 6138,
+      "category": "lavorazioni",
+      "code": "cnc-puntone-120×120",
+      "explain": [
+        "6 pezzi: 12 × tenone (2,5 min) = 30 min base",
+        "proporzionale alla grandezza 1,92 min, movimentazione 6 × 1,5 min = 9 min",
+        "totale 40,92 min × 90,00 €/h",
+        "listino v1 del 2026-01-01"
+      ],
+      "label": "Lavorazioni CNC – puntoni 120×120",
+      "quantity": 0.682,
+      "unit": "h",
+      "unitPriceCents": 9000,
+      "visibility": "cliente"
+    },
+    {
+      "amountCents": 3224,
+      "category": "lavorazioni",
+      "code": "cnc-colmo-120×240",
+      "explain": [
+        "1 pezzo: 6 × mortasa (3 min) = 18 min base",
+        "proporzionale alla grandezza 1,993 min, movimentazione 1 × 1,5 min = 1,5 min",
+        "totale 21,493 min × 90,00 €/h",
+        "listino v1 del 2026-01-01"
+      ],
+      "label": "Lavorazioni CNC – colmo 120×240",
+      "quantity": 0.35821,
+      "unit": "h",
+      "unitPriceCents": 9000,
+      "visibility": "cliente"
+    },
+    {
+      "amountCents": 8100,
+      "category": "lavorazioni",
+      "code": "cnc-controvento-100×100",
+      "explain": [
+        "12 pezzi: 24 × taglio-testa (1,5 min) = 36 min base",
+        "proporzionale alla grandezza 0 min, movimentazione 12 × 1,5 min = 18 min",
+        "totale 54 min × 90,00 €/h",
+        "listino v1 del 2026-01-01"
+      ],
+      "label": "Lavorazioni CNC – controventi 100×100",
+      "quantity": 0.9,
+      "unit": "h",
+      "unitPriceCents": 9000,
+      "visibility": "cliente"
+    },
+    {
+      "amountCents": 33169,
+      "category": "trattamenti",
+      "code": "trattamento-impregnante-incolore",
+      "explain": [
+        "superficie sviluppata di 43 pezzi (perimetro della sezione × lunghezza): 47,384 m²",
+        "47,384 m² × 7,00 €/m²",
+        "listino v1 del 2026-01-01"
+      ],
+      "label": "Trattamento – Impregnante incolore",
+      "quantity": 47.383926,
+      "unit": "m²",
+      "unitPriceCents": 700,
+      "visibility": "cliente"
+    },
+    {
+      "amountCents": 117804,
+      "category": "copertura",
+      "code": "copertura-policarbonato-alveolare",
+      "explain": [
+        "falda in pianta 5 × 4,92 m = 24,6 m², pendenza 20° ⇒ 26,179 m² reali",
+        "26,179 m² × 45,00 €/m²",
+        "listino v1 del 2026-01-01"
+      ],
+      "label": "Copertura – Policarbonato alveolare 16 mm",
+      "quantity": 26.178773,
+      "unit": "m²",
+      "unitPriceCents": 4500,
+      "visibility": "cliente"
+    },
+    {
+      "amountCents": 47040,
+      "category": "montaggio",
+      "code": "montaggio-pezzi",
+      "explain": [
+        "6 × PIL (25 min), 2 × TRV (30 min), 16 × TVT (12 min), 6 × PNT (20 min), 1 × COL (30 min), 12 × CTV (10 min) = 672 min",
+        "11,2 h × 42,00 €/h",
+        "listino v1 del 2026-01-01"
+      ],
+      "label": "Montaggio – posa dei pezzi",
+      "quantity": 11.2,
+      "unit": "h",
+      "unitPriceCents": 4200,
+      "visibility": "cliente"
+    },
+    {
+      "amountCents": 6720,
+      "category": "montaggio",
+      "code": "montaggio-giunti",
+      "explain": [
+        "12 × tenone-mortasa (8 min) = 96 min",
+        "1,6 h × 42,00 €/h",
+        "listino v1 del 2026-01-01"
+      ],
+      "label": "Montaggio – giunti",
+      "quantity": 1.6,
+      "unit": "h",
+      "unitPriceCents": 4200,
+      "visibility": "cliente"
+    },
+    {
+      "amountCents": 12600,
+      "category": "montaggio",
+      "code": "montaggio-allestimento",
+      "explain": [
+        "tempo fisso di cantiere 3 h × 42,00 €/h",
+        "listino v1 del 2026-01-01"
+      ],
+      "label": "Montaggio – allestimento del cantiere",
+      "quantity": 3,
+      "unit": "h",
+      "unitPriceCents": 4200,
+      "visibility": "cliente"
+    },
+    {
+      "amountCents": 6636,
+      "category": "complicazioni",
+      "code": "complicazione-altezza",
+      "explain": [
+        "condizione: altezza massima 3516,4 mm > 3500 mm",
+        "10% delle ore base (15,8 h) = 1,58 h × 42,00 €/h",
+        "montaggio sopra i 3,5 m",
+        "listino v1 del 2026-01-01"
+      ],
+      "label": "Complicazione: lavoro in quota 3516,4 mm",
+      "quantity": 1.58,
+      "ruleId": "altezza",
+      "unit": "h",
+      "unitPriceCents": 4200,
+      "visibility": "cliente"
+    },
+    {
+      "amountCents": 25000,
+      "category": "complicazioni",
+      "code": "ponteggio",
+      "explain": [
+        "altezza massima 3516 mm > soglia di ponteggio 3500 mm",
+        "importo fisso 250,00 €",
+        "listino v1 del 2026-01-01"
+      ],
+      "label": "Trabattello/ponteggio",
+      "quantity": 1,
+      "unit": "pz",
+      "unitPriceCents": 25000,
+      "visibility": "cliente"
+    },
+    {
+      "amountCents": 18000,
+      "category": "trasporto",
+      "code": "trasporto",
+      "explain": [
+        "CAP 36100 (prefisso 36) ⇒ zona \"Provincia\" (40 km)",
+        "90,00 € a viaggio; 17,38 h di montaggio / (squadra di 2 × 8 h al giorno) ⇒ 2 viaggi",
+        "listino v1 del 2026-01-01"
+      ],
+      "label": "Trasporto – zona Provincia",
+      "quantity": 2,
+      "unit": "viaggi",
+      "unitPriceCents": 9000,
+      "visibility": "cliente"
+    },
+    {
+      "amountCents": 89985,
+      "category": "margine",
+      "code": "margine-materiali",
+      "explain": [
+        "30% di 2.999,50 € (legno, sfrido, lavorazioni, ferramenta, trattamenti, copertura)",
+        "listino v1 del 2026-01-01"
+      ],
+      "label": "Margine materiali",
+      "quantity": 30,
+      "unit": "%",
+      "unitPriceCents": 299950,
+      "visibility": "ufficio"
+    },
+    {
+      "amountCents": 24499,
+      "category": "margine",
+      "code": "margine-manodopera",
+      "explain": [
+        "25% di 979,96 € (montaggio, complicazioni)",
+        "listino v1 del 2026-01-01"
+      ],
+      "label": "Margine manodopera",
+      "quantity": 25,
+      "unit": "%",
+      "unitPriceCents": 97996,
+      "visibility": "ufficio"
+    },
+    {
+      "amountCents": 116695,
+      "category": "iva",
+      "code": "iva-ordinaria",
+      "explain": [
+        "22% di 5.304,30 € di imponibile",
+        "listino v1 del 2026-01-01"
+      ],
+      "label": "IVA ordinaria 22%",
+      "quantity": 22,
+      "unit": "%",
+      "unitPriceCents": 530430,
+      "visibility": "cliente"
+    },
+    {
+      "amountCents": -125,
+      "category": "adeguamenti",
+      "code": "arrotondamento",
+      "explain": [
+        "totale 6.471,25 € arrotondato al passo di 10,00 €: 6.470,00 €",
+        "listino v1 del 2026-01-01"
+      ],
+      "label": "Arrotondamento",
+      "quantity": 1,
+      "unit": "€",
+      "unitPriceCents": -125,
+      "visibility": "cliente"
+    }
+  ],
+  "options": {
+    "access": "facile",
+    "cap": "36100",
+    "covering": "policarbonato-alveolare",
+    "quality": "lamellare",
+    "species": "abete",
+    "treatment": "impregnante-incolore"
+  },
+  "priceListVersion": {
+    "effectiveFrom": "2026-01-01",
+    "id": "listino-v1",
+    "status": "attiva",
+    "version": 1
+  },
+  "roundingStepCents": 1000,
+  "siteFactors": {
+    "access": "facile",
+    "anchoring": "terra",
+    "clearHeightMm": 2400,
+    "embedmentMm": 0,
+    "floorRangeMm": 0,
+    "floorSlopePct": 0,
+    "maxHeightMm": 3516.370698,
+    "obstaclesCount": 0,
+    "planDeviationDeg": 0,
+    "wallDeviationDeg": 0
+  },
+  "status": "completo",
+  "totals": {
+    "costCents": 415946,
+    "discountCents": 0,
+    "marginCents": 114484,
+    "minimumAdjustmentCents": 0,
+    "roundingCents": -125,
+    "taxableCents": 530430,
+    "totalCents": 647000,
+    "vatCents": 116695,
+    "vatPct": 22
+  },
+  "typologySlug": "autoportante-bifalda",
+  "warnings": []
+}
