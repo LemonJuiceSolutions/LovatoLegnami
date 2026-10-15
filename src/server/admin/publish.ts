@@ -1,8 +1,7 @@
-import { revalidatePath, revalidateTag } from "next/cache";
 import type { Dataset } from "@/db/schema";
 import type { Preset, PriceList, RuleSet, TypologySettings } from "@/domain";
 import { getActive } from "@/server/repositories/datasets";
-import { invalidatePublicCatalog } from "@/server/quotes/catalog";
+import { revalidatePublicSite } from "@/server/cache/revalidate";
 import { checkPresets, checkPriceList, checkRuleSet, checkTypologySettings, presetsOrCatalog, visibleTypologies, type PublishCheck } from "./publish-checks";
 
 /**
@@ -25,17 +24,7 @@ export async function runPublishChecks(dataset: Dataset, doc: unknown): Promise<
   }
 }
 
-/**
- * Dopo una pubblicazione: cache del catalogo pubblico (stima, regole) e pagine del sito.
- * `revalidateTag`/`revalidatePath` funzionano solo dentro una richiesta di Next (fuori,
- * es. nei test, lanciano): l'errore è ignorato, la cache del catalogo scade comunque in 60 s.
- */
+/** Dopo una pubblicazione: catalogo pubblico e pagine del sito (vedi `revalidatePublicSite`). */
 export function revalidateSite(dataset: Dataset): void {
-  invalidatePublicCatalog();
-  try {
-    revalidateTag(dataset);
-    revalidatePath("/", "layout");
-  } catch {
-    // fuori da una richiesta di Next
-  }
+  revalidatePublicSite(dataset);
 }

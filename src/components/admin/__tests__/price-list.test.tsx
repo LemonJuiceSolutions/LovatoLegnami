@@ -107,10 +107,12 @@ describe("form del listino (9.3)", () => {
       </DraftProvider>,
     )
     // il tecnico non modifica i prezzi
-    expect((within(screen.getByRole("table", { name: "Prezzi del legno al m³" })).getByLabelText("Prezzo riga 1") as HTMLInputElement).disabled).toBe(true)
-    const table = screen.getByRole("table", { name: "Lunghezze commerciali" })
-    const before = within(table).getAllByRole("row").length
-    const container = table.closest("div.rounded-md") as HTMLElement
+    // query per testo e selettori: le query per ruolo su tabelle di cento righe sono lente in jsdom
+    const tableOf = (title: string) => screen.getByText(title, { selector: "h3" }).closest("div.rounded-md")!.querySelector("table")!
+    expect((within(tableOf("Prezzi del legno al m³")).getByLabelText("Prezzo riga 1") as HTMLInputElement).disabled).toBe(true)
+    const table = tableOf("Lunghezze commerciali")
+    const before = table.querySelectorAll("tr").length
+    const container = table.closest("div.rounded-md.p-3") as HTMLElement
     fireEvent.click(within(container).getByRole("button", { name: "Aggiungi riga" }))
     const n = before // righe dati = righe totali − intestazione + la nuova
     fireEvent.change(within(table).getByLabelText(`Sezione riga ${n}`), { target: { value: "120×240" } })

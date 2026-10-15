@@ -10,6 +10,8 @@ const session = vi.hoisted(() => ({ current: null as null | { user: Record<strin
 vi.mock("@/server/auth/auth", () => ({ auth: async () => session.current }));
 const invalidate = vi.hoisted(() => vi.fn());
 vi.mock("@/server/quotes/catalog", async (orig) => ({ ...(await orig<object>()), invalidatePublicCatalog: invalidate }));
+const nextCache = vi.hoisted(() => ({ revalidateTag: vi.fn(), revalidatePath: vi.fn() }));
+vi.mock("next/cache", () => nextCache);
 
 const { saveDraftSection } = await import("../datasets");
 const { getPublishPreview, publishDataset } = await import("../publish");
@@ -30,6 +32,8 @@ describe("pubblicazione (9.4)", () => {
   beforeEach(async () => {
     await freshDb();
     invalidate.mockClear();
+    nextCache.revalidateTag.mockClear();
+    nextCache.revalidatePath.mockClear();
     lucia = await makeUser("lucia@lovato.it", "ufficio-tecnico", "Lucia Bianchi");
     mario = await makeUser("mario@lovato.it", "commerciale", "Mario Rossi");
     await repo.createVersion({ dataset: "listino", data: DEFAULT_PRICE_LIST_DATA, status: "attiva", effectiveFrom: "2026-01-01", version: 1 });
@@ -52,6 +56,7 @@ describe("pubblicazione (9.4)", () => {
     expect((await repo.getActive("regole"))!.version).toBe(1);
     expect(await repo.getDraft("regole")).not.toBeNull();
     expect(invalidate).not.toHaveBeenCalled();
+    expect(nextCache.revalidateTag).not.toHaveBeenCalled();
   });
 
   it("pubblicazione valida ⇒ nuova attiva, precedente archiviata, registro e cache invalidata", async () => {
@@ -72,6 +77,10 @@ describe("pubblicazione (9.4)", () => {
     expect(await repo.getDraft("regole")).toBeNull();
     expect((await audit.list({ dataset: "regole" })).map((e) => e.action).slice(0, 2)).toEqual(["archivia", "pubblica"]);
     expect(invalidate).toHaveBeenCalledTimes(1);
+    // le pagine pubbliche (tag "tipologie") si aggiornano dopo la pubblicazione di qualunque dataset
+    expect(nextCache.revalidateTag).toHaveBeenCalledWith("tipologie");
+    expect(nextCache.revalidateTag).toHaveBeenCalledWith("regole");
+    expect(nextCache.revalidatePath).toHaveBeenCalledWith("/", "layout");
   });
 
   it("listino con un prezzo mancante usato dai preset ⇒ rifiutato con il preset e la voce", async () => {
@@ -97,6 +106,7 @@ describe("pubblicazione (9.4)", () => {
     expect(res).toMatchObject({ ok: true, data: { version: 2, archivedVersion: null } });
     expect((await repo.getActive("listino"))!.version).toBe(1);
     expect((await repo.getActive("listino", "2027-01-02"))!.version).toBe(2);
+    expect(nextCache.revalidateTag).toHaveBeenCalledWith("tipologie");
     as(mario);
     expect(await getPublishPreview("regole")).toMatchObject({ ok: false, status: 403 });
     expect(await publishDataset({ dataset: "regole", effectiveFrom: "2026-01-01", notes: null, expectedUpdatedAt: lock })).toMatchObject({ ok: false, status: 403 });
