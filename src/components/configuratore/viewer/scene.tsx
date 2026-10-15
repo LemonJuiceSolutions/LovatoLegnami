@@ -12,6 +12,7 @@ import { CameraRig } from "./camera-rig"
 import { DimensionsLayer } from "./dimensions-layer"
 import { EnvelopeLayer } from "./envelope-layer"
 import { FloorLayer } from "./floor-layer"
+import { HardwareLayer } from "./hardware-layer"
 import { ObstaclesLayer } from "./obstacles-layer"
 import { PergolaLayer } from "./pergola-layer"
 import type { ViewerPalette } from "./theme-colors"
@@ -63,6 +64,7 @@ function SceneContent({ assembly, envelope, palette, results }: SceneProps) {
         {layers.ingombro && <EnvelopeLayer envelope={envelope} palette={palette} />}
         {layers.ostacoli && <ObstaclesLayer envelope={envelope} palette={palette} />}
         <PergolaLayer assembly={assembly} envelope={envelope} results={results} palette={palette} />
+        {layers.ferramenta && <HardwareLayer assembly={assembly} palette={palette} />}
         {layers.quote && <DimensionsLayer assembly={assembly} palette={palette} />}
       </Bounds>
 

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { DEFAULT_LAYERS, createViewerStore } from "./viewer-store";
+import { DEFAULT_LAYERS, LAYER_LABELS, createViewerStore } from "./viewer-store";
 
 describe("viewer store", () => {
   it("parte con i livelli di default", () => {
@@ -13,6 +13,14 @@ describe("viewer store", () => {
     expect(store.getState().layers).toEqual({ ...DEFAULT_LAYERS, ostacoli: false });
     store.getState().setLayer("ostacoli", true);
     expect(store.getState().layers).toEqual(DEFAULT_LAYERS);
+  });
+
+  it("livello ferramenta attivo di default e disattivabile", () => {
+    const store = createViewerStore();
+    expect(store.getState().layers.ferramenta).toBe(true);
+    expect(LAYER_LABELS.ferramenta).toBe("Ferramenta");
+    store.getState().toggleLayer("ferramenta");
+    expect(store.getState().layers).toEqual({ ...DEFAULT_LAYERS, ferramenta: false });
   });
 
   it("non cambia riferimento se il valore è già quello richiesto", () => {

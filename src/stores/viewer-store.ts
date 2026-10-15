@@ -7,7 +7,7 @@ import { createStore, type StoreApi } from "zustand/vanilla";
  * della configurazione e non è persistito né salvato nel JSON.
  */
 
-export const VIEWER_LAYERS = ["ingombro", "ostacoli", "pavimento", "quote"] as const;
+export const VIEWER_LAYERS = ["ingombro", "ostacoli", "pavimento", "quote", "ferramenta"] as const;
 export type ViewerLayer = (typeof VIEWER_LAYERS)[number];
 
 export const LAYER_LABELS: Readonly<Record<ViewerLayer, string>> = {
@@ -15,11 +15,12 @@ export const LAYER_LABELS: Readonly<Record<ViewerLayer, string>> = {
   ostacoli: "Ostacoli",
   pavimento: "Pavimento",
   quote: "Quote",
+  ferramenta: "Ferramenta",
 };
 
 export type LayerVisibility = Readonly<Record<ViewerLayer, boolean>>;
 
-export const DEFAULT_LAYERS: LayerVisibility = { ingombro: true, ostacoli: true, pavimento: true, quote: false };
+export const DEFAULT_LAYERS: LayerVisibility = { ingombro: true, ostacoli: true, pavimento: true, quote: false, ferramenta: true };
 
 /** Viste predefinite: prospettica e (in proiezione ortografica) fronte, lato, pianta. */
 export const VIEWS = ["prospettica", "fronte", "lato", "pianta"] as const;
