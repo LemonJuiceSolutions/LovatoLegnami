@@ -18,6 +18,7 @@ import {
 } from "@/domain"
 import type { ActionResult } from "@/stores/configuratore-store"
 import { useConfiguratore } from "@/stores/use-configuratore"
+import { SiteDeclaredFields } from "@/components/preventivo/commercial-form"
 import { NumberField } from "./fields"
 
 /**
@@ -281,6 +282,13 @@ export function EnvelopeForm() {
         ) : (
           envelope.obstacles.map((o) => <ObstacleEditor key={o.id} obstacle={o} />)
         )}
+      </div>
+
+      <Separator />
+
+      <div className="space-y-3">
+        <SectionTitle>Cantiere</SectionTitle>
+        <SiteDeclaredFields />
       </div>
 
       <Separator />
