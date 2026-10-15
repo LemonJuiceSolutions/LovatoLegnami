@@ -1,4 +1,4 @@
-import { absoluteObstacles, aabbCenter, aabbSize, floorFunction, type Envelope, type ObstacleType } from "@/domain"
+import { absoluteObstacles, floorFunction, type Envelope, type ObstacleType } from "@/domain"
 
 /**
  * Dati dei livelli ingombro, ostacoli e pavimento (funzioni pure, senza Three):
@@ -21,22 +21,28 @@ export interface ObstacleBox {
   readonly type: ObstacleType
   readonly label: string
   readonly center: [number, number, number]
+  /** Dimensioni lungo gli assi propri dell'ostacolo (lato, sporgenza, quota). */
   readonly size: [number, number, number]
+  /** Rotazione attorno a Z (radianti): ostacoli sui lati inclinati della pianta; 0 sul box. */
+  readonly rotationZ: number
   /** Fuori dal box base: ignorato nelle collisioni, reso più tenue. */
   readonly ignored: boolean
 }
 
-/** Ostacoli come box assoluti (centro e dimensioni) per il rendering. */
+/** Ostacoli come box orientati (centro, dimensioni, rotazione in pianta) per il rendering. */
 export function obstacleBoxes(envelope: Envelope): ObstacleBox[] {
   return absoluteObstacles(envelope).map((o) => {
-    const c = aabbCenter(o.box)
-    const s = aabbSize(o.box)
+    const c = o.box.center
+    const h = o.box.halfSize
+    const s = { x: 2 * h.x, y: 2 * h.y, z: 2 * h.z }
+    const ax = o.box.axes[0]
     return {
       id: o.obstacleId,
       type: o.obstacle.type,
       label: o.obstacle.label ?? o.obstacleId,
       center: [c.x, c.y, c.z],
       size: [Math.max(s.x, 1), Math.max(s.y, 1), Math.max(s.z, 1)],
+      rotationZ: Math.atan2(ax.y, ax.x) + 0,
       ignored: o.ignored,
     }
   })

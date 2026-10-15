@@ -76,3 +76,37 @@ export function obbAabbPenetration(o: OBB, box: AABB): number {
 /** Compenetrazione stretta OBB–AABB: il contatto (profondità ≤ tol) non conta. */
 export const obbIntersectsAabb = (o: OBB, box: AABB, tol: number = EPS): boolean =>
   obbAabbPenetration(o, box) > tol;
+
+/** OBB equivalente a un AABB (assi X, Y, Z del sistema assieme). */
+export const obbFromAabb = (box: AABB): OBB => ({
+  center: aabbCenter(box),
+  axes: [X_AXIS, Y_AXIS, Z_AXIS],
+  halfSize: scale(aabbSize(box), 0.5),
+});
+
+/**
+ * Separating Axis Theorem OBB–OBB su 15 assi (3 + 3 facce, 9 prodotti
+ * vettoriali): minima sovrapposizione delle proiezioni, > 0 compenetrazione,
+ * 0 contatto, < 0 separazione. Con `b` allineato agli assi coincide con
+ * `obbAabbPenetration(a, aabb(b))` (stessi assi e stesse somme).
+ */
+export function obbObbPenetration(a: OBB, b: OBB): number {
+  const d = sub(b.center, a.center);
+  const candidates: Vec3[] = [...b.axes, ...a.axes];
+  for (const u of b.axes) for (const v of a.axes) candidates.push(cross(u, v));
+  let depth = Infinity;
+  for (const raw of candidates) {
+    const n = norm(raw);
+    if (n < EPS) continue; // assi paralleli: già coperti dagli assi delle facce
+    const l = scale(raw, 1 / n);
+    let rA = 0;
+    for (let i = 0; i < 3; i++) rA += halfOf(a, i) * Math.abs(dot(a.axes[i], l));
+    let rB = 0;
+    for (let i = 0; i < 3; i++) rB += halfOf(b, i) * Math.abs(dot(b.axes[i], l));
+    depth = Math.min(depth, rA + rB - Math.abs(dot(d, l)));
+  }
+  return depth;
+}
+
+/** Compenetrazione stretta OBB–OBB: il contatto (profondità ≤ tol) non conta. */
+export const obbIntersectsObb = (a: OBB, b: OBB, tol: number = EPS): boolean => obbObbPenetration(a, b) > tol;

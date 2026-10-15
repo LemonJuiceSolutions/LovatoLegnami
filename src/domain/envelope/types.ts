@@ -1,8 +1,9 @@
 import { z } from "zod";
 import { parseWith } from "../components/schemas";
-import { type AABB, aabb, aabbPenetrationDepth } from "../math/aabb";
+import { type AABB, aabb, aabbFromPoints, aabbPenetrationDepth } from "../math/aabb";
+import { type OBB, obbAabbPenetration, obbFromAabb, obbVertices } from "../math/obb";
 import { vec3 } from "../math/vec3";
-import { type EnvelopePlan, PLAN_CORNERS, PLAN_CORNER_LABELS, planIssues } from "./plan";
+import { type EnvelopePlan, PLAN_CORNERS, PLAN_CORNER_LABELS, planIssues, planOf, sideSegment } from "./plan";
 
 /**
  * Ingombro del cliente (spec `ingombro-cliente`, D5): box base L×P×H con
@@ -168,7 +169,15 @@ export const envelopeAabb = (e: Pick<Envelope, "box">): AABB => aabb(vec3(0, 0, 
 export interface AbsoluteObstacle {
   readonly obstacleId: string;
   readonly obstacle: Obstacle;
-  readonly box: AABB;
+  /**
+   * Volume dell'ostacolo: per i lati verticali un box orientato sul lato reale
+   * della pianta (u lungo il lato, sporgenza lungo la normale entrante, Z in
+   * alto); per pavimento e soffitto, e con pianta rettangolare, allineato agli
+   * assi (identico all'AABB di sempre).
+   */
+  readonly box: OBB;
+  /** Box allineato che contiene `box` (impronta per i fattori di cantiere). */
+  readonly aabb: AABB;
   /** `true` se l'ostacolo è interamente fuori dal box base: ignorato nelle collisioni. */
   readonly ignored: boolean;
   readonly warning?: string;
@@ -177,45 +186,74 @@ export interface AbsoluteObstacle {
 /** Lunghezza del lato lungo il suo asse u. */
 const sideLength = (e: Envelope, side: Side): number => (side === "sinistro" || side === "destro" ? e.box.depth : e.box.width);
 
-/**
- * Box assoluto (AABB) dell'ostacolo nel sistema dell'assieme, per i 6 lati.
- * Un ostacolo interamente fuori dal box base è marcato `ignored` con l'avviso
- * "ostacolo fuori ingombro".
- */
-export function toAbsoluteBox(envelope: Envelope, obstacle: Obstacle): AbsoluteObstacle {
+/** AABB dell'ostacolo sul box rettangolare (pianta assente). */
+function boxAabb(envelope: Envelope, obstacle: Obstacle): AABB {
   const { width: L, depth: P, height: H } = envelope.box;
   const u0 = obstacle.offset;
   const u1 = obstacle.width !== undefined ? u0 + obstacle.width : sideLength(envelope, obstacle.side);
   const v0 = obstacle.elevation;
   const v1 = v0 + obstacle.height;
   const n = obstacle.projection;
-  let box: AABB;
   switch (obstacle.side) {
     case "anteriore":
-      box = aabb(vec3(u0, 0, v0), vec3(u1, n, v1));
-      break;
+      return aabb(vec3(u0, 0, v0), vec3(u1, n, v1));
     case "posteriore":
-      box = aabb(vec3(u0, P - n, v0), vec3(u1, P, v1));
-      break;
+      return aabb(vec3(u0, P - n, v0), vec3(u1, P, v1));
     case "sinistro":
-      box = aabb(vec3(0, u0, v0), vec3(n, u1, v1));
-      break;
+      return aabb(vec3(0, u0, v0), vec3(n, u1, v1));
     case "destro":
-      box = aabb(vec3(L - n, u0, v0), vec3(L, u1, v1));
-      break;
+      return aabb(vec3(L - n, u0, v0), vec3(L, u1, v1));
     case "pavimento":
-      box = aabb(vec3(u0, v0, 0), vec3(u1, v1, n));
-      break;
+      return aabb(vec3(u0, v0, 0), vec3(u1, v1, n));
     case "soffitto":
-      box = aabb(vec3(u0, v0, H - n), vec3(u1, v1, H));
-      break;
+      return aabb(vec3(u0, v0, H - n), vec3(u1, v1, H));
   }
-  // fuori ingombro: nessuna sovrapposizione di volume col box base
-  const ignored = aabbPenetrationDepth(box, envelopeAabb(envelope)) <= 0;
+}
+
+/** OBB dell'ostacolo di un lato verticale sul lato reale della pianta. */
+function sideObb(envelope: Envelope, obstacle: Obstacle & { side: WallSide }): OBB {
+  const s = sideSegment(planOf(envelope), obstacle.side);
+  const u0 = obstacle.offset;
+  const u1 = obstacle.width !== undefined ? u0 + obstacle.width : s.length;
+  const v0 = obstacle.elevation;
+  const v1 = v0 + obstacle.height;
+  const n = obstacle.projection;
+  const um = (u0 + u1) / 2;
+  return {
+    center: vec3(s.start.x + s.direction.x * um + (s.inward.x * n) / 2, s.start.y + s.direction.y * um + (s.inward.y * n) / 2, (v0 + v1) / 2),
+    axes: [vec3(s.direction.x, s.direction.y, 0), vec3(s.inward.x, s.inward.y, 0), vec3(0, 0, 1)],
+    halfSize: vec3((u1 - u0) / 2, n / 2, (v1 - v0) / 2),
+  };
+}
+
+const isWallSide = (side: Side): side is WallSide => (WALL_SIDES as readonly Side[]).includes(side);
+
+/**
+ * Volume assoluto dell'ostacolo nel sistema dell'assieme, per i 6 lati. Senza
+ * pianta (o per pavimento/soffitto) è l'AABB sul box; con la pianta gli
+ * ostacoli dei lati verticali seguono il lato reale (OBB). Un ostacolo
+ * interamente fuori dal box base è marcato `ignored` con l'avviso "ostacolo
+ * fuori ingombro".
+ */
+export function toAbsoluteBox(envelope: Envelope, obstacle: Obstacle): AbsoluteObstacle {
+  let box: OBB;
+  let bounds: AABB;
+  let ignored: boolean;
+  if (envelope.plan && isWallSide(obstacle.side)) {
+    box = sideObb(envelope, { ...obstacle, side: obstacle.side });
+    bounds = aabbFromPoints(obbVertices(box));
+    ignored = obbAabbPenetration(box, envelopeAabb(envelope)) <= 0;
+  } else {
+    bounds = boxAabb(envelope, obstacle);
+    box = obbFromAabb(bounds);
+    // fuori ingombro: nessuna sovrapposizione di volume col box base
+    ignored = aabbPenetrationDepth(bounds, envelopeAabb(envelope)) <= 0;
+  }
   return {
     obstacleId: obstacle.id,
     obstacle,
     box,
+    aabb: bounds,
     ignored,
     ...(ignored ? { warning: `ostacolo fuori ingombro: ${obstacle.id} è interamente fuori dal box base e viene ignorato` } : {}),
   };

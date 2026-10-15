@@ -36,7 +36,7 @@ describe("ostacoli come box assoluti", () => {
   it("grondaia posteriore a 2700, sporgente 150, alta 120, per tutta la larghezza", () => {
     const e = parseEnvelope({ ...base, obstacles: [{ id: "grondaia", type: "grondaia", side: "posteriore", elevation: 2700, height: 120, projection: 150 }] });
     const r = toAbsoluteBox(e, e.obstacles[0]);
-    expect(r.box).toEqual({ min: { x: 0, y: 3350, z: 2700 }, max: { x: 6000, y: 3500, z: 2820 } });
+    expect(r.aabb).toEqual({ min: { x: 0, y: 3350, z: 2700 }, max: { x: 6000, y: 3500, z: 2820 } });
     expect(r.ignored).toBe(false);
     expect(r.warning).toBeUndefined();
   });
@@ -44,14 +44,14 @@ describe("ostacoli come box assoluti", () => {
   it("finestra sul lato sinistro: offset 1000 dal fronte, 1200×1400 a quota 900, aderente al lato", () => {
     const e = parseEnvelope({ ...base, obstacles: [{ id: "fin", type: "finestra", side: "sinistro", offset: 1000, width: 1200, elevation: 900, height: 1400 }] });
     const r = toAbsoluteBox(e, e.obstacles[0]);
-    expect(r.box).toEqual({ min: { x: 0, y: 1000, z: 900 }, max: { x: 100, y: 2200, z: 2300 } });
+    expect(r.aabb).toEqual({ min: { x: 0, y: 1000, z: 900 }, max: { x: 100, y: 2200, z: 2300 } });
   });
 
   it("converte tutti e 6 i lati", () => {
     const o = { offset: 100, width: 200, elevation: 300, height: 400, projection: 50 };
     const sides: Side[] = ["anteriore", "posteriore", "sinistro", "destro", "pavimento", "soffitto"];
     const e = parseEnvelope({ ...base, obstacles: sides.map((side) => ({ id: side, type: "generico", side, ...o })) });
-    const boxes = Object.fromEntries(absoluteObstacles(e).map((r) => [r.obstacleId, [r.box.min, r.box.max].map((p) => [p.x, p.y, p.z])]));
+    const boxes = Object.fromEntries(absoluteObstacles(e).map((r) => [r.obstacleId, [r.aabb.min, r.aabb.max].map((p) => [p.x, p.y, p.z])]));
     expect(boxes).toEqual({
       anteriore: [[100, 0, 300], [300, 50, 700]],
       posteriore: [[100, 3450, 300], [300, 3500, 700]],

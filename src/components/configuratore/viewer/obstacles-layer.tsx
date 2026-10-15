@@ -25,7 +25,7 @@ export function ObstaclesLayer({ envelope, palette }: { envelope: Envelope; pale
       {boxes.map((o) => {
         const color = obstacleColor(o.type, palette)
         return (
-          <group key={o.id} position={o.center} scale={o.size}>
+          <group key={o.id} position={o.center} rotation={[0, 0, o.rotationZ]} scale={o.size}>
             <mesh geometry={g.box} raycast={() => null} renderOrder={2}>
               <meshStandardMaterial color={color} transparent opacity={o.ignored ? 0.12 : 0.35} depthWrite={false} />
             </mesh>

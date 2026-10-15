@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { aabb } from "./aabb";
 import { identity, multiply, rotationZ, translation } from "./mat4";
-import { obbAabbPenetration, obbFromPose, obbIntersectsAabb, obbVertices } from "./obb";
+import { obbAabbPenetration, obbFromAabb, obbFromPose, obbIntersectsAabb, obbIntersectsObb, obbObbPenetration, obbVertices } from "./obb";
 import { equals, vec3 } from "./vec3";
 
 describe("obb", () => {
@@ -55,5 +55,26 @@ describe("obb", () => {
     );
     const corner = aabb(vec3(0.8, 0.8, -1), vec3(2, 2, 1));
     expect(obbIntersectsAabb(rotated, corner)).toBe(false);
+  });
+
+  it("OBB–OBB: con un box allineato coincide con OBB–AABB (15 assi)", () => {
+    const o = obbFromPose(multiply(translation(vec3(3, 4, 0)), rotationZ(0.3)), vec3(10, 2, 3));
+    for (const box of [aabb(vec3(0, 0, 0), vec3(5, 5, 5)), aabb(vec3(20, 0, 0), vec3(30, 5, 5)), aabb(vec3(-1, 4, -1), vec3(14, 6, 1))])
+      expect(obbObbPenetration(o, obbFromAabb(box))).toBe(obbAabbPenetration(o, box));
+  });
+
+  it("OBB–OBB ruotati: separati lungo un asse di faccia ruotato, compenetranti e in contatto", () => {
+    const a = obbFromPose(rotationZ(Math.PI / 4), vec3(10, 2, 2));
+    // b: stesso orientamento, spostato di 3 lungo la normale locale Y di a (spessore 2 ⇒ separati di 1)
+    const shift = vec3(-3 * Math.SQRT1_2, 3 * Math.SQRT1_2, 0);
+    const b = obbFromPose(multiply(translation(shift), rotationZ(Math.PI / 4)), vec3(10, 2, 2));
+    expect(obbObbPenetration(a, b)).toBeCloseTo(-1, 9);
+    expect(obbIntersectsObb(a, b)).toBe(false);
+    const c = obbFromPose(multiply(translation(vec3(-Math.SQRT1_2, Math.SQRT1_2, 0)), rotationZ(Math.PI / 4)), vec3(10, 2, 2));
+    expect(obbObbPenetration(a, c)).toBeCloseTo(1, 9);
+    expect(obbIntersectsObb(a, c)).toBe(true);
+    const touch = obbFromPose(multiply(translation(vec3(-2 * Math.SQRT1_2, 2 * Math.SQRT1_2, 0)), rotationZ(Math.PI / 4)), vec3(10, 2, 2));
+    expect(obbObbPenetration(a, touch)).toBeCloseTo(0, 9);
+    expect(obbIntersectsObb(a, touch, 1e-6)).toBe(false);
   });
 });

@@ -29,6 +29,20 @@ describe("obstacleBoxes", () => {
     expect(g.center).toEqual([2000, 2850, 2775])
     expect(w.center[0]).toBe(1400)
     expect(obstacleTypes(envelope)).toEqual(["grondaia", "finestra"])
+    expect(g.rotationZ).toBe(0)
+  })
+
+  it("ostacolo sul muro inclinato della pianta: ruotato come il lato", () => {
+    const rise = 4000 * Math.tan((5 * Math.PI) / 180)
+    const skewed = parseEnvelope({
+      box: { width: 4000, depth: 3000 + rise, height: 3000 },
+      plan: { corners: [{ x: 0, y: 0 }, { x: 4000, y: 0 }, { x: 4000, y: 3000 + rise }, { x: 0, y: 3000 }] },
+      obstacles: [{ id: "OST-01", type: "grondaia", side: "posteriore", elevation: 2700, height: 150, projection: 300 }],
+    })
+    const [g] = obstacleBoxes(skewed)
+    expect((g.rotationZ * 180) / Math.PI).toBeCloseTo(5, 9)
+    expect(g.size[0]).toBeCloseTo(4000 / Math.cos((5 * Math.PI) / 180), 6)
+    expect(g.size[1]).toBeCloseTo(300, 9)
   })
 })
 

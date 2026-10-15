@@ -118,7 +118,7 @@ export function siteFactors(
   let obstaclesCount = 0;
   if (bounds) {
     const footprint = aabb(vec3(bounds.min.x, bounds.min.y, -Infinity), vec3(bounds.max.x, bounds.max.y, Infinity));
-    obstaclesCount = absoluteObstacles(envelope).filter((o) => !o.ignored && aabbIntersects(o.box, footprint)).length;
+    obstaclesCount = absoluteObstacles(envelope).filter((o) => !o.ignored && aabbIntersects(o.aabb, footprint)).length;
   }
 
   const clear = minClearHeight(assembly, { floorHeightAt: floor });
