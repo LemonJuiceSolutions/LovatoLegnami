@@ -144,7 +144,7 @@ export function ConfiguratoreLayout({ params, results, exports, toolbar, quote, 
         >
           {quote ? (
             // Esiti ed esportazioni impilati, preventivo accanto (lg) o in mezzo (≥ 1760 px).
-            <div className="grid min-h-0 flex-1 gap-4 lg:grid-cols-2 lg:grid-rows-[minmax(0,1fr)_minmax(0,1fr)] min-[1760px]:grid-cols-1 min-[1760px]:grid-rows-[minmax(0,1fr)_minmax(0,1.6fr)_minmax(0,0.8fr)]">
+            <div className="grid min-h-0 flex-1 gap-4 lg:grid-cols-2 lg:grid-rows-[minmax(0,1fr)_minmax(0,1fr)] min-[1760px]:grid-cols-1 min-[1760px]:grid-rows-[minmax(0,0.8fr)_minmax(0,2.2fr)_minmax(0,0.8fr)]">
               <Panel title="Esiti" icon={ClipboardList} className="lg:col-start-1 lg:row-start-1">
                 {results}
               </Panel>

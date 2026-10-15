@@ -245,8 +245,8 @@ export function EnvelopeForm() {
       <div className="space-y-3">
         <SectionTitle>Box d&apos;ingombro</SectionTitle>
         <div className="grid grid-cols-2 gap-3">
-          <NumberField id="env-width" label="Larghezza (fronte)" unit="mm" value={box.width} error={errors.width} disabled={Boolean(envelope.plan)} hint={envelope.plan ? "Dalla pianta" : undefined} onValueChange={(width) => run("width", setBox({ width }))} />
-          <NumberField id="env-depth" label="Profondità" unit="mm" value={box.depth} error={errors.depth} disabled={Boolean(envelope.plan)} hint={envelope.plan ? "Dalla pianta" : undefined} onValueChange={(depth) => run("depth", setBox({ depth }))} />
+          <NumberField id="env-width" label="Larghezza (fronte)" unit="mm" value={envelope.plan ? Math.round(box.width) : box.width} error={errors.width} disabled={Boolean(envelope.plan)} hint={envelope.plan ? "Dalla pianta" : undefined} onValueChange={(width) => run("width", setBox({ width }))} />
+          <NumberField id="env-depth" label="Profondità" unit="mm" value={envelope.plan ? Math.round(box.depth) : box.depth} error={errors.depth} disabled={Boolean(envelope.plan)} hint={envelope.plan ? "Dalla pianta" : undefined} onValueChange={(depth) => run("depth", setBox({ depth }))} />
           <NumberField id="env-height" label="Altezza" unit="mm" value={box.height} error={errors.height} onValueChange={(height) => run("height", setBox({ height }))} />
           <SmallSelect<WallSide>
             id="env-wall"
