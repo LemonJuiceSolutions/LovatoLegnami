@@ -268,7 +268,7 @@ export function ResultsPanel() {
           onClick={() =>
             open(() => {
               const s = configuratoreStore.getState()
-              return reviewAutoSize(s.config, s.derived.assembly)
+              return reviewAutoSize(s.config, s.derived.assembly, s.catalog.ruleSet)
             })
           }
         >
@@ -280,7 +280,7 @@ export function ResultsPanel() {
           size="sm"
           className="flex-1"
           disabled={stale}
-          onClick={() => open(() => reviewFit(configuratoreStore.getState().config))}
+          onClick={() => open(() => reviewFit(configuratoreStore.getState().config, configuratoreStore.getState().catalog.ruleSet))}
         >
           <Maximize2 className="mr-1.5 h-4 w-4 shrink-0" />
           Adatta all&apos;ingombro

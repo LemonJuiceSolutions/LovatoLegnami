@@ -145,6 +145,8 @@ export function ConfiguratoreLayout({ params, results, exports, toolbar }: Confi
 /** Pagina completa: avvia il kernel geometrico al mount (il worker parte solo qui). */
 export function Configuratore() {
   React.useEffect(() => {
+    // listino e regole della versione attiva (ripiego sui default con avviso)
+    void configuratoreStore.getState().loadCatalog()
     configuratoreStore.getState().startKernel()
     return () => configuratoreStore.getState().stopKernel()
   }, [])
