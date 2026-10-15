@@ -188,9 +188,12 @@ describe("store configuratore – selezione dei pezzi", () => {
 });
 
 describe("setTypology tra tutte le tipologie", () => {
-  it("l'assieme si genera sempre (parametri comuni incompatibili tornano al default)", () => {
-    const slugs = listTypologies().map((t) => t.slug)
-    for (const from of slugs)
+  // Una prova per tipologia di partenza (9 × 9 coppie in tutto): ogni prova genera ~20
+  // assiemi, così nessun singolo test si avvicina al timeout anche con la macchina carica;
+  // il timeout esplicito copre comunque i run paralleli lenti.
+  const slugs = listTypologies().map((t) => t.slug)
+  for (const from of slugs)
+    it(`l'assieme si genera sempre da ${from} (parametri comuni incompatibili tornano al default)`, () => {
       for (const to of slugs) {
         const store = createConfiguratoreStore()
         store.getState().resetConfig(from)
@@ -200,7 +203,7 @@ describe("setTypology tra tutte le tipologie", () => {
         expect(derived.assembly?.typologySlug, `${from} → ${to}`).toBe(to)
         expect(config.typology).toBe(to)
       }
-  })
+    }, 20_000)
 
   it("conserva i comuni compatibili (larghezza da addossata a portale)", () => {
     const store = createConfiguratoreStore()
