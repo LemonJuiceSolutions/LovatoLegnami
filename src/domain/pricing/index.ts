@@ -13,3 +13,5 @@ export * from "./types";
 export * from "./data/default-listino";
 // Ottimizzazione di taglio 1D (P2)
 export * from "./cutting-stock";
+// Piano di taglio dell'assieme per (specie, qualità, sezione)
+export * from "./assembly-cuts";
