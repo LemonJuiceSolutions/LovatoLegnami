@@ -63,13 +63,15 @@ export function createRateLimiter(options: { now?: () => number; maxKeys?: numbe
   };
 }
 
-export type RateLimitedRoute = "submit" | "estimate";
+/** `pdf` (download del PDF col token) usa i limiti della stima: generare un PDF costa CPU. */
+export type RateLimitedRoute = "submit" | "estimate" | "pdf";
 
 const processLimiter = createRateLimiter();
 
 /** Limite di processo per la rotta pubblica e l'IP, con i valori da env. */
 export function checkRateLimit(route: RateLimitedRoute, ip: string, limiter: RateLimiter = processLimiter): RateLimitResult {
-  return limiter.check(`${route}:${ip}`, getEnv().rateLimits[route]);
+  const limits = getEnv().rateLimits;
+  return limiter.check(`${route}:${ip}`, route === "pdf" ? limits.estimate : limits[route]);
 }
 
 /** Solo test: azzera il limite di processo. */

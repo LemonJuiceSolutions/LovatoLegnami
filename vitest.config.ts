@@ -57,6 +57,7 @@ export default defineConfig({
       {
         // Persistenza (P5/P13): PGlite in-process, nessun servizio esterno.
         resolve: { alias },
+        esbuild: { jsx: "automatic" },
         test: {
           name: "db",
           environment: "node",

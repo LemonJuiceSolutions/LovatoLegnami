@@ -72,3 +72,65 @@ export function blacklistedKeys(value: unknown, path = ""): string[] {
     return [...(hit ? [p] : []), ...blacklistedKeys(v, p)];
   });
 }
+
+// ---------------------------------------------------------------------------
+// Invio della richiesta (`POST /api/preventivo`, multipart: campo `request` JSON + file)
+
+// eslint-disable-next-line no-control-regex
+const noControl = (s: string) => !/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/.test(s);
+const line = (min: number, max: number, what: string) =>
+  z
+    .string()
+    .trim()
+    .min(min, `${what} obbligatorio`)
+    .max(max, `${what}: al massimo ${max} caratteri`)
+    .refine((s) => noControl(s) && !/[\r\n]/.test(s), `${what}: caratteri non ammessi`);
+
+export const CustomerSchema = z
+  .object({
+    name: line(2, 120, "nome"),
+    email: z.string().trim().toLowerCase().max(254).email("indirizzo email non valido"),
+    phone: line(6, 30, "telefono").refine((s) => /^[+0-9][0-9 ()./-]{5,29}$/.test(s), "numero di telefono non valido"),
+    cap: z.string().trim().regex(/^\d{5}$/, "CAP non valido (5 cifre)"),
+    comune: line(2, 120, "comune"),
+  })
+  .strict();
+export type Customer = z.infer<typeof CustomerSchema>;
+
+/** Tempo minimo di compilazione del form contatti (anti-bot, best effort). */
+export const MIN_FILL_MS = 3_000;
+/** Un form aperto da più di un giorno è considerato non valido (ricarica la pagina). */
+export const MAX_FILL_MS = 24 * 60 * 60 * 1000;
+
+export const SubmitRequestSchema = z
+  .object({
+    estimate: EstimateRequestSchema,
+    customer: CustomerSchema,
+    notes: z
+      .string()
+      .max(2000, "note: al massimo 2000 caratteri")
+      .refine(noControl, "note: caratteri non ammessi")
+      .transform((s) => s.trim() || null)
+      .nullable()
+      .default(null),
+    consent: z
+      .object({
+        accepted: z.boolean().default(false),
+        version: z.string().max(20).default(""),
+      })
+      .strict()
+      .default({}),
+    /** Campo trappola invisibile: un umano lo lascia vuoto. */
+    website: z.string().max(200).default(""),
+    /** Istante (ms) di apertura del form contatti, dal client. */
+    startedAt: z.number().int().nonnegative(),
+  })
+  .strict();
+export type SubmitRequest = z.infer<typeof SubmitRequestSchema>;
+
+/** Corpo multipart massimo: 5 foto da 8 MB, scena da 4 MB e il JSON. */
+export const MAX_SUBMIT_BODY_BYTES = 5 * 8 * 1024 * 1024 + 4 * 1024 * 1024 + 256 * 1024;
+/** Campo JSON della richiesta nel multipart. */
+export const MAX_SUBMIT_JSON_BYTES = 128 * 1024;
+
+export const SubmitResponseSchema = z.object({ code: z.string(), token: z.string() }).strict();

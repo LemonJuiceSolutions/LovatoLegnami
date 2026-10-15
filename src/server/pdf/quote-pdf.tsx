@@ -50,7 +50,7 @@ const C = { ink: "#1f1a17", muted: "#6b625c", line: "#d9cfc4", accent: "#5a3a22"
 const s = StyleSheet.create({
   page: { padding: 36, fontFamily: "Helvetica", fontSize: 10, color: C.ink, lineHeight: 1.35 },
   header: { flexDirection: "row", justifyContent: "space-between", borderBottomWidth: 1, borderBottomColor: C.accent, paddingBottom: 8, marginBottom: 12 },
-  brand: { fontSize: 16, fontFamily: "Helvetica-Bold", color: C.accent },
+  brand: { fontSize: 16, fontFamily: "Helvetica-Bold", color: C.accent, lineHeight: 1.2, marginBottom: 3 },
   small: { fontSize: 8.5, color: C.muted },
   title: { fontSize: 13, fontFamily: "Helvetica-Bold", marginBottom: 2 },
   section: { marginBottom: 12 },

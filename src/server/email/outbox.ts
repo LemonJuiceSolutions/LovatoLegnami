@@ -46,7 +46,10 @@ export interface OutboxDeps {
 
 let defaultPdfForLead: OutboxDeps["pdfForLead"];
 
-/** Fornitore di PDF di processo (registrato dall'API pubblica, 8.6). */
+/**
+ * Fornitore di PDF di processo; senza, l'outbox usa `pdfForLead` di
+ * `server/quotes/lead-pdf` (importato quando serve, per evitare un ciclo di moduli).
+ */
 export function setDefaultPdfProvider(provider: OutboxDeps["pdfForLead"]): void {
   defaultPdfForLead = provider;
 }
@@ -58,7 +61,16 @@ export class OutboxPayloadError extends Error {
   }
 }
 
-const recipient = z.string().email().max(254);
+/**
+ * Destinatario: un solo indirizzo, senza spazi, a capo, virgole o punti e virgola (niente
+ * destinatari aggiunti né intestazioni iniettate). Più largo di `z.email()` perché in
+ * sviluppo l'ufficio è `ufficio@localhost`; gli indirizzi del cliente sono già validati
+ * con `z.email()` all'invio della richiesta.
+ */
+const recipient = z
+  .string()
+  .max(254)
+  .regex(/^[^\s<>@,;"']+@[^\s<>@,;"']+$/, "indirizzo non valido");
 
 /** Accoda un'email (stato `in-coda`). Lancia `OutboxPayloadError` se destinatario o dati non sono validi. */
 export async function enqueue<T extends OutboxTemplate>(
@@ -84,8 +96,8 @@ export async function renderEntry(row: Pick<EmailOutboxRow, "template" | "to" | 
     case "conferma-cliente": {
       const data = CustomerConfirmationSchema.safeParse(row.payload);
       if (!data.success) throw new OutboxPayloadError("dati dell'email non validi o rimossi");
-      const pdfForLead = deps.pdfForLead ?? defaultPdfForLead;
-      const pdf = pdfForLead ? await pdfForLead(data.data.leadId) : null;
+      const pdfForLead = deps.pdfForLead ?? defaultPdfForLead ?? (await import("@/server/quotes/lead-pdf")).pdfForLead;
+      const pdf = await pdfForLead(data.data.leadId);
       return customerConfirmationEmail(row.to, data.data, pdf);
     }
     case "notifica-ufficio": {

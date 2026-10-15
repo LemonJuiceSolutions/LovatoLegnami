@@ -1,11 +1,11 @@
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
-import { crc32, deflateSync } from "node:zlib";
 import { describe, expect, it } from "vitest";
 import { customerView, formatEuro, parseEnvelope, planFromDiagonals, boxOfPlan, defaultParams, getTypology, type Quote } from "@/domain";
 import { quotePdfData, type QuotePdfSource } from "../data";
 import { pdfText, renderQuotePdf } from "../quote-pdf";
 import { extractPdfText } from "./pdf-text";
+import { tinyPng } from "@/server/storage/__tests__/fixtures";
 
 const golden = JSON.parse(
   readFileSync(fileURLToPath(new URL("../../../domain/pricing/__fixtures__/preventivo-monofalda-default.json", import.meta.url)), "utf8"),
@@ -26,25 +26,6 @@ const source = (over: Partial<QuotePdfSource> = {}): QuotePdfSource => ({
   customerNotes: "Accesso dal cancello laterale 😀",
   ...over,
 });
-
-/** PNG 2×2 valido (RGB) per l'immagine della scena. */
-function tinyPng(): Uint8Array {
-  const chunk = (type: string, data: Buffer) => {
-    const len = Buffer.alloc(4);
-    len.writeUInt32BE(data.length);
-    const td = Buffer.concat([Buffer.from(type, "latin1"), data]);
-    const crc = Buffer.alloc(4);
-    crc.writeUInt32BE(crc32(td) >>> 0);
-    return Buffer.concat([len, td, crc]);
-  };
-  const ihdr = Buffer.alloc(13);
-  ihdr.writeUInt32BE(2, 0);
-  ihdr.writeUInt32BE(2, 4);
-  ihdr[8] = 8;
-  ihdr[9] = 2;
-  const raw = Buffer.from([0, 200, 150, 100, 90, 60, 30, 0, 90, 60, 30, 200, 150, 100]);
-  return new Uint8Array(Buffer.concat([Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]), chunk("IHDR", ihdr), chunk("IDAT", deflateSync(raw)), chunk("IEND", Buffer.alloc(0))]));
-}
 
 const norm = (s: string) => s.replace(/\u00a0/g, " ").replace(/\n/g, "");
 
