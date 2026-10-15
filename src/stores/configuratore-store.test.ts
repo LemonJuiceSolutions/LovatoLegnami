@@ -170,6 +170,21 @@ describe("store configuratore – selezione dei pezzi", () => {
     store.getState().resetConfig();
     expect(store.getState().selection).toEqual([]);
   });
+
+  it("dopo una rigenerazione toglie dalla selezione i pezzi che non esistono più", () => {
+    const store = createConfiguratoreStore();
+    const ids = () => store.getState().derived.assembly!.pieces.map((p) => p.id);
+    const before = ids().filter((id) => id.startsWith("TVT-"));
+    const last = before[before.length - 1];
+    store.getState().selectPieces(["PIL-01", last]);
+    store.getState().setParam("interasse", 1200);
+    expect(ids()).not.toContain(last);
+    expect(store.getState().selection).toEqual(["PIL-01"]);
+    store.getState().selectPieces([last]);
+    expect(store.getState().selection).toEqual([last]);
+    store.getState().setParam("interasse", 1300);
+    expect(store.getState().selection).toEqual([]);
+  });
 });
 
 describe("setTypology tra tutte le tipologie", () => {

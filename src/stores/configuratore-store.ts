@@ -122,6 +122,20 @@ function failure(e: unknown): ActionResult {
   return { ok: false, error: message, issues: [{ path: "(radice)", message }] };
 }
 
+/**
+ * Selezione ristretta ai pezzi dell'assieme corrente: dopo una rigenerazione
+ * (meno travetti, altra larghezza…) gli id spariti non devono restare
+ * selezionati, altrimenti il viewer attenua tutti i pezzi senza evidenziarne
+ * nessuno. Restituisce lo stesso array se non cambia nulla.
+ */
+function pruneSelection(selection: readonly string[], derived: Derived): readonly string[] {
+  if (selection.length === 0) return selection;
+  const ids = new Set((derived.assembly?.pieces ?? []).map((p) => p.id));
+  const kept = selection.filter((id) => ids.has(id));
+  if (kept.length === selection.length) return selection;
+  return kept.length === 0 ? NO_SELECTION : kept;
+}
+
 /** Primo id `OST-nn` libero. */
 function nextObstacleId(envelope: Envelope): string {
   const used = new Set(envelope.obstacles.map((o) => o.id));
@@ -153,7 +167,12 @@ export function configuratoreSlice(options: ConfiguratoreStoreOptions = {}) {
         config.params === prev.params &&
         config.envelope === prev.envelope &&
         config.embedment === prev.embedment;
-      set({ config, derived: sameGeometry ? get().derived : computeDerived(config, get().derived, ruleSet) });
+      if (sameGeometry) {
+        set({ config });
+        return;
+      }
+      const derived = computeDerived(config, get().derived, ruleSet);
+      set({ config, derived, selection: pruneSelection(get().selection, derived) });
     };
 
     const update = (patch: Partial<ConfiguratoreConfig>) => commit({ ...get().config, ...patch });
