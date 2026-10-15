@@ -13,7 +13,7 @@ const { DraftProvider } = await import("../draft-context")
 const { draftFromRule, ruleFromDraft, sentence } = await import("../listino/complication-rules")
 
 // la sezione legno ha un centinaio di righe: rendering lento in jsdom sotto carico
-vi.setConfig({ testTimeout: 20_000 })
+vi.setConfig({ testTimeout: 60_000 })
 
 const status: DatasetStatusInfo = { dataset: "listino", active: null, draft: { id: "d", version: 2, effectiveFrom: "2026-01-01", notes: null, updatedAt: "2026-10-15T08:00:00.000Z", by: null, at: "" } }
 

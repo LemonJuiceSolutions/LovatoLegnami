@@ -62,13 +62,26 @@ interface RowState<R> {
 
 let nextId = 1
 const wrap = <R,>(rows: readonly R[]): RowState<R>[] => rows.map((values) => ({ id: nextId++, values }))
-const cellId = (rowId: number, key: string) => `${rowId}:${key}`
+type CellMap = Readonly<Record<string, string>>
+type RowMaps = Readonly<Record<number, CellMap>>
+const EMPTY: CellMap = {}
+
+/** Mappa per riga con la cella aggiornata (`null` toglie la voce); le altre righe restano identiche. */
+function setCell(maps: RowMaps, rowId: number, key: string, value: string | null): RowMaps {
+  const row = { ...(maps[rowId] ?? EMPTY) }
+  if (value === null) delete row[key]
+  else row[key] = value
+  const next = { ...maps }
+  if (Object.keys(row).length) next[rowId] = row
+  else delete next[rowId]
+  return next
+}
 
 export function EditableTable<R extends Record<string, unknown>>(props: EditableTableProps<R>) {
   const { label, description, columns, newRow, onSave, validateRows, readOnly = false, toolbar } = props
   const [rows, setRows] = React.useState(() => wrap(props.rows))
-  const [texts, setTexts] = React.useState<Record<string, string>>({})
-  const [errors, setErrors] = React.useState<Record<string, string>>({})
+  const [texts, setTexts] = React.useState<RowMaps>({})
+  const [errors, setErrors] = React.useState<RowMaps>({})
   const [dirty, setDirty] = React.useState(false)
   const [query, setQuery] = React.useState("")
   const [message, setMessage] = React.useState<{ kind: "ok" | "error"; text: string } | null>(null)
@@ -95,74 +108,81 @@ export function EditableTable<R extends Record<string, unknown>>(props: Editable
     ? rows.filter((r) => columns.some((c) => (c.display ? c.display(r.values) : String(r.values[c.key] ?? "")).toLowerCase().includes(q)))
     : rows
 
-  const update = (rowId: number, key: string, value: unknown) => {
-    setRows((rs) => rs.map((r) => (r.id === rowId ? { ...r, values: { ...r.values, [key]: value } } : r)))
+  const touch = React.useCallback(() => {
     setDirty(true)
     setMessage(null)
-  }
+  }, [])
 
-  const setError = (id: string, error: string | null) =>
-    setErrors((e) => {
-      const next = { ...e }
-      if (error) next[id] = error
-      else delete next[id]
-      return next
-    })
+  const update = React.useCallback(
+    (rowId: number, key: string, value: unknown) => {
+      setRows((rs) => rs.map((r) => (r.id === rowId ? { ...r, values: { ...r.values, [key]: value } } : r)))
+      touch()
+    },
+    [touch],
+  )
 
-  const onText = (row: RowState<R>, col: Column<R>, text: string) => {
-    const id = cellId(row.id, col.key)
-    setTexts((t) => ({ ...t, [id]: text }))
-    setDirty(true)
-    setMessage(null)
-    const parsed = parseCell(col, text)
-    if (!parsed.ok) return setError(id, parsed.error)
-    const extra = col.validate?.(parsed.value, { ...row.values, [col.key]: parsed.value })
-    setError(id, extra ?? null)
-    if (!extra) update(row.id, col.key, parsed.value)
-  }
+  const onText = React.useCallback(
+    (row: RowState<R>, col: Column<R>, text: string) => {
+      setTexts((t) => setCell(t, row.id, col.key, text))
+      touch()
+      const parsed = parseCell(col, text)
+      if (!parsed.ok) return setErrors((e) => setCell(e, row.id, col.key, parsed.error))
+      const extra = col.validate?.(parsed.value, { ...row.values, [col.key]: parsed.value }) ?? null
+      setErrors((e) => setCell(e, row.id, col.key, extra))
+      if (!extra) update(row.id, col.key, parsed.value)
+    },
+    [touch, update],
+  )
 
-  const focusCell = (rowIndex: number, colIndex: number) => {
-    const el = tableRef.current?.querySelector<HTMLElement>(`[data-cell="${rowIndex}:${colIndex}"]`)
-    el?.focus()
-  }
+  const focusCell = React.useCallback((rowIndex: number, colIndex: number) => {
+    tableRef.current?.querySelector<HTMLElement>(`[data-cell="${rowIndex}:${colIndex}"]`)?.focus()
+  }, [])
 
-  const onKeyDown = (e: React.KeyboardEvent, rowIndex: number, colIndex: number) => {
-    if (e.key === "ArrowDown" || (e.key === "Enter" && !(e.target instanceof HTMLSelectElement))) {
-      e.preventDefault()
-      focusCell(rowIndex + 1, colIndex)
-    } else if (e.key === "ArrowUp") {
-      e.preventDefault()
-      focusCell(rowIndex - 1, colIndex)
-    }
-  }
+  const onKeyDown = React.useCallback(
+    (e: React.KeyboardEvent, rowIndex: number, colIndex: number) => {
+      if (e.key === "ArrowDown" || (e.key === "Enter" && !(e.target instanceof HTMLSelectElement))) {
+        e.preventDefault()
+        focusCell(rowIndex + 1, colIndex)
+      } else if (e.key === "ArrowUp") {
+        e.preventDefault()
+        focusCell(rowIndex - 1, colIndex)
+      }
+    },
+    [focusCell],
+  )
+
+  const remove = React.useCallback(
+    (rowId: number) => {
+      setRows((rs) => rs.filter((r) => r.id !== rowId))
+      setErrors((e) => {
+        const next = { ...e }
+        delete next[rowId]
+        return next
+      })
+      touch()
+    },
+    [touch],
+  )
 
   const add = () => {
     if (!newRow) return
     const row = { id: nextId++, values: newRow() }
     setRows((rs) => [...rs, row])
-    setDirty(true)
+    touch()
     setQuery("")
     // le celle obbligatorie vuote della riga nuova sono subito segnalate
     const missing: Record<string, string> = {}
     for (const col of columns) {
       if (col.kind === "readonly" || col.kind === "switch") continue
-      const text = formatCell(col, row.values[col.key])
-      const parsed = parseCell(col, text)
-      if (!parsed.ok) missing[cellId(row.id, col.key)] = parsed.error
+      const parsed = parseCell(col, formatCell(col, row.values[col.key]))
+      if (!parsed.ok) missing[col.key] = parsed.error
     }
-    setErrors((e) => ({ ...e, ...missing }))
+    if (Object.keys(missing).length) setErrors((e) => ({ ...e, [row.id]: missing }))
     requestAnimationFrame(() => focusCell(rows.length, 0))
   }
 
-  const remove = (rowId: number) => {
-    setRows((rs) => rs.filter((r) => r.id !== rowId))
-    setErrors((e) => Object.fromEntries(Object.entries(e).filter(([k]) => !k.startsWith(`${rowId}:`))))
-    setDirty(true)
-    setMessage(null)
-  }
-
   const rowsError = validateRows?.(rows.map((r) => r.values)) ?? null
-  const errorCount = Object.keys(errors).length
+  const errorCount = Object.values(errors).reduce((n, m) => n + Object.keys(m).length, 0)
   const canSave = !readOnly && dirty && errorCount === 0 && !rowsError && !saving
 
   const save = () => {
@@ -178,6 +198,7 @@ export function EditableTable<R extends Record<string, unknown>>(props: Editable
   }
 
   const captionId = `${baseId}-caption`
+  const removable = !!newRow && !readOnly
   return (
     <div className="space-y-2 rounded-md border p-3">
       <div className="flex flex-wrap items-end justify-between gap-2">
@@ -211,7 +232,7 @@ export function EditableTable<R extends Record<string, unknown>>(props: Editable
                   {c.unit && <span className="ml-1 font-normal text-muted-foreground">({c.unit})</span>}
                 </th>
               ))}
-              {newRow && !readOnly && (
+              {removable && (
                 <th scope="col" className="w-10 px-2 py-1.5">
                   <span className="sr-only">Azioni</span>
                 </th>
@@ -226,85 +247,24 @@ export function EditableTable<R extends Record<string, unknown>>(props: Editable
                 </td>
               </tr>
             )}
-            {visible.map((row, rowIndex) => {
-              const n = rows.indexOf(row) + 1
-              return (
-                <tr key={row.id} className="border-t align-top">
-                  {columns.map((col, colIndex) => {
-                    const id = cellId(row.id, col.key)
-                    const error = errors[id]
-                    const errorId = `${baseId}-${id}-err`
-                    const name = `${col.header} riga ${n}`
-                    const common = {
-                      "data-cell": `${rowIndex}:${colIndex}`,
-                      "aria-label": name,
-                      "aria-invalid": error ? true : undefined,
-                      "aria-describedby": error ? errorId : undefined,
-                      disabled: readOnly,
-                      onKeyDown: (e: React.KeyboardEvent) => onKeyDown(e, rowIndex, colIndex),
-                    }
-                    let control: React.ReactNode
-                    if (col.kind === "readonly") control = <span className="block py-1.5">{col.display ? col.display(row.values) : formatCell(col, row.values[col.key])}</span>
-                    else if (col.kind === "switch")
-                      control = (
-                        <Switch
-                          {...common}
-                          checked={row.values[col.key] === true}
-                          onCheckedChange={(v) => update(row.id, col.key, v)}
-                        />
-                      )
-                    else if (col.kind === "select")
-                      control = (
-                        <select
-                          {...common}
-                          className={cn("h-8 w-full rounded-md border border-input bg-background px-2 text-sm", error && "border-destructive")}
-                          value={String(row.values[col.key] ?? "")}
-                          onChange={(e) => onText(row, col, e.target.value)}
-                        >
-                          {(col.optional || row.values[col.key] === undefined || row.values[col.key] === "") && <option value="">—</option>}
-                          {(col.options ?? []).map((o) => (
-                            <option key={o.value} value={o.value}>
-                              {o.label}
-                            </option>
-                          ))}
-                        </select>
-                      )
-                    else
-                      control = (
-                        <div className="flex items-center gap-1">
-                          <Input
-                            {...common}
-                            type="text"
-                            inputMode={col.kind === "text" ? undefined : "decimal"}
-                            placeholder={col.placeholder}
-                            className={cn("h-8", col.kind !== "text" && "text-right tabular-nums", error && "border-destructive")}
-                            value={texts[id] ?? formatCell(col, row.values[col.key])}
-                            onChange={(e) => onText(row, col, e.target.value)}
-                          />
-                          {col.unit && <span className="shrink-0 text-xs text-muted-foreground">{col.unit}</span>}
-                        </div>
-                      )
-                    return (
-                      <td key={col.key} className={cn("px-2 py-1", col.width)}>
-                        {control}
-                        {error && (
-                          <p id={errorId} role="alert" className="mt-0.5 text-xs text-destructive">
-                            {error}
-                          </p>
-                        )}
-                      </td>
-                    )
-                  })}
-                  {newRow && !readOnly && (
-                    <td className="px-2 py-1">
-                      <Button type="button" variant="ghost" size="icon" className="h-8 w-8" aria-label={`Rimuovi riga ${n}`} onClick={() => remove(row.id)}>
-                        <Trash2 className="h-4 w-4" aria-hidden />
-                      </Button>
-                    </td>
-                  )}
-                </tr>
-              )
-            })}
+            {visible.map((row, rowIndex) => (
+              <TableRow<R>
+                key={row.id}
+                row={row}
+                rowIndex={rowIndex}
+                n={rows.indexOf(row) + 1}
+                columns={columns}
+                texts={texts[row.id] ?? EMPTY}
+                errors={errors[row.id] ?? EMPTY}
+                baseId={baseId}
+                readOnly={readOnly}
+                removable={removable}
+                onText={onText}
+                onUpdate={update}
+                onKeyDown={onKeyDown}
+                onRemove={remove}
+              />
+            ))}
           </tbody>
         </table>
       </div>
@@ -335,3 +295,91 @@ export function EditableTable<R extends Record<string, unknown>>(props: Editable
     </div>
   )
 }
+
+interface TableRowProps<R> {
+  readonly row: RowState<R>
+  readonly rowIndex: number
+  readonly n: number
+  readonly columns: readonly Column<R>[]
+  readonly texts: CellMap
+  readonly errors: CellMap
+  readonly baseId: string
+  readonly readOnly: boolean
+  readonly removable: boolean
+  readonly onText: (row: RowState<R>, col: Column<R>, text: string) => void
+  readonly onUpdate: (rowId: number, key: string, value: unknown) => void
+  readonly onKeyDown: (e: React.KeyboardEvent, rowIndex: number, colIndex: number) => void
+  readonly onRemove: (rowId: number) => void
+}
+
+/** Riga memorizzata: digitando in una cella si ridisegna solo la sua riga. */
+const TableRow = React.memo(function TableRow<R extends Record<string, unknown>>(p: TableRowProps<R>) {
+  const { row, rowIndex, n, columns, texts, errors, baseId, readOnly } = p
+  return (
+    <tr className="border-t align-top">
+      {columns.map((col, colIndex) => {
+        const error = errors[col.key]
+        const errorId = `${baseId}-${row.id}-${col.key}-err`
+        const common = {
+          "data-cell": `${rowIndex}:${colIndex}`,
+          "aria-label": `${col.header} riga ${n}`,
+          "aria-invalid": error ? true : undefined,
+          "aria-describedby": error ? errorId : undefined,
+          disabled: readOnly,
+          onKeyDown: (e: React.KeyboardEvent) => p.onKeyDown(e, rowIndex, colIndex),
+        }
+        let control: React.ReactNode
+        if (col.kind === "readonly") control = <span className="block py-1.5">{col.display ? col.display(row.values) : formatCell(col, row.values[col.key])}</span>
+        else if (col.kind === "switch") control = <Switch {...common} checked={row.values[col.key] === true} onCheckedChange={(v) => p.onUpdate(row.id, col.key, v)} />
+        else if (col.kind === "select")
+          control = (
+            <select
+              {...common}
+              className={cn("h-8 w-full rounded-md border border-input bg-background px-2 text-sm", error && "border-destructive")}
+              value={String(row.values[col.key] ?? "")}
+              onChange={(e) => p.onText(row, col, e.target.value)}
+            >
+              {(col.optional || row.values[col.key] === undefined || row.values[col.key] === "") && <option value="">—</option>}
+              {(col.options ?? []).map((o) => (
+                <option key={o.value} value={o.value}>
+                  {o.label}
+                </option>
+              ))}
+            </select>
+          )
+        else
+          control = (
+            <div className="flex items-center gap-1">
+              <Input
+                {...common}
+                type="text"
+                inputMode={col.kind === "text" ? undefined : "decimal"}
+                placeholder={col.placeholder}
+                className={cn("h-8", col.kind !== "text" && "text-right tabular-nums", error && "border-destructive")}
+                value={texts[col.key] ?? formatCell(col, row.values[col.key])}
+                onChange={(e) => p.onText(row, col, e.target.value)}
+              />
+              {col.unit && <span className="shrink-0 text-xs text-muted-foreground">{col.unit}</span>}
+            </div>
+          )
+        return (
+          <td key={col.key} className={cn("px-2 py-1", col.width)}>
+            {control}
+            {error && (
+              <p id={errorId} role="alert" className="mt-0.5 text-xs text-destructive">
+                {error}
+              </p>
+            )}
+          </td>
+        )
+      })}
+      {p.removable && (
+        <td className="px-2 py-1">
+          <Button type="button" variant="ghost" size="icon" className="h-8 w-8" aria-label={`Rimuovi riga ${n}`} onClick={() => p.onRemove(row.id)}>
+            <Trash2 className="h-4 w-4" aria-hidden />
+          </Button>
+        </td>
+      )}
+    </tr>
+  )
+}) as <R extends Record<string, unknown>>(p: TableRowProps<R>) => React.ReactElement

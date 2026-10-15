@@ -6,7 +6,10 @@ import { cn } from "@/lib/utils"
 import { PRICE_LIST_SECTIONS, type PriceListSectionSlug } from "../admin-nav"
 import { DatasetEditorShell } from "../dataset-editor-shell"
 import type { DatasetStatusInfo } from "../types"
+import { CsvTools } from "./csv-tools"
 import { PriceListEditor } from "./price-list-editor"
+
+const TECHNICAL_TABLES = new Set(["lunghezze", "lavorazioni"])
 
 /** Pagina del listino (9.3): stato della versione, schede delle sezioni, form della sezione. */
 export function ListinoPage({
@@ -39,7 +42,13 @@ export function ListinoPage({
           </Link>
         ))}
       </nav>
-      <PriceListEditor section={section} priceList={priceList} canCommercial={canCommercial} canTechnical={canTechnical} />
+      <PriceListEditor
+        section={section}
+        priceList={priceList}
+        canCommercial={canCommercial}
+        canTechnical={canTechnical}
+        csvToolbar={(table) => <CsvTools table={table} priceList={priceList} readOnly={TECHNICAL_TABLES.has(table) ? !canTechnical : !canCommercial} />}
+      />
     </DatasetEditorShell>
   )
 }
