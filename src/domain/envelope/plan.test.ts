@@ -2,7 +2,20 @@ import { describe, expect, it } from "vitest";
 import { ValidationError } from "../components/errors";
 import { signedDistance } from "../math/plane";
 import { vec3 } from "../math/vec3";
-import { planDeviations, planOf, planPenetration, pointInPlan, sidePlane, sideSegment, wallPlane } from "./plan";
+import {
+  PlanMeasuresError,
+  boxOfPlan,
+  measuresFromPlan,
+  planBounds,
+  planDeviations,
+  planFromDiagonals,
+  planOf,
+  planPenetration,
+  pointInPlan,
+  sidePlane,
+  sideSegment,
+  wallPlane,
+} from "./plan";
 import { parseEnvelope } from "./types";
 
 const rad = (d: number) => (d * Math.PI) / 180;
@@ -87,5 +100,63 @@ describe("pianta dell'ingombro", () => {
     expect(e).toEqual(json);
     expect("plan" in e).toBe(false);
     expect(parseEnvelope(JSON.parse(JSON.stringify(skewed)))).toEqual(skewed);
+  });
+});
+
+describe("pianta dalle diagonali", () => {
+  it("diagonali uguali e lati a coppie → rettangolo", () => {
+    const d = Math.hypot(5000, 3000);
+    const p = planFromDiagonals({ front: 5000, back: 5000, left: 3000, right: 3000, d1: d, d2: d });
+    const expected = [[0, 0], [5000, 0], [5000, 3000], [0, 3000]];
+    p.corners.forEach((c, i) => {
+      expect(c.x).toBeCloseTo(expected[i][0], 6);
+      expect(c.y).toBeCloseTo(expected[i][1], 6);
+    });
+    expect(planDeviations(p).maxCornerDeg).toBeCloseTo(0, 6);
+  });
+
+  it("fronte 5000, muro 5000, fianchi 3000/3000, diagonali 5900/5760 → parallelogramma fuori squadra", () => {
+    const m = { front: 5000, back: 5000, left: 3000, right: 3000, d1: 5900, d2: 5760 };
+    const p = planFromDiagonals(m);
+    const dev = planDeviations(p);
+    expect(Math.round(dev.maxCornerDeg * 10) / 10).toBe(1.6); // deviazione in gradi con un decimale
+    expect(dev.sides.sinistro).toBeCloseTo(dev.sides.destro, 1); // fianchi (quasi) paralleli
+    expect(dev.sides.posteriore).toBeCloseTo(0, 1); // muro (quasi) parallelo al fronte
+    expect(planBounds(p).minX).toBe(0);
+    // il box ricavato dalla pianta la rende valida
+    expect(() => parseEnvelope({ box: boxOfPlan(p, 3000), plan: p })).not.toThrow();
+    const back = measuresFromPlan(p);
+    // misure compensate: tutte entro 1 mm (il chiuso darebbe 1,24 mm di errore sul solo muro)
+    for (const k of ["front", "back", "left", "right", "d1", "d2"] as const) expect(Math.abs(back[k] - m[k])).toBeLessThan(1);
+    // fronte sempre su X
+    expect(p.corners[0].y).toBe(0);
+    expect(p.corners[1].y).toBe(0);
+  });
+
+  it("parallelogramma inclinato a sinistra: traslato in X perché il box parta da 0", () => {
+    const p = planFromDiagonals({ front: 5000, back: 5000, left: 3000, right: 3000, d1: 5760, d2: 5900 });
+    expect(planBounds(p).minX).toBe(0);
+    expect(p.corners[3].x).toBe(0);
+    expect(p.corners[0].x).toBeGreaterThan(80);
+  });
+
+  it("misure impossibili → \"misure non coerenti: ricontrolla le diagonali\"", () => {
+    const base = { front: 5000, back: 5000, left: 3000, right: 3000 };
+    expect(() => planFromDiagonals({ ...base, d1: 9000, d2: 5830 })).toThrow(/^misure non coerenti: ricontrolla le diagonali/);
+    expect(() => planFromDiagonals({ ...base, d1: 6200, d2: 6200 })).toThrow(PlanMeasuresError); // muro ≠ 5000 oltre 20 mm
+    expect(() => planFromDiagonals({ ...base, d1: 5831, d2: 5831 }, 0.2)).not.toThrow();
+    expect(() => planFromDiagonals({ ...base, back: 5100, d1: 5831, d2: 5831 })).toThrow(/larghezza al muro sarebbe 5000/);
+    expect(() => planFromDiagonals({ ...base, back: 5050, d1: 5831, d2: 5831 }, 60)).not.toThrow();
+    expect(() => planFromDiagonals({ ...base, d1: 0, d2: 5831 })).toThrow(/d1 deve essere/);
+  });
+});
+
+describe("measuresFromPlan", () => {
+  it("andata e ritorno: le misure di una pianta ridanno la stessa pianta", () => {
+    const p = planFromDiagonals(measuresFromPlan(planOf(skewed)));
+    p.corners.forEach((c, i) => {
+      expect(c.x).toBeCloseTo(planOf(skewed).corners[i].x, 6);
+      expect(c.y).toBeCloseTo(planOf(skewed).corners[i].y, 6);
+    });
   });
 });

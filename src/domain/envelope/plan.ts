@@ -215,3 +215,142 @@ export function planPenetration(plan: Plan, p: Vec2): PlanPenetration {
 
 /** Il punto è nella pianta (bordo incluso) entro `tol` mm. */
 export const pointInPlan = (plan: Plan, p: Vec2, tol = 0): boolean => planPenetration(plan, p).depth <= tol;
+
+/* ------------------------------------------------------------------ */
+/* Misure del cliente: lati e diagonali                                */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Misure in pianta prese in cantiere (mm): larghezza al fronte e al muro,
+ * profondità ai due fianchi, diagonali `d1` (anteriore sinistro → posteriore
+ * destro) e `d2` (anteriore destro → posteriore sinistro).
+ */
+export interface PlanMeasures {
+  readonly front: number;
+  readonly back: number;
+  readonly left: number;
+  readonly right: number;
+  readonly d1: number;
+  readonly d2: number;
+}
+
+/** Tolleranza di default sulla coerenza delle misure (mm). */
+export const PLAN_MEASURES_TOLERANCE = 20;
+
+/** Misure che non formano un quadrilatero convesso entro la tolleranza. */
+export class PlanMeasuresError extends Error {
+  /** Dettaglio tecnico (per l'ufficio e i log). */
+  readonly detail: string;
+
+  constructor(detail: string) {
+    super(`misure non coerenti: ricontrolla le diagonali (${detail})`);
+    this.name = "PlanMeasuresError";
+    this.detail = detail;
+  }
+}
+
+const dist2 = (a: Vec2, b: Vec2): number => Math.hypot(a.x - b.x, a.y - b.y);
+
+/**
+ * Pianta dalle misure del cliente, risolta in chiuso (P4): fronte su X
+ * (anteriore sinistro nell'origine, anteriore destro in (front, 0)); angolo
+ * posteriore sinistro dalla terna `left, front, d2`, posteriore destro dalla
+ * terna `right, front, d1` (intersezione di due circonferenze, dalla parte
+ * di +Y); verifica che la distanza tra i due angoli posteriori sia `back`
+ * entro `tol`. Le sei misure sono poi compensate ai minimi quadrati (5 gradi
+ * di libertà, fronte sempre su X), così l'errore di misura è ripartito su
+ * tutte invece di finire solo sul lato al muro. La pianta è traslata in X perché il rettangolo contenitore
+ * parta da 0 (box = `boxOfPlan`). `PlanMeasuresError` ("misure non coerenti:
+ * ricontrolla le diagonali") se un triangolo non esiste, il lato al muro non
+ * torna o la pianta non è convessa.
+ */
+export function planFromDiagonals(m: PlanMeasures, tol: number = PLAN_MEASURES_TOLERANCE): Plan {
+  for (const [k, v] of Object.entries(m))
+    if (!Number.isFinite(v) || v <= 0) throw new PlanMeasuresError(`${k} deve essere un numero maggiore di 0`);
+  const f = m.front;
+  const apex = (side: number, diag: number, fromRight: boolean, what: string): Vec2 => {
+    // |P − fl| = (fromRight ? diag : side), |P − fr| = (fromRight ? side : diag)
+    const r0 = fromRight ? diag : side;
+    const r1 = fromRight ? side : diag;
+    const x = (r0 * r0 - r1 * r1 + f * f) / (2 * f);
+    const h2 = r0 * r0 - x * x;
+    if (h2 <= 0) throw new PlanMeasuresError(`il triangolo fronte–${what} non si chiude`);
+    return { x, y: Math.sqrt(h2) };
+  };
+  const bl = apex(m.left, m.d2, false, "fianco sinistro–diagonale d2");
+  const br = apex(m.right, m.d1, true, "fianco destro–diagonale d1");
+  const back = dist2(bl, br);
+  if (Math.abs(back - m.back) > tol)
+    throw new PlanMeasuresError(`con queste diagonali la larghezza al muro sarebbe ${fmt(back)} mm invece di ${fmt(m.back)} mm (tolleranza ${fmt(tol)} mm)`);
+  const raw: Plan = adjust({ corners: [{ x: 0, y: 0 }, { x: f, y: 0 }, br, bl] }, m);
+  const dx = -planBounds(raw).minX;
+  const plan: Plan = { corners: raw.corners.map((c) => ({ x: c.x + dx + 0, y: c.y })) as unknown as Plan["corners"] };
+  const issues = planIssues(plan, boxOfPlan(plan, 1));
+  if (issues.length) throw new PlanMeasuresError(issues[0].message);
+  return plan;
+}
+
+/** Coppie di angoli delle sei misure, nell'ordine di `PlanMeasures`. */
+const MEASURE_PAIRS: readonly [keyof PlanMeasures, number, number][] = [
+  ["front", 0, 1],
+  ["back", 3, 2],
+  ["left", 0, 3],
+  ["right", 1, 2],
+  ["d1", 0, 2],
+  ["d2", 1, 3],
+];
+
+/**
+ * Compensazione ai minimi quadrati (Gauss–Newton) delle sei misure sulla
+ * pianta di partenza: incognite x dell'anteriore destro e (x, y) dei due
+ * angoli posteriori, anteriore sinistro nell'origine.
+ */
+function adjust(start: Plan, m: PlanMeasures): Plan {
+  let p = [start.corners[1].x, start.corners[2].x, start.corners[2].y, start.corners[3].x, start.corners[3].y];
+  const pts = (q: number[]): Vec2[] => [{ x: 0, y: 0 }, { x: q[0], y: 0 }, { x: q[1], y: q[2] }, { x: q[3], y: q[4] }];
+  // indice dell'incognita per (angolo, coordinata); −1 = fisso
+  const unknown = [[-1, -1], [0, -1], [1, 2], [3, 4]];
+  for (let iter = 0; iter < 20; iter++) {
+    const c = pts(p);
+    const J: number[][] = [];
+    const r: number[] = [];
+    for (const [key, i, j] of MEASURE_PAIRS) {
+      const d = dist2(c[i], c[j]);
+      r.push(d - m[key]);
+      const row = [0, 0, 0, 0, 0];
+      const ux = (c[i].x - c[j].x) / d;
+      const uy = (c[i].y - c[j].y) / d;
+      for (const [k, s] of [[i, 1], [j, -1]] as const) {
+        if (unknown[k][0] >= 0) row[unknown[k][0]] += s * ux;
+        if (unknown[k][1] >= 0) row[unknown[k][1]] += s * uy;
+      }
+      J.push(row);
+    }
+    // equazioni normali JᵀJ δ = −Jᵀr (5×5, eliminazione di Gauss con pivot parziale)
+    const A = Array.from({ length: 5 }, (_, a) => [
+      ...Array.from({ length: 5 }, (_, b) => J.reduce((s, row) => s + row[a] * row[b], 0)),
+      -J.reduce((s, row, k) => s + row[a] * r[k], 0),
+    ]);
+    for (let col = 0; col < 5; col++) {
+      const piv = A.slice(col).reduce((best, row, k) => (Math.abs(row[col]) > Math.abs(A[best][col]) ? k + col : best), col);
+      [A[col], A[piv]] = [A[piv], A[col]];
+      if (Math.abs(A[col][col]) < 1e-12) return start; // configurazione degenere: resta la soluzione in chiuso
+      for (let row = 0; row < 5; row++) {
+        if (row === col) continue;
+        const k = A[row][col] / A[col][col];
+        for (let q = col; q <= 5; q++) A[row][q] -= k * A[col][q];
+      }
+    }
+    const delta = A.map((row, k) => row[5] / row[k]);
+    p = p.map((v, k) => v + delta[k]);
+    if (Math.max(...delta.map(Math.abs)) < 1e-9) break;
+  }
+  const c = pts(p);
+  return { corners: [c[0], c[1], c[2], c[3]] };
+}
+
+/** Misure (lati e diagonali) di una pianta: inverso di `planFromDiagonals`, per precompilare il form. */
+export function measuresFromPlan(plan: Plan): PlanMeasures {
+  const [fl, fr, br, bl] = plan.corners;
+  return { front: dist2(fl, fr), back: dist2(bl, br), left: dist2(fl, bl), right: dist2(fr, br), d1: dist2(fl, br), d2: dist2(fr, bl) };
+}
