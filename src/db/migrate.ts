@@ -5,8 +5,11 @@
  */
 import { getEnv } from "@/server/env";
 import { getDbHandle, closeDb, migrate } from "./client";
+import { migrationTargetError } from "./migrate-target";
 
 async function main() {
+  const targetError = migrationTargetError(process.env);
+  if (targetError) throw new Error(targetError);
   const handle = await getDbHandle();
   await migrate(handle);
   const where = handle.driver === "postgres" ? "Postgres (DATABASE_URL)" : handle.driver;
