@@ -1,6 +1,7 @@
 import type { NextAuthConfig } from "next-auth";
 import { DEV_AUTH_SECRET } from "@/server/env";
 import { isRole, type Role } from "./permissions";
+import { safeAuthRedirect } from "./route-guard";
 
 /**
  * Configurazione di Auth.js **senza adapter né provider** (P6): è quella che importa il
@@ -57,6 +58,10 @@ export const authConfig = {
   session: { strategy: "jwt", maxAge: SESSION_MAX_AGE_S },
   pages: { signIn: SIGN_IN_PATH, verifyRequest: VERIFY_REQUEST_PATH, error: SIGN_IN_PATH },
   callbacks: {
+    /** Stesse regole di `safeNextPath` (senza elenco di aree): mai fuori dal sito. */
+    redirect({ url, baseUrl }) {
+      return safeAuthRedirect(url, baseUrl);
+    },
     /** All'accesso copia nel token id, ruolo e stato dell'utente (riga di `users`). */
     jwt({ token, user }) {
       if (user) {
