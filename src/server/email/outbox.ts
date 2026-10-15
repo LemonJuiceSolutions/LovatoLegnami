@@ -6,6 +6,7 @@ import { getEnv } from "@/server/env";
 import { getEmailSender, type EmailMessage, type EmailSender } from "./sender";
 import { CustomerConfirmationSchema, customerConfirmationEmail } from "./templates/conferma-cliente";
 import { OfficeNotificationSchema, officeNotificationEmail } from "./templates/notifica-ufficio";
+import { ContactMessageSchema, contactMessageEmail } from "./templates/messaggio-contatti";
 
 /**
  * Outbox delle email (P7): la richiesta è salvata **prima**, poi le email sono accodate in
@@ -22,12 +23,13 @@ import { OfficeNotificationSchema, officeNotificationEmail } from "./templates/n
  * è saltata (niente doppio invio da due `flush` concorrenti).
  */
 
-export const OUTBOX_TEMPLATES = ["conferma-cliente", "notifica-ufficio"] as const;
+export const OUTBOX_TEMPLATES = ["conferma-cliente", "notifica-ufficio", "messaggio-contatti"] as const;
 export type OutboxTemplate = (typeof OUTBOX_TEMPLATES)[number];
 
 const PAYLOAD_SCHEMAS = {
   "conferma-cliente": CustomerConfirmationSchema,
   "notifica-ufficio": OfficeNotificationSchema,
+  "messaggio-contatti": ContactMessageSchema,
 } as const satisfies Record<OutboxTemplate, z.ZodTypeAny>;
 
 export type OutboxPayload<T extends OutboxTemplate> = z.input<(typeof PAYLOAD_SCHEMAS)[T]>;
@@ -104,6 +106,11 @@ export async function renderEntry(row: Pick<EmailOutboxRow, "template" | "to" | 
       const data = OfficeNotificationSchema.safeParse(row.payload);
       if (!data.success) throw new OutboxPayloadError("dati dell'email non validi o rimossi");
       return officeNotificationEmail(row.to, data.data);
+    }
+    case "messaggio-contatti": {
+      const data = ContactMessageSchema.safeParse(row.payload);
+      if (!data.success) throw new OutboxPayloadError("dati dell'email non validi o rimossi");
+      return contactMessageEmail(row.to, data.data);
     }
     default:
       throw new OutboxPayloadError(`template sconosciuto: ${row.template}`);
