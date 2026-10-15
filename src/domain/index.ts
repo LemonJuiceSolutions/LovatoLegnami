@@ -18,5 +18,7 @@ export * from "./envelope";
 export * from "./hardware";
 // Preset commerciali: catalogo dal riferimento, listPresets, loadPreset
 export * from "./presets";
+// Preventivazione: listino, taglio, fattori di cantiere, motore priceAssembly, viste, CSV
+export * from "./pricing";
 // Matematica di base (vettori, matrici di posa, box)
 export * from "./math";

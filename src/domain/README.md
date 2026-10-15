@@ -150,3 +150,72 @@ motore. Per un set diverso basta passare a `evaluateRules` un altro `RuleSet`
 caricato con `loadRuleSet(json)`, che rifiuta tipi di vincolo sconosciuti citando l'id
 della regola. Le regole valutano le **misure effettive** dell'assieme
 (`measureAssembly`), non i parametri, quindi valgono per ogni tipologia.
+
+## Preventivazione
+
+`pricing/` è il motore di prezzo (puro, deterministico, centesimi interi). Flusso:
+assieme + ingombro + opzioni commerciali + listino versionato → `priceAssembly` →
+`Quote` (righe spiegabili, totali, avvisi, piano di taglio, fattori di cantiere) →
+`officeView` (ufficio) o `customerView` (cliente, proiezione senza dati interni).
+
+```ts
+import {
+  DEFAULT_PRICE_LIST,
+  DEFAULT_PRICE_LIST_VERSION,
+  customerView,
+  formatEuro,
+  generate,
+  officeView,
+  parseEnvelope,
+  priceAssembly,
+  quoteToJSON,
+} from "@/domain";
+
+const assembly = generate("addossata-monofalda");
+const envelope = parseEnvelope({ box: { width: 6000, depth: 3600, height: 3800 } });
+
+const quote = priceAssembly({
+  assembly,
+  envelope,
+  options: { species: "abete", quality: "lamellare", treatment: "impregnante-incolore", covering: "policarbonato-alveolare", cap: "36100", access: "medio" },
+  priceList: DEFAULT_PRICE_LIST,
+  version: DEFAULT_PRICE_LIST_VERSION,
+});
+
+const office = officeView(quote); // righe per categoria, piano di taglio, fattori, regole scattate
+const customer = customerView(quote); // 4 voci, IVA, totale, fascia ±%, note
+
+export const preventivo = {
+  status: quote.status, // "incompleto" se manca un prezzo o una tariffa (vedi quote.warnings)
+  totale: formatEuro(customer.totalCents),
+  fascia: [customer.range.minCents, customer.range.maxCents].map(formatEuro),
+  regole: office.firedRules.map((r) => r.label),
+  json: quoteToJSON(quote), // serializzazione canonica, identica byte per byte
+};
+```
+
+Ordine fisso delle fasi (`COST_PHASES` in `engine.ts`): legno (piano di taglio:
+netto, sfrido, recupero spezzoni; curvi; pannelli) → lavorazioni CNC → ferramenta →
+trattamenti → copertura → montaggio → complicazioni → trasporto; poi `computeTotals`:
+margini (solo ufficio) → sconti → minimo d'ordine → imponibile → IVA → arrotondamento.
+
+- **Cambiare un prezzo**: è un dato del listino (`pricing/data/default-listino.ts` come
+  seed, poi la versione attiva in DB dal back-office); nessun numero è nel codice.
+  `parsePriceList` valida il documento citando il percorso del campo errato; le
+  tabelle si possono anche esportare/importare in CSV (`exportTable`/`importTable`) e
+  confrontare (`diffDocuments`). Una voce assente non è un errore: il preventivo
+  riporta la riga a 0 con l'avviso `prezzo-mancante`/`tariffa-mancante` e lo stato
+  `incompleto`.
+- **Aggiungere una regola di complicazione**: una voce in `complications` del listino,
+  `{ id, label, enabled, conditions: [{ factor, op, value }], effect: { kind, value } }`;
+  i fattori sono quelli di `siteFactors` (`planDeviationDeg`, `floorRangeMm`,
+  `obstaclesCount`, `maxHeightMm`, `access`, …), le condizioni sono in AND, gli effetti
+  `ore`, `percento-ore` (sulle ore base), `fisso` (centesimi), `percento-legno`. Le
+  regole sono valutate nell'ordine del listino e ognuna scattata è una riga.
+- **Aggiungere una fase**: una funzione `Phase = (ctx, state) => state` in
+  `pricing/phases/` che aggiunge righe con `append(state, lines, warnings)` (righe
+  create con `line({...})`, spiegazione che termina con `ctx.versionLabel`), inserita in
+  `COST_PHASES` nella posizione voluta; una nuova categoria va aggiunta a
+  `QUOTE_CATEGORIES`, a `CATEGORY_LABELS`, alla voce cliente in
+  `CUSTOMER_GROUP_CATEGORIES` e, se ha margine, a `MATERIAL_CATEGORIES` o
+  `LABOUR_CATEGORIES`.
