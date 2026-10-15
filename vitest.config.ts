@@ -28,7 +28,7 @@ export default defineConfig({
           environment: "node",
           server,
           include: ["src/**/*.test.ts"],
-          exclude: ["**/node_modules/**", "**/*.geometry.test.ts", "**/*.db.test.ts"],
+          exclude: ["**/node_modules/**", "**/*.geometry.test.ts", "**/*.db.test.ts", "src/test/bundle.test.ts"],
         },
       },
       {
@@ -67,6 +67,11 @@ export default defineConfig({
           testTimeout: 30_000,
           hookTimeout: 30_000,
         },
+      },
+      {
+        // Bundle del sito pubblico (11.6): dopo `next build`, `npm run test:bundle`.
+        resolve: { alias },
+        test: { name: "bundle", environment: "node", include: ["src/test/bundle.test.ts"] },
       },
     ],
   },
