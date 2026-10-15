@@ -75,7 +75,9 @@ describe("vista cliente (4.5)", () => {
   it("note semplici: complicazioni comprese, zona da verificare, prezzo su richiesta", () => {
     const c = customerView(quoteOf("addossata-monofalda", { cap: "00100" }));
     expect(c.notes).toContain("Il costo del trasporto va verificato per la zona di consegna.");
-    expect(c.notes.some((n) => n.startsWith("Il prezzo comprende le lavorazioni di cantiere per: lavoro in quota"))).toBe(true);
+    expect(c.notes.some((n) => n.startsWith("Il prezzo comprende le lavorazioni di cantiere per: lavoro in quota oltre 3,5 m"))).toBe(true);
+    // Note per il cliente senza misure grezze (es. "3598,4 mm").
+    for (const n of c.notes) expect(n).not.toMatch(/\d+,\d+\s*mm|\d{3,}\s*mm/);
     expect(c.status).toBe("completo");
     const { "vite-8x40": _omit, ...priceCents } = DEFAULT_PRICE_LIST.hardware.priceCents;
     const a = generate("portale-sandwich");

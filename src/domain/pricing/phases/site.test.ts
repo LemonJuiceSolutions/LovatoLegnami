@@ -83,7 +83,7 @@ describe("fase complicazioni (4.3)", () => {
     const s = complicationsPhase(makeContext({ pieces: [] }, { site: { planDeviationDeg: 6 } }), base);
     expect(s.lines).toHaveLength(1);
     const [row] = s.lines;
-    expect(row.label).toBe("Complicazione: fuorisquadra 6°");
+    expect(row.label).toBe("Complicazione: fuorisquadra oltre 3°");
     expect(row.ruleId).toBe("fuorisquadra");
     expect(row.quantity).toBe(1.5);
     expect(row.amountCents).toBe(Math.round(4_200 * 1.5));
@@ -95,8 +95,8 @@ describe("fase complicazioni (4.3)", () => {
   it("dislivello 180 mm e 2 ostacoli → due righe distinte", () => {
     const s = complicationsPhase(makeContext({ pieces: [] }, { site: { floorRangeMm: 180, obstaclesCount: 2 } }), base);
     expect(s.lines.map((l) => [l.ruleId, l.quantity, l.label])).toEqual([
-      ["pavimento-non-in-piano", 3, "Complicazione: pavimento non in piano 180 mm"],
-      ["ostacoli", 2, "Complicazione: ostacoli in cantiere 2"],
+      ["pavimento-non-in-piano", 3, "Complicazione: pavimento non in piano da 10 cm"],
+      ["ostacoli", 2, "Complicazione: ostacoli in cantiere"],
     ]);
   });
 
@@ -111,6 +111,10 @@ describe("fase complicazioni (4.3)", () => {
     expect(s.lines.map((l) => l.code)).toEqual(["complicazione-altezza", "complicazione-accesso", "ponteggio"]);
     expect(s.lines[2]).toMatchObject({ label: "Trabattello/ponteggio", amountCents: 25_000 });
     expect(s.lines[1].explain[0]).toBe("condizione: accesso medio tra medio, difficile");
+    // Etichette leggibili dal cliente: soglia arrotondata, mai il valore grezzo in mm.
+    expect(s.lines.map((l) => l.label)).toEqual(["Complicazione: lavoro in quota oltre 3,5 m", "Complicazione: accesso al cantiere medio", "Trabattello/ponteggio"]);
+    // Il valore esatto resta nella spiegazione per l'ufficio.
+    expect(s.lines[0].explain[0]).toBe("condizione: altezza massima 3600 mm > 3500 mm");
   });
 
   it("effetti fisso e percento-legno; regole disattivate ignorate; condizioni in AND", () => {

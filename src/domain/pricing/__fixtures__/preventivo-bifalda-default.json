@@ -809,7 +809,7 @@
             "montaggio sopra i 3,5 m",
             "listino v1 del 2026-01-01"
           ],
-          "label": "Complicazione: lavoro in quota 3516,4 mm",
+          "label": "Complicazione: lavoro in quota oltre 3,5 m",
           "quantity": 1.58,
           "ruleId": "altezza",
           "unit": "h",
@@ -1250,7 +1250,7 @@
         "montaggio sopra i 3,5 m",
         "listino v1 del 2026-01-01"
       ],
-      "label": "Complicazione: lavoro in quota 3516,4 mm",
+      "label": "Complicazione: lavoro in quota oltre 3,5 m",
       "quantity": 1.58,
       "ruleId": "altezza",
       "unit": "h",

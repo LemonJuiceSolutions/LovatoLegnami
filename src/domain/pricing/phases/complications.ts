@@ -47,6 +47,41 @@ export function describeCondition(factors: SiteFactors, c: ComplicationCondition
   return `${SITE_FACTOR_LABELS[c.factor]} ${actual(factors, c)} ${op} ${show(c.factor, c.value)}`;
 }
 
+/**
+ * Misura arrotondata in unità comode per il cliente: `3,5 m`, `10 cm`, `3°`, `5%`.
+ * Le etichette delle righe finiscono nelle note della vista cliente ("Il prezzo comprende
+ * le lavorazioni di cantiere per: …"): niente valori grezzi come `3516,4 mm`.
+ */
+export function friendlyAmount(factor: keyof SiteFactors, v: number): string {
+  switch (SITE_FACTOR_UNITS[factor].trim()) {
+    case "mm":
+      if (Math.abs(v) >= 1_000) return `${fmt(v / 1_000, 1)} m`;
+      if (Math.abs(v) >= 10) return `${fmt(v / 10, 0)} cm`;
+      return `${fmt(v, 0)} mm`;
+    case "°":
+      return `${fmt(v, 0)}°`;
+    case "%":
+      return `${fmt(v, 1)}%`;
+    default:
+      return fmt(v, 0);
+  }
+}
+
+/**
+ * Condizione in parole semplici per l'etichetta: soglia della regola (`oltre 3,5 m`,
+ * `da 10 cm`) o valore dichiarato (`medio`); niente per i conteggi e le soglie a zero
+ * (bastano le parole della regola: "ostacoli in cantiere", "pilastri affondati").
+ */
+export function friendlyCondition(factors: SiteFactors, c: ComplicationCondition): string {
+  if (c.op === "in") return String(factorValue(factors, c));
+  if (c.op === "==") {
+    const v = factorValue(factors, c);
+    return typeof v === "number" ? friendlyAmount(c.factor, v) : String(v);
+  }
+  if (typeof c.value !== "number" || c.value === 0 || SITE_FACTOR_UNITS[c.factor] === "") return "";
+  return `${c.op === ">" ? "oltre" : "da"} ${friendlyAmount(c.factor, c.value)}`;
+}
+
 export const complicationsPhase: Phase = (ctx, state) => {
   const factors = ctx.siteFactors;
   const lab = ctx.priceList.labour;
@@ -60,7 +95,7 @@ export const complicationsPhase: Phase = (ctx, state) => {
   for (const rule of ctx.priceList.complications) {
     if (!ruleFires(rule, factors)) continue;
     fired.push(rule.id);
-    const values = rule.conditions.map((c) => actual(factors, c)).join(", ");
+    const values = rule.conditions.map((c) => friendlyCondition(factors, c)).filter(Boolean).join(" e ");
     const condition = rule.conditions.length
       ? `condizione: ${rule.conditions.map((c) => describeCondition(factors, c)).join(" e ")}`
       : "regola sempre attiva";
