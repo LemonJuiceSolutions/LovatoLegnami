@@ -19,6 +19,8 @@ import {
   carryOverParams,
   computeDerived,
   defaultConfig,
+  hiddenParamNames,
+  presetConfig,
   type ConfiguratoreConfig,
   type Derived,
 } from "./config";
@@ -79,6 +81,13 @@ export interface ConfiguratoreActions {
   setFloor(patch: FloorPatch): ActionResult;
   setEmbedment(mm: number): ActionResult;
   setExportOption<K extends keyof SatExportOptions>(key: K, value: SatExportOptions[K]): ActionResult;
+  /**
+   * Carica un preset commerciale (`PRESET_CATALOG`): tipologia, parametri
+   * completi e ingombro (quello di default della tipologia se il preset non
+   * ne dichiara uno); affondamento 0, opzioni di export conservate. Id
+   * sconosciuto o parametri non validi → stato invariato.
+   */
+  loadPreset(id: string): ActionResult;
   /** Sostituisce l'intera configurazione (file JSON, esempi). */
   loadConfig(config: ConfiguratoreConfig): void;
   /** Torna alla configurazione di default (della tipologia indicata). */
@@ -235,6 +244,17 @@ export function configuratoreSlice(options: ConfiguratoreStoreOptions = {}) {
         update({ exportOptions: { ...exportOptions, sat: parsed.data } });
         return OK;
       },
+      loadPreset(id) {
+        let config: ConfiguratoreConfig;
+        try {
+          config = presetConfig(id);
+        } catch (e) {
+          return failure(e);
+        }
+        commit({ ...config, exportOptions: get().config.exportOptions });
+        set({ selection: NO_SELECTION });
+        return OK;
+      },
       loadConfig(config) {
         commit(config);
         set({ selection: NO_SELECTION });
@@ -325,6 +345,20 @@ export const selectWarnings = memoByDerived((d) => d.violations.filter((v) => v.
 /** Problemi che richiedono la conferma "esporta comunque" (errori o collisioni). */
 export const selectNeedsExportConfirmation = (s: ConfiguratoreState) =>
   s.derived.collisions.length > 0 || s.derived.violations.some((v) => v.severity === "errore");
+
+/** Ferramenta raggruppata per codice dell'assieme corrente (riferimento stabile per `derived`). */
+export const selectHardwareRows = (s: ConfiguratoreState) => s.derived.hardwareRows;
+
+const hiddenCache = new WeakMap<ConfiguratoreConfig, readonly string[]>();
+/** Parametri nascosti dal form (`visibleWhen` falso), memo per `config`. */
+export const selectHiddenParams = (s: ConfiguratoreState): readonly string[] => {
+  let v = hiddenCache.get(s.config);
+  if (!v) {
+    v = hiddenParamNames(s.config);
+    hiddenCache.set(s.config, v);
+  }
+  return v;
+};
 
 /** Solidi pronti per l'assieme corrente (abilita "Esporta SAT/STEP"). */
 export const selectSolidsReady = (s: ConfiguratoreState) => solidsReady(s.kernel, s.derived.assembly);

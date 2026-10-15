@@ -68,7 +68,7 @@ Riferimenti: `specs/*/spec.md` per il comportamento, `design.md` per le decision
 
 ## 10. Store (prerequisito: task 10.x di `configuratore-pergole`)
 
-- [ ] 10.1 Aggiornare `src/stores/configuratore-store.ts`: `setTypology` conserva i parametri comuni compatibili anche per `enum` (solo se il valore è tra le opzioni), `derived` espone `hardwareRows` (da `buildDistinta`) e `loadPreset(id)` che imposta tipologia, parametri e ingombro; `examples.ts` include i preset del dominio. Verificare con test: `loadPreset("maxi-5x5")` → `typologySlug` `portale-sandwich`, parametri del preset, assieme rigenerato; cambio tipologia con `costruzione` compatibile la conserva; `ConfigFileSchema` accetta i parametri `enum` (stringhe) senza modifiche di `schemaVersion`.
+- [x] 10.1 Aggiornare `src/stores/configuratore-store.ts`: `setTypology` conserva i parametri comuni compatibili anche per `enum` (solo se il valore è tra le opzioni), `derived` espone `hardwareRows` (da `buildDistinta`) e `loadPreset(id)` che imposta tipologia, parametri e ingombro; `examples.ts` include i preset del dominio. Verificare con test: `loadPreset("maxi-5x5")` → `typologySlug` `portale-sandwich`, parametri del preset, assieme rigenerato; cambio tipologia con `costruzione` compatibile la conserva; `ConfigFileSchema` accetta i parametri `enum` (stringhe) senza modifiche di `schemaVersion`.
 
 ## 11. UI – selettore tipologie e miniature (spec `configuratore-ui`)
 

@@ -9,7 +9,9 @@ import {
   floorFunction,
   generate,
   getTypology,
+  isParamVisible,
   listTypologies,
+  loadPreset,
   parseEnvelope,
   resolveParams,
   type Assembly,
@@ -21,6 +23,7 @@ import {
   type TypologyTemplate,
   type Violation,
 } from "@/domain";
+import { hardwareRows, type HardwareRow } from "@/export/csv/distinta";
 import { DEFAULT_SAT_OPTIONS, type SatExportOptions } from "@/export/sat/options";
 
 /**
@@ -54,6 +57,11 @@ export interface Derived {
   readonly violations: readonly Violation[];
   readonly collisions: readonly Collision[];
   readonly measures: Measures | null;
+  /**
+   * Ferramenta dell'assieme raggruppata per codice (la tabella ferramenta di
+   * `buildDistinta`, E7), coerente con `assembly`.
+   */
+  readonly hardwareRows: readonly HardwareRow[];
   /** Errori per parametro (fuori limite, tipo errato): l'assieme non viene rigenerato. */
   readonly paramErrors: Readonly<Record<string, string>>;
   /** Errore di generazione non legato a un singolo parametro (tipologia sconosciuta, lavorazione impossibile…). */
@@ -71,28 +79,33 @@ const ceil100 = (mm: number) => Math.ceil(mm / 100) * 100;
 const envelopeCache = new Map<string, Envelope>();
 
 /**
+ * `DEFAULT_ENVELOPE` se contiene l'assieme senza collisioni, altrimenti
+ * allargato (al centimetro superiore, con 100 mm di margine) fino a contenerlo.
+ */
+function envelopeContaining(assembly: Assembly): Envelope {
+  const bounds = assemblyBounds(assembly);
+  if (!bounds || checkCollisions(assembly, DEFAULT_ENVELOPE).length === 0) return DEFAULT_ENVELOPE;
+  const { max } = bounds;
+  const box = DEFAULT_ENVELOPE.box;
+  return parseEnvelope({
+    box: {
+      width: Math.max(box.width, ceil100(max.x)),
+      depth: Math.max(box.depth, ceil100(max.y) + 100),
+      height: Math.max(box.height, ceil100(max.z) + 100),
+    },
+  });
+}
+
+/**
  * Ingombro di default della tipologia: `DEFAULT_ENVELOPE` se contiene
- * l'assieme di default senza collisioni, altrimenti allargato (al centimetro
- * superiore, con 100 mm di margine) fino a contenerlo, così "Ripristina" non
- * parte mai da una configurazione in collisione (es. bifalda 5 × 4 m).
+ * l'assieme di default senza collisioni, altrimenti allargato fino a
+ * contenerlo, così "Ripristina" non parte mai da una configurazione in
+ * collisione (es. bifalda 5 × 4 m).
  */
 export function defaultEnvelopeFor(typology: string): Envelope {
   const cached = envelopeCache.get(typology);
   if (cached) return cached;
-  const assembly = generate(typology);
-  let envelope = DEFAULT_ENVELOPE;
-  const bounds = assemblyBounds(assembly);
-  if (bounds && checkCollisions(assembly, DEFAULT_ENVELOPE).length > 0) {
-    const { max } = bounds;
-    const box = DEFAULT_ENVELOPE.box;
-    envelope = parseEnvelope({
-      box: {
-        width: Math.max(box.width, ceil100(max.x)),
-        depth: Math.max(box.depth, ceil100(max.y) + 100),
-        height: Math.max(box.height, ceil100(max.z) + 100),
-      },
-    });
-  }
+  const envelope = envelopeContaining(generate(typology));
   envelopeCache.set(typology, envelope);
   return envelope;
 }
@@ -106,6 +119,59 @@ export function defaultConfig(typology: string = DEFAULT_TYPOLOGY): Configurator
     embedment: 0,
     exportOptions: { sat: DEFAULT_SAT_OPTIONS },
   };
+}
+
+/**
+ * Configurazione di un preset commerciale (`loadPreset` del dominio):
+ * tipologia, parametri risolti (completi), ingombro del preset o, se assente,
+ * l'ingombro di default allargato fino a contenere l'assieme del preset (come
+ * `defaultEnvelopeFor`); affondamento 0 e opzioni export di default. Lancia
+ * `PresetNotFoundError` / `ParamError`.
+ */
+export function presetConfig(id: string): ConfiguratoreConfig {
+  const { typologySlug, params, envelope } = loadPreset(id);
+  return {
+    schemaVersion: CONFIG_SCHEMA_VERSION,
+    typology: typologySlug,
+    params: { ...params },
+    envelope: envelope ?? presetEnvelope(id, typologySlug, params),
+    embedment: 0,
+    exportOptions: { sat: DEFAULT_SAT_OPTIONS },
+  };
+}
+
+const presetEnvelopeCache = new Map<string, Envelope>();
+function presetEnvelope(id: string, typology: string, params: Readonly<Record<string, ParamValue>>): Envelope {
+  let envelope = presetEnvelopeCache.get(id);
+  if (!envelope) {
+    envelope = envelopeContaining(generate(typology, params));
+    presetEnvelopeCache.set(id, envelope);
+  }
+  return envelope;
+}
+
+/**
+ * Nomi dei parametri da nascondere nel form (`visibleWhen` falso, E4). La
+ * condizione è valutata sui parametri risolti; i valori non validi (es. un
+ * numero appena digitato fuori limite) sono sostituiti dal default, così la
+ * visibilità non "salta" mentre l'utente scrive. Tipologia sconosciuta → `[]`.
+ */
+export function hiddenParamNames(config: Pick<ConfiguratoreConfig, "typology" | "params">): string[] {
+  let template: TypologyTemplate;
+  try {
+    template = getTypology(config.typology);
+  } catch {
+    return [];
+  }
+  const errors = paramErrorsOf(template, config.params);
+  const valid = Object.fromEntries(Object.entries(config.params).filter(([name]) => !(name in errors)));
+  let resolved;
+  try {
+    resolved = resolveParams(template, valid);
+  } catch {
+    resolved = defaultParams(template);
+  }
+  return template.params.filter((spec) => !isParamVisible(spec, resolved)).map((spec) => spec.name);
 }
 
 /** `true` se `value` è ammesso per il parametro `name` della tipologia. */
@@ -122,6 +188,8 @@ function acceptsParam(template: TypologyTemplate, name: string, value: ParamValu
 /**
  * Parametri per una nuova tipologia: default del template, sovrascritti dai
  * parametri correnti con lo stesso nome e valore ammesso (es. `larghezza`).
+ * Per i parametri `enum` (es. `costruzione`) "ammesso" significa tra le
+ * opzioni della nuova tipologia: altrimenti resta il default.
  */
 export function carryOverParams(
   params: Readonly<Record<string, ParamValue>>,
@@ -154,6 +222,7 @@ export const EMPTY_DERIVED: Derived = {
   violations: [],
   collisions: [],
   measures: null,
+  hardwareRows: [],
   paramErrors: {},
   error: null,
   stale: true,
@@ -185,7 +254,16 @@ export function computeDerived(
     const assembly = generate(config.typology, config.params, { floorHeightAt, embedment: config.embedment });
     const { violations, measures } = evaluateRules(assembly, ruleSet, { floorHeightAt });
     const collisions = checkCollisions(assembly, config.envelope);
-    return { assembly, violations, collisions, measures, paramErrors: {}, error: null, stale: false };
+    return {
+      assembly,
+      violations,
+      collisions,
+      measures,
+      hardwareRows: hardwareRows(assembly.hardware),
+      paramErrors: {},
+      error: null,
+      stale: false,
+    };
   } catch (e) {
     return keep({ error: errorText(e) });
   }
