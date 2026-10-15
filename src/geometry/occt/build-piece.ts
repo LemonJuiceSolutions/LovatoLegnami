@@ -1,7 +1,9 @@
 import { Vector, basicFaceExtrusion, makeBox, makeCylinder, makePolygon, revolution, type Shape3D, type Solid } from "replicad";
 import type { Curve, Face, Machining, Section } from "@/domain/components/types";
+import { arcFrame } from "@/domain/math/arc";
 import { add, cross, normalize, scale, vec3, type Vec3 } from "@/domain/math/vec3";
 import { occt } from "./init";
+import { placeShape } from "./pose";
 
 /**
  * Costruzione del solido di un pezzo nel sistema LOCALE (D6): parallelepipedo
@@ -245,8 +247,40 @@ export function makeBaseArc(section: Section, curve: Curve): Solid {
   }
 }
 
+/**
+ * Utensile su un pezzo curvo (E2/E6): sono ammessi solo il `foro` sulle facce
+ * `sinistra`/`destra` (asse ∥ Y, parallelo all'asse del cilindro) e il
+ * `taglio-testa` senza `angle2` (piano che contiene Y). L'utensile è quello del
+ * pezzo dritto costruito nel sistema della sezione in `at` (`at` = 0, cioè
+ * nell'origine) e portato sul pezzo con `arcFrame(radius, at)`: il foro cade
+ * nel punto dell'arco a coordinata curvilinea `at`, spostato di `offset` lungo
+ * la normale radiale (verso il centro); il taglio ha la convenzione dei dritti
+ * nel sistema della sezione in `at`, come `headCutFromPlane`/`planeOfHeadCut`.
+ */
+function makeCurvedTool(m: Machining, piece: PieceSolidInput & { readonly curve: Curve }): Shape3D {
+  const allowed =
+    (m.type === "foro" && (m.face === "sinistra" || m.face === "destra")) ||
+    (m.type === "taglio-testa" && !m.angle2);
+  if (!allowed) throw new PieceBuildError(piece.id, "lavorazione non ammessa su pezzi curvi", m);
+  const { radius } = piece.curve;
+  // Il semispazio del taglio deve coprire tutto l'arco: lunghezza "dritta" fittizia ≥ ingombro dell'arco.
+  const straight: PieceSolidInput = {
+    id: piece.id,
+    section: piece.section,
+    length: piece.length + 2 * (radius + piece.section.h),
+    machinings: [],
+  };
+  const local = makeTool({ ...m, at: 0 } as Machining, straight);
+  try {
+    return placeShape(local, arcFrame(radius, m.at));
+  } finally {
+    local.delete();
+  }
+}
+
 /** Solido-utensile di una lavorazione (lancia se il tipo non ha procedura). */
 export function makeTool(m: Machining, piece: PieceSolidInput): Shape3D {
+  if (piece.curve) return makeCurvedTool(m, { ...piece, curve: piece.curve });
   const builder = (TOOLS as Record<string, ToolBuilder<Machining> | undefined>)[m.type];
   if (!builder) throw new PieceBuildError(piece.id, "nessuna procedura di costruzione geometrica", m);
   return builder(m, piece);
@@ -292,7 +326,6 @@ export function buildPieceSolid(piece: PieceSolidInput): Solid {
   for (const m of piece.machinings) {
     let tool: Shape3D | undefined;
     try {
-      if (piece.curve) throw new PieceBuildError(piece.id, "lavorazione non ancora supportata sui pezzi curvi", m);
       tool = makeTool(m, piece);
       const result = solid.cut(tool);
       const next = singleSolid(result, piece, m);
