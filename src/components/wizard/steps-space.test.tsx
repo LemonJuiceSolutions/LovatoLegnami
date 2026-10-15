@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest"
 import { loadPreset } from "@/domain/presets/catalog"
 import { axeViolations } from "@/test/axe"
 import { testStore, wizardData } from "./__fixtures__/data"
+import { estimateBody } from "./use-estimate"
 import { PreventivoWizard } from "./wizard"
 
 vi.mock("next/navigation", () => ({
@@ -109,6 +110,31 @@ describe("passo 3 spazio (12.4)", () => {
     expect(store.getState().answers.spazio).toMatchObject({ floor: "dislivello", floorDrop: 6, floorDirection: "muro", access: "difficile" })
     expect(store.getState().derived.envelope!.floor.corners).toMatchObject({ backLeft: -60, backRight: -60 })
     expect(store.getState().derived.config!.commercial.access).toBe("difficile")
+  })
+
+  it("CAP del cantiere: chiesto qui, va nella stima e resta nei contatti; solo cifre, errore se incompleto", async () => {
+    const { store } = await renderStep("spazio")
+    const input = screen.getByLabelText("CAP del cantiere")
+    fireEvent.change(input, { target: { value: "31a0" } })
+    expect(store.getState().answers.contatti.cap).toBe("310")
+    fireEvent.blur(input)
+    expect(screen.getByText("Il CAP ha 5 cifre.")).toBeTruthy()
+    expect(input.getAttribute("aria-invalid")).toBe("true")
+    fireEvent.change(input, { target: { value: "31100" } })
+    expect(screen.queryByText("Il CAP ha 5 cifre.")).toBeNull()
+    expect(store.getState().answers.contatti.cap).toBe("31100")
+    const body = estimateBody(store.getState().derived.config!, store.getState().answers)
+    expect(body.declared.cap).toBe("31100")
+    expect(body.config.commercial.cap).toBe("31100")
+  })
+
+  it("CAP indicato al passo 3 ⇒ già compilato nel passo contatti", async () => {
+    const store = monofaldaStore()
+    store.getState().setContacts({ cap: "31100" })
+    await act(async () => {
+      render(<PreventivoWizard data={wizardData()} step="contatti" store={store} fetcher={(async () => new Response("{}", { status: 503 })) as unknown as typeof fetch} />)
+    })
+    expect((screen.getByLabelText("CAP del cantiere") as HTMLInputElement).value).toBe("31100")
   })
 
   it("accessibilità (axe) con le diagonali e un ostacolo", async () => {

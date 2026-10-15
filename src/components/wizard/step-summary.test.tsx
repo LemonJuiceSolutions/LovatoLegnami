@@ -62,9 +62,10 @@ function unavailableKernel(): KernelClient {
   return client
 }
 
-async function renderSummary(opts: { fetcher: typeof fetch; kernelFactory?: () => KernelClient }) {
+async function renderSummary(opts: { fetcher: typeof fetch; kernelFactory?: () => KernelClient; cap?: string }) {
   const store = testStore()
   store.getState().chooseTypology("autoportante-bifalda", null)
+  if (opts.cap) store.getState().setContacts({ cap: opts.cap })
   let utils!: ReturnType<typeof render>
   await act(async () => {
     utils = render(<PreventivoWizard data={wizardData()} step="riepilogo" store={store} fetcher={opts.fetcher} kernelFactory={opts.kernelFactory} />)
@@ -121,6 +122,22 @@ describe("passo 5 riepilogo (12.6)", () => {
     const fn = vi.fn(async () => new Response(JSON.stringify({ quote: { ...quote(500_000), status: "incompleto" }, notes: [] }), { status: 200 })) as unknown as typeof fetch
     await renderSummary({ fetcher: fn })
     await waitFor(() => expect(screen.getAllByText("Prezzo su richiesta").length).toBeGreaterThan(0))
+  })
+
+  it("CAP dal passo 3 ⇒ la prima stima usa già la zona di trasporto; senza CAP l'invito a indicarlo", async () => {
+    const f = fakeFetch()
+    const { unmount } = await renderSummary({ fetcher: f.fn, cap: "31100" })
+    await waitFor(() => expect(screen.getByTestId("totale").textContent).toBe("7.900 €"), { timeout: 2000 })
+    expect(f.calls).toHaveLength(1)
+    expect((f.calls[0]!.body as unknown as { declared: { cap?: string } }).declared.cap).toBe("31100")
+    expect(screen.getByTestId("trasporto-cap").textContent).toMatch(/CAP 31100/)
+    unmount()
+
+    const g = fakeFetch()
+    await renderSummary({ fetcher: g.fn })
+    await waitFor(() => expect(screen.getByTestId("totale").textContent).toBe("7.900 €"), { timeout: 2000 })
+    expect((g.calls[0]!.body as unknown as { declared: { cap?: string } }).declared.cap).toBeUndefined()
+    expect(screen.getByRole("link", { name: "indica il CAP del cantiere" }).getAttribute("href")).toBe("/preventivo/spazio")
   })
 
   it("misure finali e note semplici", async () => {

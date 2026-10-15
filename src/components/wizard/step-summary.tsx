@@ -147,7 +147,26 @@ function MobilePrice({ estimate }: { estimate: EstimateState }) {
   )
 }
 
+/** Riga sul trasporto: per il CAP indicato al passo 3, oppure l'invito a indicarlo. */
+function TransportLine({ cap }: { cap: string }) {
+  const valid = /^\d{5}$/.test(cap.trim())
+  return valid ? (
+    <p className="mt-3 text-[0.95rem] text-muted-foreground" data-testid="trasporto-cap">
+      Trasporto calcolato per il CAP {cap.trim()}.
+    </p>
+  ) : (
+    <p className="mt-3 text-[0.95rem] text-muted-foreground" data-testid="trasporto-cap">
+      Trasporto stimato senza CAP:{" "}
+      <Link href={stepPath("spazio")} className="font-medium text-foreground underline underline-offset-4">
+        indica il CAP del cantiere
+      </Link>{" "}
+      per un prezzo più preciso.
+    </p>
+  )
+}
+
 function PriceCard({ estimate }: { estimate: EstimateState }) {
+  const cap = useWizard((s) => s.answers.contatti.cap)
   const quote = estimate.status === "ok" || estimate.status === "loading" ? (estimate.status === "ok" ? estimate.quote : estimate.quote) : null
   const loading = estimate.status === "loading" || estimate.status === "idle"
   return (
@@ -176,6 +195,7 @@ function PriceCard({ estimate }: { estimate: EstimateState }) {
               <p className="mt-2 text-muted-foreground">
                 IVA inclusa · tra {euro(quote.range.minCents)} e {euro(quote.range.maxCents)}
               </p>
+              <TransportLine cap={cap} />
               <ul className="mt-5 space-y-2 border-t border-border pt-4">
                 {quote.groups
                   .filter((g) => g.amountCents !== 0)

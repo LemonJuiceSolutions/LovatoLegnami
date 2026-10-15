@@ -22,7 +22,9 @@ import { useWizard, useWizardActions } from "./wizard-context"
  * Passo 3 (12.4, spec "Spazio disponibile in termini semplici"): muro sì/no; muro dritto,
  * fuori squadra (con le due diagonali) o "non so"; pavimento in piano o in pendenza
  * (dislivello e verso); ostacoli guidati con pochi campi; accesso al cantiere. Le risposte
- * diventano l'ingombro del dominio in `toConfig`.
+ * diventano l'ingombro del dominio in `toConfig`. In fondo il CAP del cantiere: chiesto qui,
+ * prima del prezzo, perché la prima stima usi già la zona di trasporto giusta; è lo stesso
+ * campo dei contatti (passo 6), che lo ritrova compilato.
  */
 export function StepSpace() {
   const slug = useWizard((s) => s.answers.tipologia.slug)
@@ -30,7 +32,8 @@ export function StepSpace() {
   const misure = useWizard((s) => s.answers.misure)
   const plan = useWizard((s) => s.derived.plan)
   const planError = useWizard((s) => s.derived.planError)
-  const { setSpace, setDiagonals } = useWizardActions()
+  const cap = useWizard((s) => s.answers.contatti.cap)
+  const { setSpace, setDiagonals, setContacts } = useWizardActions()
   const wallTypology = React.useMemo(() => (slug ? getTypology(slug).category === "addossata" : false), [slug])
   const wall = space.againstWall || wallTypology
   const deviation = plan ? Math.abs(planDeviations(plan).maxCornerDeg) : null
@@ -123,7 +126,42 @@ export function StepSpace() {
           ]}
         />
       </Question>
+
+      <CapQuestion value={cap} onChange={(v) => setContacts({ cap: v })} />
     </section>
+  )
+}
+
+/** CAP a 5 cifre (lo stesso controllo del passo contatti). */
+const isValidCap = (cap: string): boolean => /^\d{5}$/.test(cap.trim())
+
+function CapQuestion({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  const id = React.useId()
+  const errorId = React.useId()
+  const [touched, setTouched] = React.useState(false)
+  const invalid = touched && value.trim() !== "" && !isValidCap(value)
+  return (
+    <Question title="Dove si trova il cantiere?" hint="Con il CAP calcoliamo subito il trasporto nel prezzo indicativo. Lo ritrovi già compilato nei contatti.">
+      <div className="max-w-[12rem]">
+        <label htmlFor={id} className="mb-1.5 block font-medium">
+          CAP del cantiere
+        </label>
+        <input
+          id={id}
+          name="cap"
+          value={value}
+          onChange={(e) => onChange(e.target.value.replace(/\D/g, "").slice(0, 5))}
+          onBlur={() => setTouched(true)}
+          autoComplete="postal-code"
+          inputMode="numeric"
+          maxLength={5}
+          aria-invalid={invalid ? true : undefined}
+          aria-describedby={invalid ? errorId : undefined}
+          className={`h-12 w-full rounded-lg border-2 bg-background px-4 text-lg tabular-nums outline-none focus-visible:border-primary ${invalid ? "border-destructive" : "border-input"}`}
+        />
+      </div>
+      {invalid && <FieldError id={errorId}>Il CAP ha 5 cifre.</FieldError>}
+    </Question>
   )
 }
 
