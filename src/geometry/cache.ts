@@ -1,4 +1,8 @@
 import type { Curve, Machining, PieceType, Section } from "@/domain/components/types";
+import { canonicalJson } from "@/domain/math/canonical";
+
+/** Riesporto: `canonicalJson` vive ora in `domain/math/canonical.ts`. */
+export { canonicalJson };
 
 /**
  * Cache dei solidi per pezzo (D6): la chiave dipende solo da tipo, sezione,
@@ -16,23 +20,6 @@ export interface CacheKeyInput {
 
 /** Campi delle lavorazioni che non influenzano la geometria. */
 const NON_GEOMETRIC = new Set(["id", "pieceId", "jointId"]);
-
-/** Numeri arrotondati a 1e-6 mm (rumore numerico) e senza `-0`. */
-const canonNumber = (n: number): number => {
-  const r = Math.round(n * 1e6) / 1e6;
-  return Object.is(r, -0) ? 0 : r;
-};
-
-/** JSON canonico: chiavi ordinate, campi non geometrici delle lavorazioni esclusi. */
-export function canonicalJson(value: unknown, skip: ReadonlySet<string> = new Set()): string {
-  if (typeof value === "number") return JSON.stringify(canonNumber(value));
-  if (value === null || typeof value !== "object") return JSON.stringify(value) ?? "null";
-  if (Array.isArray(value)) return `[${value.map((v) => canonicalJson(v, skip)).join(",")}]`;
-  const entries = Object.entries(value as Record<string, unknown>)
-    .filter(([k, v]) => v !== undefined && !skip.has(k))
-    .sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0));
-  return `{${entries.map(([k, v]) => `${JSON.stringify(k)}:${canonicalJson(v, skip)}`).join(",")}}`;
-}
 
 /** Hash stabile a 53 bit (cyrb53) in esadecimale. */
 export function stableHash(text: string, seed = 0): string {

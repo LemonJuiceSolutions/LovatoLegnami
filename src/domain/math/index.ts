@@ -6,3 +6,4 @@ export * from "./interp";
 export * from "./delaunay";
 export * from "./plane";
 export * from "./arc";
+export * from "./canonical";

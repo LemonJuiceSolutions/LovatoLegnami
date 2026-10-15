@@ -1,5 +1,9 @@
 /**
  * Motore di preventivazione (puro TS): listino, denaro, ottimizzazione di taglio,
- * fasi di prezzo e viste. Popolato dai task 2–4 di `sito-preventivi`.
+ * fasi di prezzo e viste (sito-preventivi, gruppi 2–4).
  */
-export {};
+
+// Denaro in centesimi interi: namespace (evita la collisione di `add` con `math/vec3`)
+export * as money from "./money";
+export { formatEuro, MoneyError, roundToStep } from "./money";
+export type { Cents } from "./money";
