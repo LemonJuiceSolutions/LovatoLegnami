@@ -238,10 +238,13 @@ export interface PublishResult<D extends Dataset> {
 }
 
 /** Pubblica la bozza: validazione completa, poi attiva la bozza e archivia l'attiva con la stessa validità. */
-export async function publishDraft<D extends Dataset>(dataset: D, userId: string | null): Promise<PublishResult<D>> {
+export async function publishDraft<D extends Dataset>(dataset: D, userId: string | null, options: { expectedUpdatedAt?: Date } = {}): Promise<PublishResult<D>> {
   const db = await getDb();
   return db.transaction(async (tx) => {
     const draft = await lockDraft(dataset, tx);
+    // la bozza provata prima della pubblicazione deve essere quella pubblicata
+    if (options.expectedUpdatedAt && draft.updatedAt.getTime() !== options.expectedUpdatedAt.getTime())
+      throw new ConcurrentEditError(await userLabel(draft.updatedBy, tx), draft.updatedAt);
     const doc = validateDataset(dataset, draft.data);
     const at = new Date();
     // Base del confronto: l'attiva con la stessa validità, altrimenti quella in vigore a quella data.

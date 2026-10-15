@@ -2,16 +2,16 @@
 
 import * as React from "react"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import type { Actor } from "@/server/auth/permissions"
 import { canPublishDataset, DATASET_HREF } from "./admin-nav"
 import { DatasetStatusBar } from "./dataset-status"
+import { PublishDialog } from "./publish-dialog"
 import type { DatasetStatusInfo } from "./types"
 
 /**
  * Riepilogo dell'area admin (9.1): stato di ogni insieme di dati (attiva, bozza con autore e
- * data, "Pubblica") e richieste nuove. "Pubblica" porta all'editor con il dialogo aperto.
+ * data, "Pubblica" con il dialogo delle differenze) e richieste nuove.
  */
 export function AdminOverview({
   user,
@@ -23,11 +23,17 @@ export function AdminOverview({
   datasets: readonly DatasetStatusInfo[]
   /** `null` se l'utente non legge le richieste. */
   newLeads: number | null
-  /** Iniettabile nei test; default: editor del dataset con `?pubblica=1`. */
+  /** Iniettabile nei test; default: dialogo di pubblicazione. */
   onPublish?: (dataset: DatasetStatusInfo["dataset"]) => void
 }) {
-  const router = useRouter()
-  const publish = onPublish ?? ((d: DatasetStatusInfo["dataset"]) => router.push(`${DATASET_HREF[d]}?pubblica=1`))
+  const [publishing, setPublishing] = React.useState<DatasetStatusInfo | null>(null)
+  const [open, setOpen] = React.useState(false)
+  const publish =
+    onPublish ??
+    ((d: DatasetStatusInfo["dataset"]) => {
+      setPublishing(datasets.find((s) => s.dataset === d) ?? null)
+      setOpen(true)
+    })
   return (
     <div className="space-y-4">
       <h1 className="text-xl font-semibold">Area admin</h1>
@@ -58,6 +64,7 @@ export function AdminOverview({
           </div>
         ))}
       </div>
+      {publishing?.draft && <PublishDialog status={publishing} open={open} onOpenChange={setOpen} />}
     </div>
   )
 }
