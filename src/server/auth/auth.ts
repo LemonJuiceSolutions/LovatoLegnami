@@ -1,4 +1,5 @@
 import NextAuth, { type NextAuthConfig } from "next-auth";
+import Credentials from "next-auth/providers/credentials";
 import Resend from "next-auth/providers/resend";
 import { DrizzleAdapter } from "@auth/drizzle-adapter";
 import { eq } from "drizzle-orm";
@@ -8,10 +9,12 @@ import { getEmailSender, type EmailSender } from "@/server/email/sender";
 import { accessEmail } from "@/server/email/templates/accesso";
 import { getEnv, type ServerEnv } from "@/server/env";
 import { MAGIC_LINK_MAX_AGE_S, authConfig } from "./auth.config";
+import { PASSWORD_PROVIDER_ID, authorizeWithPassword, clientIp } from "./password-login";
 
 /**
  * Auth.js completo (runtime Node, P6): adapter Drizzle sulle tabelle di `schema.ts` e
- * provider email "resend" (collegamento monouso). L'invio passa dall'adattatore email
+ * provider email "resend" (collegamento monouso) e provider "password" (email e password,
+ * `password-login.ts`). L'invio del collegamento passa dall'adattatore email
  * del progetto: Resend in produzione, console in sviluppo (il link è stampato nel
  * terminale di `npm run dev`), memoria nei test.
  *
@@ -58,6 +61,15 @@ export function createAuthConfig(deps: AuthDeps): NextAuthConfig {
         async sendVerificationRequest({ identifier, url }) {
           await deps.sender.send(accessEmail({ to: identifier, url, minutes: Math.round(MAGIC_LINK_MAX_AGE_S / 60) }));
         },
+      }),
+      // Email e password: stessa forma di utente dell'adapter (id, email, nome, ruolo,
+      // attivo), quindi `jwt`/`session` e `requireUser` non distinguono i due accessi.
+      Credentials({
+        id: PASSWORD_PROVIDER_ID,
+        name: "Email e password",
+        credentials: { email: { label: "Email", type: "email" }, password: { label: "Password", type: "password" } },
+        authorize: (credentials, request) =>
+          authorizeWithPassword(deps.db, { email: credentials?.email, password: credentials?.password, ip: clientIp(request.headers) }),
       }),
     ],
     callbacks: {

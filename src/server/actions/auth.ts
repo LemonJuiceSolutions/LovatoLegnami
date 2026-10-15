@@ -1,10 +1,12 @@
 "use server";
 
-import { AuthError } from "next-auth";
+import { AuthError, CredentialsSignin } from "next-auth";
 import { headers } from "next/headers";
 import { z } from "zod";
 import { signIn, signOut } from "@/server/auth/auth";
 import { safeNextPath } from "@/server/auth/route-guard";
+import { LOGIN_ERROR_MESSAGE, LOGIN_RATE_MESSAGE, PASSWORD_PROVIDER_ID, TooManyAttempts } from "@/server/auth/password-login";
+import { PASSWORD_MAX_LENGTH } from "@/server/auth/password";
 import { checkRateLimit } from "@/server/rate-limit";
 
 /**
@@ -34,6 +36,26 @@ export async function requestSignIn(formData: FormData): Promise<SignInResult | 
     await signIn("resend", { email: email.data, redirectTo: next });
   } catch (e) {
     if (e instanceof AuthError) return { ok: false, message: "Invio non riuscito: riprova tra qualche minuto." };
+    throw e;
+  }
+}
+
+/**
+ * Accesso con email e password (provider `password`). Errore sempre generico; il limite dei
+ * tentativi (per IP e per email) è applicato in `authorize`, quindi vale anche per chi
+ * chiama direttamente `/api/auth/callback/password` (lì con il token CSRF di Auth.js).
+ */
+export async function signInWithPassword(formData: FormData): Promise<SignInResult | void> {
+  const email = EmailSchema.safeParse(formData.get("email"));
+  const password = formData.get("password");
+  if (!email.success || typeof password !== "string" || !password || password.length > PASSWORD_MAX_LENGTH) return { ok: false, message: LOGIN_ERROR_MESSAGE };
+  const next = safeNextPath(String(formData.get("next") ?? ""));
+  try {
+    // Riuscito: lancia il redirect di Next verso la destinazione (non va intercettato).
+    await signIn(PASSWORD_PROVIDER_ID, { email: email.data, password, redirectTo: next });
+  } catch (e) {
+    if (e instanceof TooManyAttempts || (e instanceof CredentialsSignin && e.code === "tentativi")) return { ok: false, message: LOGIN_RATE_MESSAGE };
+    if (e instanceof AuthError) return { ok: false, message: LOGIN_ERROR_MESSAGE };
     throw e;
   }
 }

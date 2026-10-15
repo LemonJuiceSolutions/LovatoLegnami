@@ -5,7 +5,7 @@
 #
 # - deps:    npm ci (con postinstall: copia il kernel OCCT in public/occt/<versione>/)
 # - builder: next build in modalità standalone + comandi operativi impacchettati
-#            (db:migrate, db:seed, admin:link → .next/tools/*.cjs)
+#            (db:migrate, db:seed, admin:link, admin:set-password → .next/tools/*.cjs)
 # - runner:  solo server standalone, asset statici, migrazioni SQL e strumenti; utente
 #            non root `node`; all'avvio applica le migrazioni e parte `node server.js`.
 
@@ -52,6 +52,7 @@ RUN chmod 0755 /usr/local/bin/lovato-entrypoint \
                 "scripts.db:migrate=node tools/migrate.cjs" \
                 "scripts.db:seed=node tools/seed.cjs" \
                 "scripts.admin:link=node tools/admin-link.cjs" \
+                "scripts.admin:set-password=node tools/set-password.cjs" \
  && mkdir -p /app/.data/uploads \
  && chown -R node:node /app/.data /app/package.json
 USER node

@@ -23,7 +23,9 @@ export type AuditAction =
   | "crea-utente"
   | "attiva-utente"
   | "disattiva-utente"
-  | "cambia-ruolo";
+  | "cambia-ruolo"
+  | "imposta-password"
+  | "cambia-password";
 
 export interface AuditEntryInput {
   readonly userId: string | null;

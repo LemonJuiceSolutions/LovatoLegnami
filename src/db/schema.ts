@@ -66,6 +66,12 @@ export const users = pgTable(
     active: boolean("active").notNull().default(true),
     emailVerified: ts("email_verified"),
     image: text("image"),
+    /**
+     * Hash della password (`scrypt$N$r$p$sale$hash`, `src/server/auth/password.ts`), `null`
+     * se l'utente accede solo con il collegamento via email. Mai esposto al client.
+     */
+    passwordHash: text("password_hash"),
+    passwordChangedAt: ts("password_changed_at"),
     createdAt: ts("created_at").notNull().$defaultFn(now),
   },
   (t) => [check("users_role_check", sql`${t.role} in (${quoted(ROLE_VALUES)})`)],

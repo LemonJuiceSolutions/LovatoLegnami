@@ -20,7 +20,8 @@
     "db:migrate": "tsx src/db/migrate.ts",
     "db:seed": "tsx src/db/seed.ts",
     "db:studio": "drizzle-kit studio",
-    "admin:link": "tsx scripts/admin-link.ts"
+    "admin:link": "tsx scripts/admin-link.ts",
+    "admin:set-password": "tsx scripts/set-password.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.82.0",

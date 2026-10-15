@@ -3,6 +3,7 @@
 import * as React from "react"
 import { usePathname } from "next/navigation"
 import { LogOut, User } from "lucide-react"
+import { ChangePasswordDialog } from "@/components/auth/change-password-dialog"
 import { Button } from "@/components/ui/button"
 import { ROLE_LABELS, type Role } from "@/server/auth/permissions"
 
@@ -32,6 +33,7 @@ export function NavHeader({ user, onSignOut }: { user?: NavUser; onSignOut?: () 
         <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground" aria-hidden>
           <User className="h-4 w-4" />
         </div>
+        {user && <ChangePasswordDialog />}
         {user && <SignOutButton onSignOut={onSignOut} />}
       </div>
     </header>

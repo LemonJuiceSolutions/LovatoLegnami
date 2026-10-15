@@ -17,6 +17,7 @@ describe("utenti (9.10)", () => {
       create: vi.fn(async () => ({ ok: true as const, data: {} })),
       setRole: vi.fn(async () => ({ ok: false as const, status: 409 as const, message: "deve restare almeno un amministratore attivo" })),
       setActive: vi.fn(async () => ({ ok: true as const, data: {} })),
+      resetPassword: vi.fn(async () => ({ ok: true as const, data: { email: "mario@lovato.it", password: "x" } })),
     }
     render(
       <UsersAdmin
@@ -37,6 +38,35 @@ describe("utenti (9.10)", () => {
     await waitFor(() => expect(actions.setActive).toHaveBeenCalledWith("u2", false))
     fireEvent.change(screen.getByLabelText("Ruolo di admin@lovato.it"), { target: { value: "commerciale" } })
     expect((await screen.findByRole("alert")).textContent).toMatch(/almeno un amministratore attivo/)
+  })
+})
+
+describe("reimpostazione della password", () => {
+  it("mostra una volta la password generata; per sé stessi rimanda al menu", async () => {
+    const actions = {
+      create: vi.fn(async () => ({ ok: true as const, data: {} })),
+      setRole: vi.fn(async () => ({ ok: true as const, data: {} })),
+      setActive: vi.fn(async () => ({ ok: true as const, data: {} })),
+      resetPassword: vi.fn(async () => ({ ok: true as const, data: { email: "mario@lovato.it", password: "Abcdefghjkmnpqrs2345" } })),
+    }
+    const confirm = vi.spyOn(window, "confirm").mockReturnValue(true)
+    render(
+      <UsersAdmin
+        currentUserId="u1"
+        actions={actions}
+        users={[
+          { id: "u1", email: "admin@lovato.it", name: "Admin", role: "admin", active: true, createdAt: "" },
+          { id: "u2", email: "mario@lovato.it", name: "Mario", role: "commerciale", active: true, createdAt: "" },
+        ]}
+      />,
+    )
+    expect(screen.queryByRole("button", { name: "Reimposta la password di admin@lovato.it" })).toBeNull()
+    fireEvent.click(screen.getByRole("button", { name: "Reimposta la password di mario@lovato.it" }))
+    await waitFor(() => expect(actions.resetPassword).toHaveBeenCalledWith("u2"))
+    expect((await screen.findByTestId("password-generata")).textContent).toBe("Abcdefghjkmnpqrs2345")
+    fireEvent.click(screen.getByRole("button", { name: "Nascondi" }))
+    expect(screen.queryByTestId("password-generata")).toBeNull()
+    confirm.mockRestore()
   })
 })
 

@@ -27,12 +27,14 @@ export interface UserActions {
   readonly create: (input: { email: string; name?: string | null; role: string }) => Promise<ActionResult<unknown>>
   readonly setActive: (id: string, active: boolean) => Promise<ActionResult<unknown>>
   readonly setRole: (id: string, role: string) => Promise<ActionResult<unknown>>
+  readonly resetPassword: (id: string) => Promise<ActionResult<{ email: string; password: string }>>
 }
 
 const serverActions: UserActions = {
   create: async (input) => (await import("@/server/actions/users")).createUserAction(input),
   setActive: async (id, active) => (await import("@/server/actions/users")).setUserActiveAction(id, active),
   setRole: async (id, role) => (await import("@/server/actions/users")).setUserRoleAction(id, role),
+  resetPassword: async (id) => (await import("@/server/actions/users")).resetUserPasswordAction(id),
 }
 
 const selectClass = "h-9 rounded-md border border-input bg-background px-2 text-sm"
@@ -44,9 +46,23 @@ export function UsersAdmin({ users, currentUserId, actions = serverActions }: { 
   const [email, setEmail] = React.useState("")
   const [name, setName] = React.useState("")
   const [role, setRole] = React.useState<Role>("commerciale")
+  // Password generata dalla reimpostazione: mostrata una sola volta, solo in memoria.
+  const [issued, setIssued] = React.useState<{ email: string; password: string } | null>(null)
+
+  const resetPassword = (u: UserRowView) => {
+    if (!window.confirm(`Reimpostare la password di ${u.email}? Quella attuale smetterà di funzionare.`)) return
+    start(async () => {
+      const r = await actions.resetPassword(u.id)
+      if (r.ok) {
+        setIssued(r.data)
+        setMessage(null)
+      } else setMessage({ kind: "error", text: r.message })
+    })
+  }
 
   const run = (fn: () => Promise<ActionResult<unknown>>, ok: string, after?: () => void) =>
     start(async () => {
+      setIssued(null)
       const r = await fn()
       if (r.ok) {
         setMessage({ kind: "ok", text: ok })
@@ -62,7 +78,7 @@ export function UsersAdmin({ users, currentUserId, actions = serverActions }: { 
         className="flex flex-wrap items-end gap-2 rounded-md border p-3"
         onSubmit={(e) => {
           e.preventDefault()
-          run(() => actions.create({ email, name: name.trim() || null, role }), `Utente ${email.trim().toLowerCase()} creato: può accedere con il collegamento via email`, () => {
+          run(() => actions.create({ email, name: name.trim() || null, role }), `Utente ${email.trim().toLowerCase()} creato: imposta la sua password con «Reimposta password»`, () => {
             setEmail("")
             setName("")
           })
@@ -95,11 +111,29 @@ export function UsersAdmin({ users, currentUserId, actions = serverActions }: { 
           {message.text}
         </p>
       )}
+      {issued && (
+        <div role="status" className="space-y-1 rounded-md border border-primary/40 bg-primary/5 p-3 text-sm">
+          <p>
+            Nuova password di <strong>{issued.email}</strong> (mostrata solo ora, comunicala in modo riservato):
+          </p>
+          <p className="flex flex-wrap items-center gap-2">
+            <code className="select-all rounded bg-muted px-2 py-1 font-mono text-base" data-testid="password-generata">
+              {issued.password}
+            </code>
+            <Button type="button" size="sm" variant="outline" onClick={() => void navigator.clipboard?.writeText(issued.password)}>
+              Copia
+            </Button>
+            <Button type="button" size="sm" variant="ghost" onClick={() => setIssued(null)}>
+              Nascondi
+            </Button>
+          </p>
+        </div>
+      )}
       <div className="overflow-auto rounded-md border">
         <table className="w-full text-sm" aria-label="Utenti">
           <thead className="bg-muted">
             <tr>
-              {["Email", "Nome", "Ruolo", "Attivo", "Creato il"].map((h) => (
+              {["Email", "Nome", "Ruolo", "Attivo", "Creato il", "Password"].map((h) => (
                 <th key={h} scope="col" className="px-2 py-1.5 text-left font-medium">
                   {h}
                 </th>
@@ -138,6 +172,15 @@ export function UsersAdmin({ users, currentUserId, actions = serverActions }: { 
                   />
                 </td>
                 <td className="px-2 py-1.5 text-muted-foreground">{u.createdAt}</td>
+                <td className="px-2 py-1.5">
+                  {u.id === currentUserId ? (
+                    <span className="text-xs text-muted-foreground">dal menu «Cambia password»</span>
+                  ) : (
+                    <Button type="button" size="sm" variant="outline" disabled={pending} aria-label={`Reimposta la password di ${u.email}`} onClick={() => resetPassword(u)}>
+                      Reimposta password
+                    </Button>
+                  )}
+                </td>
               </tr>
             ))}
           </tbody>

@@ -13,7 +13,7 @@ export default async function AdminUtentiPage() {
   return (
     <div className="space-y-3">
       <h1 className="text-xl font-semibold">Utenti</h1>
-      <p className="text-sm text-muted-foreground">Solo gli utenti in questo elenco possono accedere all&apos;area interna, con il collegamento ricevuto via email.</p>
+      <p className="text-sm text-muted-foreground">Solo gli utenti attivi in questo elenco possono accedere all&apos;area interna, con email e password (o con il collegamento via email, se configurato).</p>
       <UsersAdmin
         currentUserId={user.id}
         users={users.map((u) => ({ id: u.id, email: u.email, name: u.name, role: u.role as Role, active: u.active, createdAt: formatDateTime(u.createdAt) }))}

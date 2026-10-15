@@ -1,7 +1,9 @@
 "use server";
 
 import { z } from "zod";
+import { getDb } from "@/db/client";
 import { ROLES, requireUser } from "@/server/auth";
+import { resetPasswordById } from "@/server/auth/password-store";
 import * as repo from "@/server/repositories/users";
 import { runAction, type ActionResult } from "./result";
 
@@ -41,5 +43,17 @@ export async function setUserRoleAction(id: string, role: string): Promise<Actio
   return runAction(async () => {
     const actor = await requireUser("utenti:gestisci");
     return repo.setRole(Id.parse(id), RoleSchema.parse(role), actor.id);
+  });
+}
+
+/**
+ * Reimposta la password di un altro utente: ne genera una casuale, restituita **una sola
+ * volta** all'amministratore (non è salvata in chiaro da nessuna parte). Registrata nel registro.
+ */
+export async function resetUserPasswordAction(id: string): Promise<ActionResult<{ email: string; password: string }>> {
+  return runAction(async () => {
+    const actor = await requireUser("utenti:gestisci");
+    const r = await resetPasswordById(await getDb(), Id.parse(id), actor.id);
+    return { email: r.email, password: r.generated };
   });
 }

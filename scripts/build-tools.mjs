@@ -1,5 +1,5 @@
-// Comandi operativi per l'immagine Docker (`deploy/hetzner/`): `db:migrate`, `db:seed` e
-// `admin:link` impacchettati con esbuild in `.next/tools/*.cjs` (un file ciascuno, Node
+// Comandi operativi per l'immagine Docker (`deploy/hetzner/`): `db:migrate`, `db:seed`,
+// `admin:link` e `admin:set-password` impacchettati con esbuild in `.next/tools/*.cjs` (un file ciascuno, Node
 // puro, nessun `tsx` né sorgenti TypeScript nell'immagine finale). Le dipendenze sono
 // incluse nel file; restano esterne solo PGlite (mai usato con DATABASE_URL) e il driver
 // nativo opzionale di `pg`. Le migrazioni SQL si leggono da `<cwd>/drizzle/`.
@@ -15,6 +15,7 @@ const entries = {
   migrate: "src/db/migrate.ts",
   seed: "src/db/seed.ts",
   "admin-link": "scripts/admin-link.ts",
+  "set-password": "scripts/set-password.ts",
 };
 
 await build({

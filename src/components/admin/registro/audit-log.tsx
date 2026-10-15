@@ -36,6 +36,8 @@ const ACTION_LABELS: Readonly<Record<string, string>> = {
   "attiva-utente": "utente attivato",
   "disattiva-utente": "utente disattivato",
   "cambia-ruolo": "cambio di ruolo",
+  "imposta-password": "password impostata",
+  "cambia-password": "password cambiata",
 }
 
 const ENTITY_LABELS: Readonly<Record<string, string>> = { dataset_version: "versione", lead: "richiesta", user: "utente" }

@@ -10,7 +10,7 @@ import { freshDb, makeUser } from "@/server/repositories/__tests__/helpers";
 
 const session = vi.hoisted(() => ({ current: null as null | { user: Record<string, unknown> } }));
 vi.mock("@/server/auth/auth", () => ({ auth: async () => session.current }));
-vi.mock("@/server/actions/auth", () => ({ requestSignIn: async () => undefined }));
+vi.mock("@/server/actions/auth", () => ({ requestSignIn: async () => undefined, signInWithPassword: async () => undefined }));
 vi.mock("next/navigation", () => ({
   notFound: () => {
     throw new Error("NEXT_NOT_FOUND");
@@ -22,6 +22,7 @@ vi.mock("next/navigation", () => ({
 
 const { default: AccessoPage } = await import("@/app/(auth)/accesso/page");
 const { currentUser, requirePageUser } = await import("@/server/auth");
+const { resetEnvCache } = await import("@/server/env");
 
 afterAll(() => closeDb());
 const as = (id: string | null) => {
@@ -63,4 +64,25 @@ describe("/accesso con sessione non più valida (correzione A)", () => {
     const page = await AccessoPage({ searchParams: {} });
     expect(text(page)).not.toContain("non è più valida");
   });
+
+  it("form email e password sempre; collegamento via email solo con RESEND_API_KEY", async () => {
+    as(null);
+    const saved = process.env.RESEND_API_KEY;
+    try {
+      delete process.env.RESEND_API_KEY;
+      resetEnvCache();
+      let page = text(await AccessoPage({ searchParams: {} }));
+      expect(page).toContain("Inserisci la tua email aziendale e la password");
+      expect(page).not.toContain("Ricevi un link via email");
+      process.env.RESEND_API_KEY = "re_test";
+      resetEnvCache();
+      page = text(await AccessoPage({ searchParams: {} }));
+      expect(page).toContain("Ricevi un link via email");
+    } finally {
+      if (saved === undefined) delete process.env.RESEND_API_KEY;
+      else process.env.RESEND_API_KEY = saved;
+      resetEnvCache();
+    }
+  });
 });
+

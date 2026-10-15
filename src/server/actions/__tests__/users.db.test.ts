@@ -2,6 +2,7 @@ import { afterAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { closeDb, getDb } from "@/db/client";
 import { truncateAll } from "@/db/testing";
 import { users } from "@/db/schema";
+import { eq } from "drizzle-orm";
 
 const session = vi.hoisted(() => ({ current: null as null | { user: Record<string, unknown> } }));
 vi.mock("@/server/auth/auth", () => ({ auth: async () => session.current }));
@@ -67,5 +68,29 @@ describe("gestione utenti (7.5)", () => {
     expect((await repo.get(mario.id)).role).toBe("commerciale");
     session.current = null;
     expect(await actions.createUserAction({ email: "z@y.it", role: "admin" })).toMatchObject({ ok: false, status: 401 });
+  });
+
+  it("password: reimpostazione solo dall'admin (mostrata una volta), cambio della propria per tutti", async () => {
+    const pw = await import("../password");
+    const { verifyPassword } = await import("@/server/auth/password");
+    const hashOf = async (id: string) => (await (await getDb()).select({ h: users.passwordHash }).from(users).where(eq(users.id, id)))[0]!.h;
+    as(mario.id);
+    expect(await actions.resetUserPasswordAction(admin.id)).toMatchObject({ ok: false, status: 403 });
+    as(admin.id);
+    const reset = await actions.resetUserPasswordAction(mario.id);
+    expect(reset).toMatchObject({ ok: true, data: { email: "mario@lovato.it" } });
+    const generated = reset.ok ? reset.data.password : "";
+    expect(generated).toHaveLength(20);
+    expect(await verifyPassword(generated, await hashOf(mario.id))).toBe(true);
+    expect(await actions.resetUserPasswordAction("inesistente")).toMatchObject({ ok: false, status: 400 });
+
+    as(mario.id);
+    expect(await pw.changeOwnPasswordAction({ current: "sbagliata", next: "nuova password lunga" })).toMatchObject({ ok: false, status: 400, message: "La password attuale non è corretta." });
+    expect(await pw.changeOwnPasswordAction({ current: generated, next: "corta" })).toMatchObject({ ok: false, status: 400 });
+    expect(await pw.changeOwnPasswordAction({ current: generated, next: "nuova password lunga" })).toEqual({ ok: true, data: null });
+    expect(await verifyPassword("nuova password lunga", await hashOf(mario.id))).toBe(true);
+    expect((await audit.list({ entity: "user", entityId: mario.id })).map((e) => e.action)).toEqual(expect.arrayContaining(["imposta-password", "cambia-password"]));
+    session.current = null;
+    expect(await pw.changeOwnPasswordAction({ current: "", next: "nuova password lunga" })).toMatchObject({ ok: false, status: 401 });
   });
 });
