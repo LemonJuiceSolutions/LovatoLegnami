@@ -520,7 +520,10 @@ export const PRESET_CATALOG: readonly Preset[] = [
     params: {},
     envelope: { box: { width: 5000, depth: 5100, height: 3600 } },
     source: `${SRC} §3 estensioni (autoportante bifalda, non offerta dal sito; tipologia MVP)`,
-    notes: ["Esempio MVP \"Bifalda libera\": autoportante bifalda 5×4 con i parametri di default."],
+    notes: [
+      "Esempio MVP \"Bifalda libera\": autoportante bifalda 5×4 con i parametri di default.",
+      "[dedotto] Il sito non vende tettoie bifalda in kit: nessuna distinta di riferimento, conteggi non verificati contro il sito.",
+    ],
   },
 ];
 
