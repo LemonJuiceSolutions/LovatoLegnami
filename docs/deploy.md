@@ -92,8 +92,10 @@ compare un avviso nel log).
 4. Attendere lo stato **Verified** in Resend.
 5. `EMAIL_FROM` deve usare quel dominio, es. `Lovato Legnami <preventivi@lovatolegnami.it>`.
 
-Senza `RESEND_API_KEY` le email (compreso il link di accesso al back-office) sono solo
-stampate nel log della funzione: utile per una prima prova, non per l'uso reale.
+Senza `RESEND_API_KEY` le email non partono: in produzione il log riporta solo
+destinatario e oggetto (mai il contenuto, perché il collegamento di accesso è una
+credenziale). Quindi **senza Resend non si può accedere al back-office**: configurarlo
+prima del primo accesso.
 
 ## 5. Variabili d'ambiente
 
@@ -108,7 +110,7 @@ anche nelle anteprime).
 | `NEXT_PUBLIC_SITE_URL` | PROD | `https://www.lovatolegnami.it` | Senza barra finale; link nelle email, sitemap, Open Graph. Per Preview si può lasciare l'URL di produzione o un URL di anteprima fisso. |
 | `EMAIL_FROM` | PROD | `Lovato Legnami <preventivi@lovatolegnami.it>` | Dominio verificato su Resend. |
 | `OFFICE_EMAIL` | PROD | casella dell'ufficio | Riceve le notifiche delle nuove richieste. |
-| `RESEND_API_KEY` | consigliata | Resend | Assente ⇒ email solo nel log (avviso all'avvio). |
+| `RESEND_API_KEY` | di fatto sì | Resend | Assente ⇒ nessuna email inviata (avviso all'avvio) e nessun accesso al back-office. |
 | `BLOB_READ_WRITE_TOKEN` | consigliata | Integrazione Blob | Assente ⇒ foto su disco non persistente (avviso). |
 | `ADMIN_EMAIL` | solo per il seed | email del primo admin | Letta da `npm run db:seed`, non dal sito. |
 | `NEXT_PUBLIC_ANALYTICS` | no | `1` o `0` | `1` = Vercel Web Analytics (senza cookie) sul sito pubblico. È letta **al build**: dopo una modifica serve un nuovo deploy. Attivare anche Analytics nel progetto Vercel. |
@@ -137,6 +139,9 @@ back-office deve rispondere da un dominio diverso da quello della richiesta.
 
    Il comando è idempotente: crea la versione 1 di listino, regole, tipologie e preset
    (valori segnaposto **DA VALIDARE**) e l'utente admin; rieseguito non modifica nulla.
+   Le pagine del sito generate durante il primo build (database ancora vuoto) mostrano
+   "Prezzo su richiesta": si aggiornano da sole entro 5 minuti dal seed, oppure subito
+   con un **Redeploy** o con la prima pubblicazione dal back-office.
    Per un'anteprima già creata si può fare lo stesso con il `DATABASE_URL` del suo branch.
    Il comando può anche applicare le migrazioni a mano sullo stesso database:
 
@@ -145,8 +150,8 @@ back-office deve rispondere da un dominio diverso da quello della richiesta.
    ```
 
 4. **Primo accesso admin**: aprire `https://<dominio>/accesso`, inserire `ADMIN_EMAIL`,
-   aprire il collegamento ricevuto via email (valido pochi minuti, monouso). Senza
-   `RESEND_API_KEY` il collegamento si trova nei log della funzione (Vercel → Logs).
+   aprire il collegamento ricevuto via email (valido pochi minuti, monouso). Se l'email
+   non arriva: Resend → **Emails** (stato dell'invio) e Vercel → **Logs** (errori).
 5. Dal back-office: **Utenti** per creare gli altri account (commerciale, tecnico,
    visualizzatore); **Listino**, **Regole**, **Tipologie** per sostituire i segnaposto e
    **pubblicare** (la pubblicazione aggiorna il sito in pochi secondi).
@@ -270,4 +275,32 @@ npm run test:bundle
 
 ## 12. Esiti della verifica finale (task 14.2)
 
-Da completare con gli esiti della verifica manuale (vedi sotto).
+Verifica del 15/10/2026 su `next build` + `next start` in locale (porta 3135) con PGlite.
+In locale `next start` è stato avviato con `NODE_ENV=development`, perché in produzione
+`src/server/env.ts` esige `DATABASE_URL` (Postgres) e PGlite non è ammesso; per lo stesso
+motivo il build locale genera le pagine senza prezzi e la cache dei dati del build
+(`.next/cache/fetch-cache`) è stata svuotata prima dell'avvio. Su Vercel, con
+`DATABASE_URL`, nessuno dei due accorgimenti serve. Browser: Chromium headless
+(Playwright) a 1440 px (tema chiaro) e 390 px (tema scuro).
+
+| Controllo | Esito |
+|---|---|
+| Home, elenco tipologie, scheda tipologia, galleria, contatti a 390 e 1440 px | OK, nessuno scroll orizzontale; prezzi "da …" presenti |
+| Wizard monofalda con muro fuori squadra (548/534 cm) e grondaia a 270 cm, accesso medio | OK: nota "Abbiamo ridotto la profondità a 2,3 m per passare sotto la grondaia", "Muro fuori squadra di circa 2°", prezzo in circa 0,8 s, invio con foto, pagina di conferma, PDF dal token, pagina `/p/[token]` senza contatti |
+| Wizard bifalda a 390 px | OK; nota "lavoro in quota oltre 3,5 m" (prima: "3516,4 mm", corretto) |
+| Accesso admin con il collegamento nel log del server | OK |
+| Richiesta nell'admin con foto, "Apri nel configuratore" | OK: pianta e 3D caricati, pannello preventivo |
+| Export SAT dal configuratore e "Verifica file" | OK: "Struttura SAT valida", SAT 7.0, 20 body, 2719 entità |
+| Preventivo definitivo con voce manuale, stato "preventivo inviato", email al cliente | OK (email con PDF nell'outbox) |
+| Modifica del listino (manodopera +20%), simulatore, dialogo di pubblicazione con differenze | OK |
+| "A partire da" sul sito dopo la pubblicazione | OK dopo la correzione (prima restava il prezzo vecchio fino a 6 minuti) |
+| Lighthouse home, mobile | Prestazioni 89 alla prima esecuzione a freddo, 94 nelle successive; Accessibilità, Best practice, SEO 100 |
+| Lighthouse home, desktop | 100 / 100 / 100 / 100 |
+| Intestazioni `/occt/1.1.0/replicad_single.wasm` | `Cache-Control: public, max-age=31536000, immutable`, `Content-Type: application/wasm` |
+
+Da notare: nel wizard il CAP si chiede solo nell'ultimo passo, quindi il prezzo mostrato al
+passo "Prezzo" usa la zona di trasporto di ripiego ("da verificare") ed è più alto di quello
+salvato dopo l'invio con il CAP (es. 3.840 € → 3.400 € circa). Da valutare con Lovato se
+chiedere il CAP prima.
+
+La prova di ripristino del database (sezione 10) va eseguita sull'anteprima reale.
