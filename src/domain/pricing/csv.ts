@@ -95,6 +95,13 @@ const euro = (c: number): string => (c / 100).toFixed(2).replace(".", ",");
 
 type Rows = { row: number; cells: string[] }[];
 
+/** Chiavi che non possono diventare proprietà di un oggetto costruito dal CSV. */
+export const FORBIDDEN_KEYS: ReadonlySet<string> = new Set(["__proto__", "constructor", "prototype"]);
+export const isForbiddenKey = (k: string): boolean => FORBIDDEN_KEYS.has(k);
+
+/** Oggetto semplice da una `Map` (proprietà proprie, nessun setter di prototipo coinvolto). */
+const plain = <V>(m: ReadonlyMap<string, V>): Record<string, V> => Object.fromEntries(m);
+
 class RowReader {
   readonly errors: string[] = [];
   constructor(
@@ -103,6 +110,18 @@ class RowReader {
   ) {}
   text(i: number): string {
     return (this.cells[i] ?? "").trim();
+  }
+  /**
+   * Cella usata come chiave di un oggetto: le chiavi speciali di JavaScript
+   * (`__proto__`, `constructor`, `prototype`) sono rifiutate (prototype pollution).
+   */
+  key(i: number): string | undefined {
+    const k = this.text(i);
+    if (isForbiddenKey(k)) {
+      this.errors.push(`riga ${this.row}: chiave "${k}" non ammessa`);
+      return undefined;
+    }
+    return k;
   }
   number(i: number, what: string): number {
     const v = parseDecimal(this.text(i));
@@ -136,8 +155,16 @@ const TABLES: Readonly<Record<PriceTable, TableDef>> = {
     header: ["Specie", "Qualità", "Prezzo €/m³"],
     rows: (pl) => Object.entries(pl.timber.pricePerM3).flatMap(([sp, byQ]) => Object.entries(byQ).map(([q, c]) => [sp, q, euro(c)])),
     apply: (pl, rows) => {
-      const pricePerM3: Record<string, Record<string, number>> = {};
-      for (const r of rows) (pricePerM3[r.text(0)] ??= {})[r.text(1)] = r.price(2);
+      const bySpecies = new Map<string, Map<string, number>>();
+      for (const r of rows) {
+        const sp = r.key(0);
+        const q = r.key(1);
+        const price = r.price(2);
+        if (sp === undefined || q === undefined) continue;
+        if (!bySpecies.has(sp)) bySpecies.set(sp, new Map());
+        bySpecies.get(sp)!.set(q, price);
+      }
+      const pricePerM3 = Object.fromEntries([...bySpecies].map(([sp, m]) => [sp, plain(m)]));
       return { ...pl, timber: { ...pl.timber, pricePerM3 } };
     },
   },
@@ -148,35 +175,46 @@ const TABLES: Readonly<Record<PriceTable, TableDef>> = {
         ls.map((l) => [sec, dec(l.length), l.priceCents === undefined ? "" : euro(l.priceCents), (l.qualities ?? []).join(" ")]),
       ),
     apply: (pl, rows) => {
-      const stockLengths: Record<string, PriceList["timber"]["stockLengths"][string][number][]> = {};
+      const bySection = new Map<string, PriceList["timber"]["stockLengths"][string][number][]>();
       for (const r of rows) {
+        const sec = r.key(0);
         const priceCents = r.optionalPrice(2);
         const qualities = r.list(3);
-        (stockLengths[r.text(0)] ??= []).push({
+        if (sec === undefined) continue;
+        if (!bySection.has(sec)) bySection.set(sec, []);
+        bySection.get(sec)!.push({
           length: r.number(1, "lunghezza"),
           ...(priceCents !== undefined ? { priceCents } : {}),
           ...(qualities.length ? { qualities } : {}),
         });
       }
-      return { ...pl, timber: { ...pl.timber, stockLengths } };
+      return { ...pl, timber: { ...pl.timber, stockLengths: plain(bySection) } };
     },
   },
   lavorazioni: {
     header: ["Tipo", "Base min", "Per unità min", "Unità"],
     rows: (pl) => Object.entries(pl.machining.perType).map(([t, r]) => [t, dec(r.baseMin), dec(r.perUnitMin), r.unit]),
     apply: (pl, rows) => {
-      const perType: Record<string, unknown> = {};
-      for (const r of rows) perType[r.text(0)] = { baseMin: r.number(1, "tempo"), perUnitMin: r.number(2, "tempo"), unit: r.text(3) };
-      return { ...pl, machining: { ...pl.machining, perType: perType as PriceList["machining"]["perType"] } };
+      const perType = new Map<string, unknown>();
+      for (const r of rows) {
+        const type = r.key(0);
+        const rate = { baseMin: r.number(1, "tempo"), perUnitMin: r.number(2, "tempo"), unit: r.text(3) };
+        if (type !== undefined) perType.set(type, rate);
+      }
+      return { ...pl, machining: { ...pl.machining, perType: plain(perType) as PriceList["machining"]["perType"] } };
     },
   },
   ferramenta: {
     header: ["Codice", "Descrizione", "Prezzo €"],
     rows: (pl) => Object.entries(pl.hardware.priceCents).map(([code, c]) => [code, hasHardware(code) ? findHardware(code).name : "", euro(c)]),
     apply: (pl, rows) => {
-      const priceCents: Record<string, number> = {};
-      for (const r of rows) priceCents[r.text(0)] = r.price(2);
-      return { ...pl, hardware: { priceCents } };
+      const priceCents = new Map<string, number>();
+      for (const r of rows) {
+        const code = r.key(0);
+        const price = r.price(2);
+        if (code !== undefined) priceCents.set(code, price);
+      }
+      return { ...pl, hardware: { priceCents: plain(priceCents) } };
     },
   },
   trattamenti: {
@@ -197,19 +235,28 @@ const TABLES: Readonly<Record<PriceTable, TableDef>> = {
       ...Object.entries(pl.labour.minPerHardware).map(([k, m]) => ["ferramenta", k, dec(m)]),
     ],
     apply: (pl, rows) => {
-      const maps: Record<string, Record<string, number>> = { pezzo: {}, giunto: {}, ferramenta: {} };
+      const maps = new Map<string, Map<string, number>>([
+        ["pezzo", new Map()],
+        ["giunto", new Map()],
+        ["ferramenta", new Map()],
+      ]);
       for (const r of rows) {
-        const map = maps[r.text(0)];
-        if (!map) r.errors.push(`riga ${r.row}: voce "${r.text(0)}" non valida (pezzo, giunto, ferramenta)`);
-        else map[r.text(1)] = r.number(2, "tempo");
+        const map = maps.get(r.text(0));
+        if (!map) {
+          r.errors.push(`riga ${r.row}: voce "${r.text(0)}" non valida (pezzo, giunto, ferramenta)`);
+          continue;
+        }
+        const k = r.key(1);
+        const minutes = r.number(2, "tempo");
+        if (k !== undefined) map.set(k, minutes);
       }
       return {
         ...pl,
         labour: {
           ...pl.labour,
-          minPerPiece: maps.pezzo as PriceList["labour"]["minPerPiece"],
-          minPerJoint: maps.giunto as PriceList["labour"]["minPerJoint"],
-          minPerHardware: maps.ferramenta as PriceList["labour"]["minPerHardware"],
+          minPerPiece: plain(maps.get("pezzo")!) as PriceList["labour"]["minPerPiece"],
+          minPerJoint: plain(maps.get("giunto")!) as PriceList["labour"]["minPerJoint"],
+          minPerHardware: plain(maps.get("ferramenta")!) as PriceList["labour"]["minPerHardware"],
         },
       };
     },

@@ -18,7 +18,17 @@ import type { Cents } from "./money";
 // Mattoni
 
 const ID_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
-const id = z.string().regex(ID_RE, "identificativo non valido (minuscole, cifre e trattini)");
+/**
+ * Chiavi speciali di JavaScript: mai ammesse come id o chiavi di record (un documento JSON
+ * dall'admin o un CSV con `__proto__`/`constructor`/`prototype` non deve toccare i prototipi).
+ */
+export const RESERVED_KEYS: readonly string[] = ["__proto__", "constructor", "prototype"];
+const notReserved = (k: string) => !RESERVED_KEYS.includes(k);
+const RESERVED_MSG = "chiave riservata non ammessa";
+const id = z
+  .string()
+  .regex(ID_RE, "identificativo non valido (minuscole, cifre e trattini)")
+  .refine(notReserved, RESERVED_MSG);
 const label = z.string().trim().min(1, "testo obbligatorio");
 /** Importo o prezzo unitario in centesimi, intero ≥ 0. */
 const price = z.number({ invalid_type_error: "prezzo non numerico" }).int("il prezzo deve essere in centesimi interi").min(0, "il prezzo non può essere negativo");
@@ -250,7 +260,7 @@ export const PriceListSchema = z
     currency: z.literal("EUR").default("EUR"),
     timber: TimberSchema,
     machining: MachiningSchema,
-    hardware: z.object({ priceCents: z.record(z.string().min(1), price) }).strict(),
+    hardware: z.object({ priceCents: z.record(z.string().min(1).refine(notReserved, RESERVED_MSG), price) }).strict(),
     treatments: z.array(CatalogItemSchema),
     coverings: z.array(CatalogItemSchema),
     labour: LabourSchema,
