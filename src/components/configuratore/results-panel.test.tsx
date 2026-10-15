@@ -58,3 +58,41 @@ describe("ResultsPanel", () => {
     expect(state().config.params).toBe(params)
   })
 })
+
+describe("ResultsPanel – ferramenta", () => {
+  beforeEach(() => state().resetConfig("portale-sandwich"))
+
+  it("tabella codice/descrizione/quantità da hardwareRows", () => {
+    render(<ResultsPanel />)
+    const rows = state().derived.hardwareRows
+    expect(rows.length).toBeGreaterThan(0)
+    const table = screen.getByRole("region", { name: "Ferramenta" })
+    expect(table.querySelectorAll("tbody tr").length).toBe(rows.length)
+    for (const r of rows) expect(table.querySelector(`[data-hardware="${r.code}"]`)?.textContent).toContain(r.description)
+  })
+
+  it("clic sulla riga dei bulloni seleziona i pezzi forati", () => {
+    render(<ResultsPanel />)
+    const { assembly, hardwareRows } = state().derived
+    const bolts = hardwareRows.find((r) => r.kind === "bullone")!
+    // pezzi forati dai bulloni di quel codice
+    const boltIds = new Set(assembly!.hardware.filter((h) => h.code === bolts.code).map((h) => h.id))
+    const drilled = assembly!.pieces.filter((p) => p.machinings.some((m) => m.type === "foro" && m.jointId && boltIds.has(m.jointId))).map((p) => p.id)
+    expect(drilled.length).toBeGreaterThan(0)
+
+    fireEvent.click(screen.getByRole("button", { name: `Seleziona i pezzi di ${bolts.code}` }))
+    expect([...state().selection].sort()).toEqual([...drilled].sort())
+    expect(screen.getByRole("button", { name: `Seleziona i pezzi di ${bolts.code}` }).getAttribute("aria-pressed")).toBe("true")
+
+    // secondo clic sulla riga: selezione annullata
+    fireEvent.click(document.querySelector(`[data-hardware="${bolts.code}"]`)!)
+    expect(state().selection).toEqual([])
+  })
+
+  it("carpenteria: nessuna riga di bulloni", () => {
+    act(() => state().setParam("costruzione", "carpenteria"))
+    render(<ResultsPanel />)
+    expect(state().derived.hardwareRows.some((r) => r.kind === "bullone")).toBe(false)
+    expect(document.querySelector('[data-hardware^="bullone"]')).toBeNull()
+  })
+})
