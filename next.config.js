@@ -6,6 +6,17 @@
  */
 const OCCT_CACHE = "public, max-age=31536000, immutable"
 
+/**
+ * Intestazioni di sicurezza per ogni risposta: niente incorniciamento (clickjacking sul
+ * back-office), niente MIME sniffing, referrer limitato all'origine verso altri siti.
+ */
+const SECURITY_HEADERS = [
+  { key: "X-Frame-Options", value: "DENY" },
+  { key: "Content-Security-Policy", value: "frame-ancestors 'none'" },
+  { key: "X-Content-Type-Options", value: "nosniff" },
+  { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+]
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   env: {
@@ -23,6 +34,7 @@ const nextConfig = {
   },
   async headers() {
     return [
+      { source: "/:path*", headers: SECURITY_HEADERS },
       { source: "/occt/:path*", headers: [{ key: "Cache-Control", value: OCCT_CACHE }] },
       {
         source: "/occt/:path*.wasm",
@@ -36,3 +48,4 @@ const nextConfig = {
 }
 
 module.exports = nextConfig
+module.exports.SECURITY_HEADERS = SECURITY_HEADERS
