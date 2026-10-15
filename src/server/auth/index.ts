@@ -81,6 +81,22 @@ export async function requireUser(permission?: Permission): Promise<AuthUser> {
   return { id: row.id, email: row.email, name: row.name, role: row.role };
 }
 
+/**
+ * Utente valido della richiesta o `null`: come `requireUser()` ma senza lanciare. Un
+ * cookie di sessione che punta a un utente inesistente, disattivato o senza ruolo valido
+ * (es. JWT di un altro database locale con lo stesso segreto) vale come **anonimo**: chi
+ * decide se mostrare il login (pagina `/accesso`) deve usare questa e non `getSession()`,
+ * altrimenti `/accesso` ⇄ area interna diventano un ciclo di redirect.
+ */
+export async function currentUser(): Promise<AuthUser | null> {
+  try {
+    return await requireUser();
+  } catch (e) {
+    if (e instanceof UnauthorizedError) return null;
+    throw e;
+  }
+}
+
 export const isAuthError = (e: unknown): e is UnauthorizedError | ForbiddenError => e instanceof UnauthorizedError || e instanceof ForbiddenError;
 
 /**
