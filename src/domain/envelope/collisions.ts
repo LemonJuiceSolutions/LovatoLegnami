@@ -1,13 +1,16 @@
-import { pieceObbs } from "../assembly/bounds";
+import { pieceHullVertices, pieceObbs } from "../assembly/bounds";
 import type { Assembly } from "../components/types";
-import { obbAabbPenetration, obbVertices } from "../math/obb";
+import { obbAabbPenetration } from "../math/obb";
 import { type Envelope, type Side, absoluteObstacles } from "./types";
 
 /**
  * Controllo collisioni (D5): ogni pezzo come OBB (sezione × lunghezza nella
  * sua posa, lavorazioni ignorate: approssimazione conservativa; per i pezzi
  * curvi la catena di box di segmento di `pieceObbs`) deve stare dentro il box
- * base dell'ingombro e non compenetrare gli ostacoli.
+ * base dell'ingombro e non compenetrare gli ostacoli. Per il box base i box
+ * sono ritagliati dai tagli di testa (`pieceHullVertices`): la testa prolungata
+ * oltre un muro o il pavimento e poi tagliata non sfora. Per gli ostacoli resta
+ * il box intero (conservativo).
  */
 
 /** Id convenzionale del box base nelle collisioni. */
@@ -57,7 +60,7 @@ export function checkCollisions(assembly: Pick<Assembly, "pieces">, envelope: En
       ["pavimento", 0],
       ["soffitto", 0],
     ];
-    for (const v of obbs.flatMap(obbVertices)) {
+    for (const v of pieceHullVertices(p)) {
       excess[0][1] = Math.max(excess[0][1], -v.x);
       excess[1][1] = Math.max(excess[1][1], v.x - L);
       excess[2][1] = Math.max(excess[2][1], -v.y);

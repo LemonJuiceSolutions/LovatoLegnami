@@ -59,7 +59,9 @@ describe("tipologia addossata-monofalda", () => {
     const b = assemblyBounds(a)!;
     expect(b.min.x).toBeCloseTo(0, 6);
     expect(b.max.x).toBeCloseTo(6000, 6);
-    expect(b.min.y).toBeCloseTo(0, 6);
+    // gronda: il taglio a piombo passa per lo spigolo inferiore della testa, il box non lavorato arriva a y = 0
+    const sj = a.pieces.find((x) => x.type === "travetto")!.section;
+    expect(b.min.y).toBeCloseTo(sj.h * Math.sin(degToRad(15)), 6);
     expect(b.max.y).toBeCloseTo(a.meta.yMuro as number, 6);
     expect(b.min.z).toBeCloseTo(0, 6);
   });

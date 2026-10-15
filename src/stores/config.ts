@@ -80,7 +80,12 @@ const envelopeCache = new Map<string, Envelope>();
 
 /**
  * `DEFAULT_ENVELOPE` se contiene l'assieme senza collisioni, altrimenti
- * allargato (al centimetro superiore, con 100 mm di margine) fino a contenerlo.
+ * allargato (ai 100 mm superiori, con 100 mm di margine in profondità e
+ * altezza) fino a contenerlo. I limiti sono quelli del legno
+ * (`assemblyBounds`: box ritagliati dai tagli di testa), gli stessi del
+ * controllo collisioni. L'ingombro ha l'origine nell'angolo anteriore
+ * sinistro dell'assieme: i template generano il legno in x, y ≥ 0 (verificato
+ * da `default-collisions.test.ts`), quindi basta allargare verso i massimi.
  */
 function envelopeContaining(assembly: Assembly): Envelope {
   const bounds = assemblyBounds(assembly);

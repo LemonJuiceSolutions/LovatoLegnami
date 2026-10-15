@@ -45,8 +45,10 @@ describe("tipologia autoportante-bifalda", () => {
     const m = measureAssembly(a);
     expect(m.slope).toBeCloseTo(20, 9);
     const bounds = assemblyBounds(a)!;
-    expect(bounds.min.y).toBeCloseTo(0, 6);
-    expect(bounds.max.y).toBeCloseTo(2 * yC, 6);
+    // gronde: tagli a piombo per lo spigolo inferiore delle teste (il box non lavorato arriva a y = 0 e 2·yColmo)
+    const cut = tvt[0].section.h * Math.sin((20 * Math.PI) / 180);
+    expect(bounds.min.y).toBeCloseTo(cut, 6);
+    expect(bounds.max.y).toBeCloseTo(2 * yC - cut, 6);
   });
 
   it("puntoni innestati con tenone-mortasa in travi e colmo, lavorazioni complementari", () => {
