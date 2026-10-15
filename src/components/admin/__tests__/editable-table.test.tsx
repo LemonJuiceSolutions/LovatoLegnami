@@ -101,10 +101,14 @@ describe("EditableTable (9.2)", () => {
     await waitFor(() => expect(saveAction).toHaveBeenCalledTimes(1))
     expect(saveAction).toHaveBeenCalledWith({
       dataset: "listino",
-      path: "treatments",
-      value: [
-        { id: "impregnante", label: "Impregnante", pricePerM2Cents: 850 },
-        { id: "olio", label: "Olio di lino", pricePerM2Cents: 990 },
+      changes: [
+        {
+          path: "treatments",
+          value: [
+            { id: "impregnante", label: "Impregnante", pricePerM2Cents: 850 },
+            { id: "olio", label: "Olio di lino", pricePerM2Cents: 990 },
+          ],
+        },
       ],
       expectedUpdatedAt: "2026-10-15T08:00:00.000Z",
     })

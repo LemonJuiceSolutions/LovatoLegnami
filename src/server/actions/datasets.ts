@@ -20,42 +20,63 @@ import { runAction, type ActionResult } from "./result";
 
 const MAX_VALUE_CHARS = 2_000_000;
 
-const SaveSectionSchema = z
+const valueSize = (value: unknown): number => {
+  try {
+    return JSON.stringify(value ?? null).length;
+  } catch {
+    return Infinity;
+  }
+};
+
+const ChangeSchema = z.object({ path: z.string().max(100), value: z.unknown() }).strict();
+
+const SaveSectionsSchema = z
   .object({
     dataset: z.enum(DATASETS),
-    path: z.string().max(100),
-    value: z.unknown(),
+    changes: z.array(ChangeSchema).min(1).max(30),
     /** `updatedAt` della bozza letta dall'utente (ISO), `null` se la pagina non aveva bozza. */
     expectedUpdatedAt: z.string().datetime({ offset: true }).nullable(),
   })
   .strict()
   .superRefine((v, ctx) => {
-    if (!isSectionPath(v.dataset, v.path)) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["path"], message: `percorso non ammesso per ${v.dataset}: "${v.path}"` });
-    let size = 0;
-    try {
-      size = JSON.stringify(v.value ?? null).length;
-    } catch {
-      size = Infinity;
-    }
-    if (size > MAX_VALUE_CHARS) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["value"], message: "valore troppo grande" });
+    v.changes.forEach((c, i) => {
+      if (!isSectionPath(v.dataset, c.path)) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["changes", i, "path"], message: `percorso non ammesso per ${v.dataset}: "${c.path}"` });
+    });
+    if (valueSize(v.changes.map((c) => c.value)) > MAX_VALUE_CHARS) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["changes"], message: "valore troppo grande" });
   });
 
-export type SaveSectionInput = z.input<typeof SaveSectionSchema>;
+export type SaveSectionsInput = z.input<typeof SaveSectionsSchema>;
+export interface SaveSectionInput {
+  readonly dataset: (typeof DATASETS)[number];
+  readonly path: string;
+  readonly value: unknown;
+  readonly expectedUpdatedAt: string | null;
+}
 
 /**
- * Salva `value` al percorso `path` della bozza del dataset. Esito con lo stato aggiornato
- * (nuovo `updatedAt` per il lock del salvataggio successivo).
+ * Salva una o più porzioni (`changes: [{ path, value }]`) nella bozza del dataset in un
+ * solo salvataggio (una voce di registro). Esito con lo stato aggiornato (nuovo
+ * `updatedAt` per il lock del salvataggio successivo).
  */
-export async function saveDraftSection(input: SaveSectionInput): Promise<ActionResult<DatasetStatusInfo>> {
+export async function saveDraftSections(input: SaveSectionsInput): Promise<ActionResult<DatasetStatusInfo>> {
   return runAction(async () => {
     const user = await requireUser();
-    const v = SaveSectionSchema.parse(input);
+    const v = SaveSectionsSchema.parse(input);
     const base = await resolveBase(v.dataset, v.expectedUpdatedAt);
-    const remove = v.value === null && OPTIONAL_SECTION_PATHS.includes(v.path);
-    const next = setAtPath(base.doc, v.path, remove ? undefined : v.value);
+    let next = base.doc;
+    for (const c of v.changes) {
+      const remove = c.value === null && OPTIONAL_SECTION_PATHS.includes(c.path);
+      next = setAtPath(next, c.path, remove ? undefined : c.value);
+    }
     await assertCanChange(user, v.dataset, base.doc, next);
     // nessuna modifica su una bozza esistente: niente scrittura né voce di registro
-    if (base.draft && JSON.stringify(getAtPath(base.doc, v.path) ?? null) === JSON.stringify(getAtPath(next, v.path) ?? null)) return datasetStatus(v.dataset);
+    if (base.draft && v.changes.every((c) => JSON.stringify(getAtPath(base.doc, c.path) ?? null) === JSON.stringify(getAtPath(next, c.path) ?? null))) return datasetStatus(v.dataset);
     return commitDraft(user, v.dataset, next, base);
   });
+}
+
+/** Salva `value` al percorso `path` della bozza (una porzione). */
+export async function saveDraftSection(input: SaveSectionInput): Promise<ActionResult<DatasetStatusInfo>> {
+  const { path, value, ...rest } = (input ?? {}) as SaveSectionInput;
+  return saveDraftSections({ ...rest, changes: [{ path, value }] });
 }

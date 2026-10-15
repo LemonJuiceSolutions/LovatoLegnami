@@ -13,17 +13,24 @@ import type { DatasetName, DatasetStatusInfo } from "./types"
  * server (`router.refresh()`), così le altre tabelle della pagina ripartono dalla bozza.
  */
 
-export type SaveSectionFn = (input: { dataset: DatasetName; path: string; value: unknown; expectedUpdatedAt: string | null }) => Promise<ActionResult<DatasetStatusInfo>>
+export interface SectionChange {
+  readonly path: string
+  readonly value: unknown
+}
+
+export type SaveSectionFn = (input: { dataset: DatasetName; changes: SectionChange[]; expectedUpdatedAt: string | null }) => Promise<ActionResult<DatasetStatusInfo>>
 
 interface DraftContextValue {
   readonly status: DatasetStatusInfo
   readonly save: (path: string, value: unknown) => Promise<SaveOutcome>
+  /** Più porzioni in un solo salvataggio (form di parametri). */
+  readonly saveMany: (changes: SectionChange[]) => Promise<SaveOutcome>
   readonly setStatus: (status: DatasetStatusInfo) => void
 }
 
 const DraftContext = React.createContext<DraftContextValue | null>(null)
 
-const defaultSave: SaveSectionFn = async (input) => (await import("@/server/actions/datasets")).saveDraftSection(input)
+const defaultSave: SaveSectionFn = async (input) => (await import("@/server/actions/datasets")).saveDraftSections(input)
 
 export function DraftProvider({ status: initial, saveAction, children }: { status: DatasetStatusInfo; saveAction?: SaveSectionFn; children: React.ReactNode }) {
   const router = useRouter()
@@ -33,10 +40,10 @@ export function DraftProvider({ status: initial, saveAction, children }: { statu
   const ref = React.useRef(status)
   ref.current = status
 
-  const save = React.useCallback(
-    async (path: string, value: unknown): Promise<SaveOutcome> => {
+  const saveMany = React.useCallback(
+    async (changes: SectionChange[]): Promise<SaveOutcome> => {
       const current = ref.current
-      const res = await (saveAction ?? defaultSave)({ dataset: current.dataset, path, value, expectedUpdatedAt: current.draft?.updatedAt ?? null })
+      const res = await (saveAction ?? defaultSave)({ dataset: current.dataset, changes, expectedUpdatedAt: current.draft?.updatedAt ?? null })
       if (!res.ok) return { ok: false, message: res.message }
       ref.current = res.data
       setStatus(res.data)
@@ -46,9 +53,13 @@ export function DraftProvider({ status: initial, saveAction, children }: { statu
     [saveAction, router],
   )
 
-  const value = React.useMemo(() => ({ status, save, setStatus }), [status, save])
+  const save = React.useCallback((path: string, value: unknown) => saveMany([{ path, value }]), [saveMany])
+  const value = React.useMemo(() => ({ status, save, saveMany, setStatus }), [status, save, saveMany])
   return <DraftContext.Provider value={value}>{children}</DraftContext.Provider>
 }
+
+/** Bozza della pagina se presente (componenti usabili anche fuori da un editor). */
+export const useOptionalDraft = (): DraftContextValue | null => React.useContext(DraftContext)
 
 export function useDraft(): DraftContextValue {
   const ctx = React.useContext(DraftContext)

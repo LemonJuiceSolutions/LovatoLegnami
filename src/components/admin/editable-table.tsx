@@ -77,16 +77,17 @@ export function EditableTable<R extends Record<string, unknown>>(props: Editable
   const baseId = React.useId()
 
   // Righe nuove dal server (dopo il salvataggio o un import): si riparte da lì se non ci sono modifiche locali.
-  const incoming = React.useRef(props.rows)
+  const rowsKey = JSON.stringify(props.rows)
+  const incoming = React.useRef(rowsKey)
+  const latestRows = React.useRef(props.rows)
+  latestRows.current = props.rows
   React.useEffect(() => {
-    if (incoming.current === props.rows) return
-    incoming.current = props.rows
-    if (!dirty) {
-      setRows(wrap(props.rows))
-      setTexts({})
-      setErrors({})
-    }
-  }, [props.rows, dirty])
+    if (incoming.current === rowsKey || dirty) return
+    incoming.current = rowsKey
+    setRows(wrap(latestRows.current))
+    setTexts({})
+    setErrors({})
+  }, [rowsKey, dirty])
 
   const searchable = props.searchable ?? props.rows.length > 8
   const q = query.trim().toLowerCase()
