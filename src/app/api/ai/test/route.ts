@@ -2,10 +2,15 @@ import { NextResponse } from 'next/server'
 
 export const dynamic = 'force-dynamic'
 import { execSync } from 'child_process'
+import { denyUnlessAllowed } from "@/server/auth"
 
 const CLAUDE_PATH = process.env.CLAUDE_PATH || 'claude'
 
 export async function GET() {
+  // Area interna: utente attivo riletto dal database (il middleware reindirizza soltanto).
+  const denied = await denyUnlessAllowed("configuratore:usa")
+  if (denied) return denied
+
   try {
     // Try direct path first, then npx as fallback
     let result: string

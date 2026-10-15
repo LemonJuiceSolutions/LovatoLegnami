@@ -3,6 +3,7 @@ import { spawn, execSync } from 'child_process'
 import { streamOllamaChat, streamSimpleOpenAIChat, streamSimpleAnthropicChat } from '@/lib/llm-providers'
 import type { ChatMessage, SSECallback } from '@/lib/llm-providers'
 import { UNIVERSAL_SYSTEM_PROMPT } from '@/lib/ai-prompts'
+import { denyUnlessAllowed } from "@/server/auth"
 
 /** Resolve working CLI command */
 const IS_WIN = process.platform === 'win32'
@@ -35,6 +36,10 @@ interface ChatRequestBody {
 // ══════════════════════════════════════════════════════════════
 
 export async function POST(request: NextRequest) {
+  // Area interna: utente attivo riletto dal database (il middleware reindirizza soltanto).
+  const denied = await denyUnlessAllowed("configuratore:usa")
+  if (denied) return denied
+
   try {
     const body: ChatRequestBody = await request.json()
     const { prompt, provider = 'claude-cli', model, apiKey, context, sessionId, history } = body

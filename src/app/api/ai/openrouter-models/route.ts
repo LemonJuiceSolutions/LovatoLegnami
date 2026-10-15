@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { denyUnlessAllowed } from "@/server/auth"
 
 export const dynamic = 'force-dynamic'
 
@@ -7,6 +8,10 @@ let cacheTime = 0
 const CACHE_TTL = 1000 * 60 * 30 // 30 minutes
 
 export async function GET() {
+  // Area interna: utente attivo riletto dal database (il middleware reindirizza soltanto).
+  const denied = await denyUnlessAllowed("configuratore:usa")
+  if (denied) return denied
+
   // Return cached if fresh
   if (cachedModels && Date.now() - cacheTime < CACHE_TTL) {
     return NextResponse.json({ data: cachedModels })

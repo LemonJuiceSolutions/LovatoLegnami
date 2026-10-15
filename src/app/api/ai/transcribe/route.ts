@@ -1,9 +1,14 @@
 import { NextRequest, NextResponse } from "next/server"
+import { denyUnlessAllowed } from "@/server/auth"
 
 // POST /api/ai/transcribe
 // Body: multipart/form-data with "audio" (Blob) and optional "groqApiKey" (string)
 // Forwards the audio to Groq's Whisper endpoint and returns the transcript.
 export async function POST(req: NextRequest) {
+  // Area interna: utente attivo riletto dal database (il middleware reindirizza soltanto).
+  const denied = await denyUnlessAllowed("configuratore:usa")
+  if (denied) return denied
+
   try {
     const form = await req.formData()
     const audio = form.get("audio")
