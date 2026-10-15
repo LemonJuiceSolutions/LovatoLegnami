@@ -59,11 +59,20 @@ describe("registro completo delle tipologie (6.4)", () => {
     for (const t of BUILTIN_TEMPLATES) expect(listPresets(t.slug).length, t.slug).toBeGreaterThan(0);
   });
 
-  it("la validazione del registro completo dura meno di 200 ms", () => {
-    createRegistry(BUILTIN_TEMPLATES); // riscaldamento (JIT)
-    const t0 = performance.now();
-    createRegistry(BUILTIN_TEMPLATES);
-    expect(performance.now() - t0).toBeLessThan(200);
+  it("la validazione del registro completo genera una sola volta ogni tipologia e dura meno di 200 ms", () => {
+    // costo deterministico: una sola generazione di prova (default) per template
+    let builds = 0;
+    const counted = BUILTIN_TEMPLATES.map((t) => ({ ...t, build: (ctx: Parameters<typeof t.build>[0]) => (builds++, t.build(ctx)) }));
+    createRegistry(counted);
+    expect(builds).toBe(BUILTIN_TEMPLATES.length);
+    // tempo: il minimo di più misure (dopo il riscaldamento del JIT) non risente del carico della
+    // macchina (una misura singola superava i 200 ms con più suite in parallelo; tipico ≈ 20 ms)
+    const samples = Array.from({ length: 7 }, () => {
+      const t0 = performance.now();
+      createRegistry(BUILTIN_TEMPLATES);
+      return performance.now() - t0;
+    });
+    expect(Math.min(...samples)).toBeLessThan(200);
   });
 
   for (const t of BUILTIN_TEMPLATES)
