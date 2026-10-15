@@ -61,15 +61,50 @@
         "no-restricted-imports": [
           "error",
           {
+            "paths": [
+              {
+                "name": "@/db",
+                "message": "Codice client: niente accesso diretto a database o moduli server (usa le server action di @/server/actions o le API)."
+              },
+              {
+                "name": "@/server/env",
+                "message": "Codice client: niente accesso diretto a database o moduli server (usa le server action di @/server/actions o le API)."
+              },
+              {
+                "name": "@/server/email",
+                "message": "Codice client: niente accesso diretto a database o moduli server (usa le server action di @/server/actions o le API)."
+              },
+              {
+                "name": "@/server/repositories",
+                "message": "Codice client: niente accesso diretto a database o moduli server (usa le server action di @/server/actions o le API)."
+              },
+              {
+                "name": "@/server/storage",
+                "message": "Codice client: niente accesso diretto a database o moduli server (usa le server action di @/server/actions o le API)."
+              },
+              {
+                "name": "@/server/pdf",
+                "message": "Codice client: niente accesso diretto a database o moduli server (usa le server action di @/server/actions o le API)."
+              },
+              {
+                "name": "@/server/auth",
+                "message": "Codice client: niente accesso diretto a database o moduli server (usa le server action di @/server/actions o le API)."
+              }
+            ],
             "patterns": [
               {
                 "group": [
-                  "@/db",
                   "@/db/*",
-                  "@/server/*",
-                  "!@/server/auth/permissions"
+                  "@/server/email/*",
+                  "@/server/repositories/*",
+                  "@/server/storage/*",
+                  "@/server/pdf/*",
+                  "@/server/auth/auth",
+                  "@/server/auth/auth.config",
+                  "@/server/auth/index",
+                  "@/server/auth/route-guard"
                 ],
-                "message": "Codice client: niente accesso diretto a database o moduli server (usa server actions o API)."
+                "message": "Codice client: niente accesso diretto a database o moduli server (usa le server action di @/server/actions o le API)."
               }
             ]
           }
