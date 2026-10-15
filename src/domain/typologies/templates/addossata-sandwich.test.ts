@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { assemblyBounds } from "../../assembly/bounds";
 import { planeOfHeadCut } from "../../components/head-cut";
 import type { Assembly, Piece } from "../../components/types";
 import { applyToPoint, axisOf } from "../../math/mat4";
@@ -49,6 +50,20 @@ describe("addossata-sandwich", () => {
       expect(Math.max(...corners(t).map((v) => -signedDistance(wall, v)))).toBeGreaterThan(0);
     }
     for (const p of a.pieces.filter((x) => x.type !== "tavola")) for (const v of corners(p)) expect(signedDistance(wall, v)).toBeGreaterThan(-1e-6);
+  });
+
+  it("testa anteriore a squadra con lo spigolo superiore in y = 0: muro a profondita·cos(pendenza), pilastro a sbalzo dall'asse", () => {
+    for (const pendenza of [5, 10, 20]) {
+      const a = generate(SLUG, { pendenza, sbalzo: 300 });
+      const t = ofType(a, "tavola")[0];
+      expect(Math.min(...corners(t).map((v) => v.y))).toBeCloseTo(0, 9);
+      expect(assemblyBounds(a)!.min.y).toBeCloseTo(0, 6);
+      const r = (pendenza * Math.PI) / 180;
+      expect(a.meta.yMuro as number).toBeCloseTo(2000 * Math.cos(r), 9);
+      const y0 = (t.section.h / 2) * Math.sin(r);
+      expect(t.pose[7]).toBeCloseTo(y0, 9);
+      for (const p of ofType(a, "pilastro")) expect(p.pose[7]).toBeCloseTo(y0 + 300, 9);
+    }
   });
 
   it("staffa inclinata 25°: pendenza imposta dalla ferramenta, parametro pendenza nascosto", () => {

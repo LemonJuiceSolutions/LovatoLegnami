@@ -41,8 +41,11 @@ const imposed = (p: Readonly<Record<string, unknown>>) => WALL_SLOPE[p.attaccoMu
  * Geometria dell'addossata sandwich (E5, ricerca T-B/T-C/T-F):
  *
  * - `campate + 1` telai ortogonali al muro (piano y = `yMuro`), trave lunga
- *   `profondita` (lunghezza commerciale delle tavole) dalla testa anteriore
- *   (y = 0) al muro, in salita verso il muro con la pendenza effettiva;
+ *   `profondita` (lunghezza commerciale delle tavole) dalla testa anteriore al
+ *   muro, in salita verso il muro con la pendenza effettiva; la testa
+ *   anteriore (a squadra) ha lo spigolo superiore, il più avanzato, in y = 0,
+ *   cioè l'asse parte da y = `y0` = (h/2)·sin(pendenza) e il muro dista
+ *   `profondita·cos(pendenza)` dal fronte;
  * - un pilastro per telaio a `sbalzo` dalla testa anteriore, intradosso della
  *   trave a quota `altezza` sull'asse del pilastro;
  * - testa della trave a filo muro: il muro passa per lo spigolo superiore della
@@ -72,10 +75,12 @@ function geometry(ctx: BuildContext) {
     throw new ParamError("attaccoMuro", attach, "il supporto a scomparsa entra in una trave singola: usare costruzione carpenteria");
   const bay = (W - 2 * lateral) / campate;
   if (bay < MIN_BAY) throw new ParamError("sbalzoLaterale", lateral, `interasse dei telai di ${Math.round(bay)} mm: servono almeno ${MIN_BAY} mm`);
-  const yMuro = L * Math.cos(a) - (sec.h / 2) * Math.sin(a);
-  if (yMuro - sbalzo < 500) throw new ParamError("sbalzo", sbalzo, `il pilastro deve stare ad almeno 500 mm dal muro (profondità ${Math.round(yMuro)} mm)`);
+  const y0 = (sec.h / 2) * Math.sin(a);
+  const yMuro = y0 + L * Math.cos(a) - (sec.h / 2) * Math.sin(a);
+  const yPost = y0 + sbalzo;
+  if (yMuro - yPost < 500) throw new ParamError("sbalzo", sbalzo, `il pilastro deve stare ad almeno 500 mm dal muro (profondità ${Math.round(yMuro)} mm)`);
   const frameXs = Array.from({ length: campate + 1 }, (_, k) => lateral + k * bay);
-  return { W, L, H, campate, sbalzo, attach, mode, slope, a, sec, bay, yMuro, frameXs, origin: forced !== undefined ? "ferramenta" : "parametro" };
+  return { W, L, H, campate, sbalzo, y0, yPost, attach, mode, slope, a, sec, bay, yMuro, frameXs, origin: forced !== undefined ? "ferramenta" : "parametro" };
 }
 
 export const addossataSandwich: TypologyTemplate = {
@@ -138,7 +143,7 @@ export const addossataSandwich: TypologyTemplate = {
       const sb = ctx.section("sezioneBanchina");
       const yEdge = g.yMuro - sb.b;
       const c = seatOffset(g.slope, [sb.b], g.sec);
-      const zEdge = g.H + (yEdge - g.sbalzo) * t + c / Math.cos(g.a);
+      const zEdge = g.H + (yEdge - g.yPost) * t + c / Math.cos(g.a);
       banchina = { ref: "banchina", type: "banchina", section: sb, length: g.W, pose: fromBasis(vec3(0, g.yMuro - sb.b / 2, zEdge - sb.h / 2), vec3(1, 0, 0), vec3(0, 0, 1)) };
       steps.push(placeStep(banchina));
       const m = Math.min(BANCHINA_ANCHOR_MARGIN, g.W / 4);
@@ -152,7 +157,7 @@ export const addossataSandwich: TypologyTemplate = {
     const frames: PortalResult[] = g.frameXs.map((x, k) => {
       const f = beamOnPosts(ctx, g.mode, {
         prefix: `telaio-${k}`,
-        start: { x, y: 0 },
+        start: { x, y: g.y0 },
         dir: { x: 0, y: 1 },
         length: g.L,
         posts: [g.sbalzo],
@@ -170,7 +175,7 @@ export const addossataSandwich: TypologyTemplate = {
     // travetti paralleli al muro: dal pilastro (in carpenteria appena davanti) al muro
     const carp = g.mode === "carpenteria";
     const half = frames[0].width / 2;
-    const yFirst = carp ? g.sbalzo - (sp.h / 2 + sj.b / 2 + CARPENTRY_JOIST_CLEARANCE) : g.sbalzo;
+    const yFirst = carp ? g.yPost - (sp.h / 2 + sj.b / 2 + CARPENTRY_JOIST_CLEARANCE) : g.yPost;
     const yLast = g.yMuro - (sj.b / 2) * Math.cos(g.a) - sj.h * Math.sin(g.a) - WALL_CLEARANCE;
     const ys = spread(yFirst - sj.b / 2, yLast + sj.b / 2, sj.b, joistSpaces(yLast - yFirst, ctx.num("interasse")));
     const joists: JoistLine[] = [];
