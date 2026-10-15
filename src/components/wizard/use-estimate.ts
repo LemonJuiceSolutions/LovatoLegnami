@@ -25,9 +25,12 @@ export interface EstimateBody {
 export function estimateBody(config: WizardConfigFile, answers: WizardAnswers): EstimateBody {
   const f = answers.finiture
   const cap = answers.contatti.cap.trim()
+  const validCap = /^\d{5}$/.test(cap)
   return {
-    config,
-    declared: { access: answers.spazio.access, ...(/^\d{5}$/.test(cap) ? { cap } : {}) },
+    // il CAP va anche nelle opzioni commerciali del file: chi riapre la richiesta nel
+    // configuratore interno ritrova lo stesso trasporto
+    config: validCap ? { ...config, commercial: { ...config.commercial, cap } } : config,
+    declared: { access: answers.spazio.access, ...(validCap ? { cap } : {}) },
     commercial: { species: f.species, quality: f.quality, treatment: f.treatment, covering: f.covering },
   }
 }

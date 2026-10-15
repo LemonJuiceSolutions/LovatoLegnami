@@ -109,6 +109,7 @@ describe("passo 6 contatti (12.7)", () => {
     expect(request.notes).toMatch(/Tinta preferita: Noce/)
     expect(request.estimate.config.typology).toBe("autoportante-bifalda")
     expect(request.estimate.declared).toEqual({ access: "facile", cap: "37026" })
+    expect(request.estimate.config.commercial.cap).toBe("37026")
     expect(store.getState().submitted).toMatchObject({ code: "PRV-2026-00042", token: "tok_abc", email: "maria@example.it" })
     // le risposte restano fino alla pagina di conferma (che le azzera)
     expect(store.getState().answers.tipologia.slug).toBe("autoportante-bifalda")
