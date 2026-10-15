@@ -39,7 +39,7 @@ compilazione, consenso privacy versionato, foto verificate dai byte.
 
 ## Back-office
 
-Area `/admin` (Auth.js con collegamento via email, solo utenti creati dall'admin; ruoli `admin`, `ufficio-tecnico`,
+Area `/admin` (Auth.js con **email e password**, e collegamento via email se è configurato Resend; solo utenti creati dall'admin; ruoli `admin`, `ufficio-tecnico`,
 `commerciale` in `src/server/auth/permissions.ts`): riepilogo, **Listino** per sezioni (form, import/export CSV),
 **Regole** costruttive, **Tipologie** del sito (testi, immagini, preset di riferimento), **Preset**, **Richieste**
 (stato, assegnazione, foto, PDF, reinvio email, anonimizzazione), **Utenti**, **Registro** delle modifiche e
@@ -71,7 +71,10 @@ ADMIN_EMAIL=nome@esempio.it npm run db:seed # versione 1 dei dataset (segnaposto
 npm run db:generate                         # nuova migrazione dopo una modifica dello schema (solo additiva)
 ```
 
-In locale l'accesso al back-office usa il collegamento stampato nel terminale di `npm run dev`. Rilascio su Vercel,
+Accesso al back-office: password impostata dall'operatore con `npm run admin:set-password -- <email> [password]`
+(senza password ne genera e stampa una, una sola volta; nessuna route HTTP), poi `/accesso` con email e password; ognuno la
+cambia da "Cambia password" nell'intestazione, l'admin la reimposta da `/admin/utenti`. In locale resta anche il
+collegamento stampato nel terminale di `npm run dev` (`npm run admin:link` per generarne uno). Rilascio su Vercel,
 backup e rollback: **`docs/deploy.md`**. CI: `.github/workflows/ci.yml`.
 
 ## AI

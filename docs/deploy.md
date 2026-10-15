@@ -323,11 +323,11 @@ Indirizzi del primo rilascio (DNS gratuito di sslip.io, nessun dominio da config
 
 | Parte | Dettaglio |
 |---|---|
-| `Dockerfile` | multi-stage su `node:22.20.0-bookworm-slim`; `next build` con `NEXT_OUTPUT=standalone` (solo nel container: su Vercel il build resta quello di sempre); kernel OCCT copiato in `public/occt/<versione>/`; `db:migrate`, `db:seed`, `admin:link` impacchettati in `tools/*.cjs` (Node puro, senza `tsx`); utente non root `node`; healthcheck su `/robots.txt` |
+| `Dockerfile` | multi-stage su `node:22.20.0-bookworm-slim`; `next build` con `NEXT_OUTPUT=standalone` (solo nel container: su Vercel il build resta quello di sempre); kernel OCCT copiato in `public/occt/<versione>/`; `db:migrate`, `db:seed`, `admin:link`, `admin:set-password` impacchettati in `tools/*.cjs` (Node puro, senza `tsx`); utente non root `node`; healthcheck su `/robots.txt` |
 | Avvio del container | `deploy/hetzner/docker-entrypoint.sh`: applica le migrazioni (idempotenti) e poi `node server.js`. Una migrazione fallita ferma l'avvio (il log lo dice) |
 | `lovato-app` | porta **solo** `127.0.0.1:3310` → 3000; limite 2 GB; `restart: unless-stopped`; log `json-file` ruotati (5 × 10 MB); volume `lovato-uploads` su `/app/.data/uploads` (foto su disco, senza Vercel Blob) |
 | `lovato-db` | `postgres:16.10-bookworm`; nessuna porta pubblicata, solo rete interna `lovato-internal` (senza uscita); limite 512 MB; volume `lovato-db-data`; healthcheck `pg_isready` (l'app parte solo con il database sano) |
-| Email | senza `RESEND_API_KEY`: adattatore console, nel log del container compaiono solo destinatario e oggetto. Per entrare nel back-office si usa `admin:link` (13.4) |
+| Email | senza `RESEND_API_KEY`: adattatore console, nel log del container compaiono solo destinatario e oggetto. Per entrare nel back-office: password con `admin:set-password` (13.4) o collegamento con `admin:link` (13.4.1) |
 | Accesso su due host | `AUTH_TRUST_HOST=true` e **nessun** `AUTH_URL`: Auth.js prende l'host da `X-Forwarded-Host`/`X-Forwarded-Proto` di Caddy. La route `/api/auth/*` ricostruisce l'URL pubblico (`src/server/auth/forwarded-origin.ts`), perché in modalità standalone Next 14 darebbe `http://0.0.0.0:3000` |
 
 **Host condiviso**: lo stack non tocca gli altri servizi. L'app ascolta solo su
@@ -397,7 +397,37 @@ database (`revalidate = 300`; provato in locale: "Prezzo su richiesta" → prezz
 sito, i prezzi "a partire da" compaiono entro 5 minuti (o subito con
 `dc up -d --force-recreate lovato-app`).
 
-### 13.4 Primo accesso al back-office (senza email)
+### 13.4 Accesso con email e password
+
+L'accesso principale di `/accesso` è **email + password** (nessuna email inviata). La
+password di un utente **esistente** (creato dal seed con `ADMIN_EMAIL` o da
+`/admin/utenti`) si imposta dal server, con una shell nel container:
+
+```bash
+dc exec lovato-app npm run admin:set-password -- tonslemonjuice@gmail.com
+```
+
+Senza secondo argomento genera una password casuale di 20 caratteri e la **stampa una
+sola volta**: copiarla subito in un gestore di password. Con un secondo argomento
+(`… -- email@esempio.it 'password-di-almeno-12-caratteri'`) usa quella, ma resta nella
+cronologia della shell: meglio generarla. Il comando scrive nel registro delle modifiche
+(`imposta-password`, mai la password) e non ha una route HTTP: serve l'accesso SSH al server.
+
+Poi, nell'area interna:
+
+- **Cambia password** (intestazione, accanto a "Esci"): chiede la password attuale (vuota
+  se non ne è ancora stata impostata una) e la nuova, almeno 12 caratteri.
+- **/admin/utenti → Reimposta password** (solo admin): genera una password nuova per un
+  altro utente e la mostra una volta sola.
+
+Hash scrypt (`node:crypto`, N=2^15, r=8, p=1, sale 16 byte) in `users.password_hash`
+(migrazione `0001_password`, applicata all'avvio del container). Limite dei tentativi: 5
+ogni 10 minuti per indirizzo e 20 ogni 10 minuti per IP (in memoria del processo: si
+azzera al riavvio); l'errore è sempre "Email o password non corretti". Un utente
+disattivato non entra anche con la password giusta. Il collegamento via email ("Ricevi un
+link via email") compare in `/accesso` solo se è configurato `RESEND_API_KEY`.
+
+### 13.4.1 Collegamento di accesso dell'operatore (alternativa)
 
 Senza Resend il collegamento di accesso non arriva per email. Lo genera l'operatore sul
 server, per un utente **esistente e attivo**:
