@@ -7,3 +7,5 @@
 export * as money from "./money";
 export { formatEuro, MoneyError, roundToStep } from "./money";
 export type { Cents } from "./money";
+// Listino (schema zod), versioni, opzioni commerciali, tipi del preventivo e del piano di taglio
+export * from "./types";
