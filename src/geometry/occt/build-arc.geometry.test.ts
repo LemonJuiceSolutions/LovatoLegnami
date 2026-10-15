@@ -17,6 +17,7 @@ import {
   type BrepPlaneFace,
   type NeutralBrep,
 } from "../neutral-brep";
+import { arcBrep } from "../neutral-brep-box";
 import { PieceBuildError, buildPieceSolid, isValidShape, type PieceSolidInput } from "./build-piece";
 import { extractBrep } from "./extract-brep";
 import { initOcct } from "./init";
@@ -178,6 +179,28 @@ describe("pezzi curvi (E6): lavorazioni", () => {
   ])("%s su un pezzo curvo → PieceBuildError", (_, spec) => {
     expect(() => buildPieceSolid(arc([m(1, spec)]))).toThrowError(PieceBuildError);
     expect(() => buildPieceSolid(arc([m(1, spec)]))).toThrowError(/non ammessa su pezzi curvi/);
+  });
+});
+
+describe("arcBrep (TS puro) e B-rep estratta dal kernel", () => {
+  it("stessi vertici e stessi loop (ordine ciclico dei vertici, tipo e senso delle facce)", () => {
+    const solid = buildPieceSolid(arc());
+    const real = extractBrep(solid);
+    solid.delete();
+    const pure = arcBrep({ b: 90, h: 90 }, curve.radius, curve.sweep);
+    const key = (p: { x: number; y: number; z: number }) => [p.x, p.y, p.z].map((v) => (Math.round(v * 1e4) / 1e4 + 0).toFixed(4)).join(",");
+    const outwardNormalKey = (f: NeutralBrep["faces"][number]) => (f.kind === "piana" ? key(outwardNormal(f)) : "");
+    const signature = (b: NeutralBrep) =>
+      b.faces
+        .map((f) => {
+          const ring = faceVertices(b, f).map(key);
+          const start = ring.indexOf([...ring].sort()[0]);
+          const rotated = [...ring.slice(start), ...ring.slice(0, start)];
+          return `${f.kind}:${f.kind === "cilindrica" ? (f.sense === "reversed" ? "concava" : "convessa") : outwardNormalKey(f)}:${rotated.join(" ")}`;
+        })
+        .sort();
+    expect(new Set(pure.vertices.map((v) => key(v.point)))).toEqual(new Set(real.vertices.map((v) => key(v.point))));
+    expect(signature(pure)).toEqual(signature(real));
   });
 });
 
