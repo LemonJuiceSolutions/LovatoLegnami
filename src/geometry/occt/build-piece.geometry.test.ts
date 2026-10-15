@@ -1,9 +1,12 @@
 import { beforeAll, describe, expect, it } from "vitest";
 import { measureVolume, type Solid } from "replicad";
-import { generate } from "@/domain";
+import { generate, listTypologies } from "@/domain";
+import { translation } from "@/domain/math/mat4";
+import { vec3 } from "@/domain/math/vec3";
 import type { Machining } from "@/domain/components/types";
 import { PieceBuildError, buildPieceSolid, isValidShape, type PieceSolidInput } from "./build-piece";
 import { initOcct } from "./init";
+import { placeShape } from "./pose";
 import { nodeOcctFactory } from "./init-node";
 
 beforeAll(async () => {
@@ -160,3 +163,86 @@ describe("buildPieceSolid", () => {
     }
   });
 });
+
+describe("utensili delle tipologie estese (E2/E6)", () => {
+  it("pilastro 90 con asola 8×68×180 e 2 fori Ø13 → solido unico valido, volume ridotto di asola + fori", () => {
+    const pil = (machinings: Machining[]): PieceSolidInput => ({ id: "P-01", section: { b: 90, h: 90 }, length: 2400, machinings });
+    const solid = buildPieceSolid(
+      pil([
+        m({ id: "P-01-L01", type: "asola-lama", face: "testa-inizio", at: 0, width: 8, height: 68, depth: 180 }),
+        m({ id: "P-01-L02", type: "foro", face: "sinistra", at: 60, diameter: 13, offset: 0 }),
+        m({ id: "P-01-L03", type: "foro", face: "sinistra", at: 140, diameter: 13, offset: 0 }),
+      ]),
+    );
+    expect(isValidShape(solid)).toBe(true);
+    expect(solid.solids).toHaveLength(1);
+    const slot = 8 * 68 * 180;
+    // I fori attraversano l'asola: il tratto nella lama (8 mm) è già vuoto.
+    const holes = 2 * Math.PI * 6.5 ** 2 * (90 - 8);
+    const removed = 90 * 90 * 2400 - measureVolume(solid);
+    expect(Math.abs(removed - (slot + holes)) / (slot + holes)).toBeLessThan(0.01);
+    expect(removed).toBeCloseTo(slot + holes, 0);
+    // Asola dalla testa finale con scostamento lungo Z.
+    const end = buildPieceSolid(
+      pil([m({ type: "asola-lama", face: "testa-fine", at: 2400, width: 8, height: 40, depth: 250, offset: 15 })]),
+    );
+    expect(isValidShape(end)).toBe(true);
+    expect(measureVolume(end)).toBeCloseTo(90 * 90 * 2400 - 8 * 40 * 250, 1);
+    expect(end.boundingBox.bounds[1][0]).toBeCloseTo(2400, 6);
+    solid.delete();
+    end.delete();
+  });
+
+  it("dardo di Giove: due travi complementari sovrapposte → somma dei volumi b·h·(L1 + L2 − sovrapposizione), intersezione < 1 mm³", () => {
+    const section = { b: 90, h: 160 };
+    const [L1, L2, overlap] = [2000, 1500, 300];
+    const dardo = { length: overlap, angle: 10, step: 30 };
+    const a = buildPieceSolid({
+      id: "A",
+      section,
+      length: L1,
+      machinings: [m({ id: "A-L01", pieceId: "A", type: "dardo-di-giove", face: "testa-fine", at: L1, ...dardo })],
+    });
+    const bLocal = buildPieceSolid({
+      id: "B",
+      section,
+      length: L2,
+      machinings: [m({ id: "B-L01", pieceId: "B", type: "dardo-di-giove", face: "testa-inizio", at: 0, ...dardo, angle: -10 })],
+    });
+    expect(isValidShape(a)).toBe(true);
+    expect(isValidShape(bLocal)).toBe(true);
+    const b = placeShape(bLocal, translation(vec3(L1 - overlap, 0, 0)));
+    const sum = measureVolume(a) + measureVolume(b);
+    const expected = section.b * section.h * (L1 + L2 - overlap);
+    expect(Math.abs(sum - expected) / expected).toBeLessThan(0.01);
+    expect(sum).toBeCloseTo(expected, 0);
+    const common = a.intersect(b);
+    expect(measureVolume(common)).toBeLessThan(1);
+    // Facce del profilo: 6 originali + piano obliquo ×2, dente, battuta (il piano di testa sparisce).
+    expect(a.faces.every((f) => f.geomType === "PLANE")).toBe(true);
+    for (const s of [a, bLocal, b, common]) s.delete();
+  });
+
+  it("i nuovi tipi di pezzo dritti usano il parallelepipedo di base", () => {
+    const types = new Set(["tavola", "cantonale", "monaco", "mensola", "fascia", "grigliato"]);
+    const found = new Set<string>();
+    const assemblies = [
+      ...listTypologies().map((t) => generate(t.slug)),
+      generate("gazebo-padiglione", { costruzione: "carpenteria", arcarecci: 600, grigliati: 2 }),
+    ];
+    for (const a of assemblies) {
+      for (const p of a.pieces) {
+        if (!types.has(p.type) || found.has(p.type)) continue;
+        found.add(p.type);
+        const solid = buildPieceSolid({ ...p, machinings: [] });
+        const { faces, volume } = check(solid);
+        expect(faces, p.type).toHaveLength(6);
+        expect(faces.every((f) => f.geomType === "PLANE"), p.type).toBe(true);
+        expect(volume, p.type).toBeCloseTo(p.section.b * p.section.h * p.length, 2);
+        solid.delete();
+      }
+    }
+    expect([...found].sort()).toEqual([...types].sort());
+  });
+});
+

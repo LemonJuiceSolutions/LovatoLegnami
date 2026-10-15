@@ -107,11 +107,7 @@ const facePoint = (frame: FaceFrame, x: number, offset: number): Vec3 =>
   add(add(vec3(x, 0, 0), scale(frame.n, frame.dist)), scale(frame.w, offset));
 
 type ToolBuilder<M extends Machining> = (m: M, p: PieceSolidInput) => Shape3D;
-/** Lavorazioni il cui utensile non è ancora implementato nel kernel (task 8.3 di `tipologie-estese`). */
-type PendingTools = "asola-lama" | "dardo-di-giove";
-type ToolBuilders = { [K in Exclude<Machining["type"], PendingTools>]: ToolBuilder<Extract<Machining, { type: K }>> } & {
-  [K in PendingTools]?: ToolBuilder<Extract<Machining, { type: K }>>;
-};
+type ToolBuilders = { [K in Machining["type"]]: ToolBuilder<Extract<Machining, { type: K }>> };
 
 const deg = (a: number): number => (a * Math.PI) / 180;
 
@@ -208,6 +204,49 @@ const TOOLS: ToolBuilders = {
       add(add(c, scale(u, size)), scale(v, -size)),
     ];
     return prism(pts, scale(towardHead, size));
+  },
+
+  /**
+   * Asola per lama (E2): tasca `width` (Y) × `height` (Z) dalla testa, profonda
+   * `depth` lungo X, centrata sulla sezione con lo scostamento `offset` lungo Z;
+   * esce dalla testa di `TOOL_OFFSET`.
+   */
+  "asola-lama": (m, p) => {
+    const [x0, x1] = m.face === "testa-inizio" ? [-TOOL_OFFSET, m.depth] : [p.length - m.depth, p.length + TOOL_OFFSET];
+    const z = m.offset ?? 0;
+    return makeBox([x0, -m.width / 2, z - m.height / 2], [x1, m.width / 2, z + m.height / 2]);
+  },
+
+  /**
+   * Dardo di Giove (E2, profilo di design.md note 1.5): con ξ = distanza dalla
+   * testa (0..`length`), t = tan|angle| ed e = (h − length·t − step)/2, la linea
+   * di taglio va da (0, −h/2 + e) a (length/2, −step/2), dente verticale fino a
+   * (length/2, +step/2), poi a (length, h/2 − e) e battuta verticale fino alla
+   * faccia superiore. Con `angle > 0` si rimuove il legno sopra la linea, con
+   * `angle < 0` il profilo è specchiato in Z. Prisma dal poligono X–Z estruso
+   * lungo Y oltre le facce laterali; il poligono esce di `TOOL_OFFSET` dalla
+   * testa (prolungando la prima retta) e dalla faccia.
+   */
+  "dardo-di-giove": (m, p) => {
+    const { b, h } = p.section;
+    const e0 = TOOL_OFFSET;
+    const t = Math.tan(deg(Math.abs(m.angle)));
+    const e = (h - m.length * t - m.step) / 2;
+    const half = m.length / 2;
+    // Profilo (ξ, z) per angle > 0; il segno di angle specchia z.
+    const profile: [number, number][] = [
+      [-e0, -h / 2 + e - t * e0],
+      [half, -m.step / 2],
+      [half, m.step / 2],
+      [m.length, h / 2 - e],
+      [m.length, h / 2 + e0],
+      [-e0, h / 2 + e0],
+    ];
+    const sz = m.angle < 0 ? -1 : 1;
+    const toX = (xi: number): number => (m.face === "testa-inizio" ? xi : p.length - xi);
+    const y0 = -b / 2 - e0;
+    const pts = profile.map(([xi, z]) => vec3(toX(xi), y0, sz * z));
+    return prism(pts, vec3(0, b + 2 * e0, 0));
   },
 };
 
