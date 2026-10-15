@@ -58,8 +58,17 @@ function allChunks(dir = path.join(NEXT_DIR, "static", "chunks")): string[] {
   })
 }
 
-/** Pagine pubbliche: tutto il gruppo `(site)` tranne il wizard. */
-const sitePages = () => Object.keys(manifests.pages).filter((p) => p.startsWith("/(site)/") && p.endsWith("page") && !p.startsWith("/(site)/preventivo"))
+/** Pagina del wizard (gruppo 12): unica del sito con dominio, zustand e (a richiesta) il 3D. */
+const WIZARD_PAGE = "/(site)/preventivo/[[...step]]/page"
+/**
+ * Budget del wizard: il dominio (template, regole, zod) gira nel browser per l'anteprima
+ * immediata, quindi supera di poco i 200 kB delle altre pagine; `three`/r3f e il kernel
+ * restano fuori dal JS iniziale (caricati solo nel riepilogo).
+ */
+const WIZARD_BUDGET_BYTES = 240 * 1024
+
+/** Pagine pubbliche: tutto il gruppo `(site)` tranne il wizard (conferma e pagina del cliente comprese). */
+const sitePages = () => Object.keys(manifests.pages).filter((p) => p.startsWith("/(site)/") && p.endsWith("page") && p !== WIZARD_PAGE)
 
 beforeAll(() => {
   if (!existsSync(path.join(NEXT_DIR, "app-build-manifest.json")))
@@ -72,7 +81,7 @@ beforeAll(() => {
 describe("bundle del sito pubblico (11.6)", () => {
   it("le pagine del sito sono nel build", () => {
     const pages = sitePages()
-    for (const p of ["/(site)/page", "/(site)/pergole/page", "/(site)/pergole/[seoSlug]/page", "/(site)/galleria/page", "/(site)/contatti/page", "/(site)/privacy/page"])
+    for (const p of ["/(site)/page", "/(site)/pergole/page", "/(site)/pergole/[seoSlug]/page", "/(site)/galleria/page", "/(site)/contatti/page", "/(site)/privacy/page", "/(site)/preventivo/grazie/page", "/(site)/p/[token]/page"])
       expect(pages).toContain(p)
   })
 
@@ -102,5 +111,18 @@ describe("bundle del sito pubblico (11.6)", () => {
       .map((p) => [p, initialChunks(p).reduce((s, f) => s + gz(f), 0)] as const)
       .filter(([, size]) => size >= HOME_BUDGET_BYTES)
     expect(over).toEqual([])
+  })
+
+  it("wizard (12): nel JS iniziale niente three, r3f, kernel né listino seed; entro il budget", () => {
+    expect(Object.keys(manifests.pages)).toContain(WIZARD_PAGE)
+    const found: string[] = []
+    for (const chunk of initialChunks(WIZARD_PAGE)) {
+      const c = text(chunk)
+      for (const [name, re] of Object.entries(SIGNATURES)) if (name !== "zustand" && re.test(c)) found.push(`${name} in ${chunk}`)
+    }
+    expect(found).toEqual([])
+    const total = initialChunks(WIZARD_PAGE).reduce((s, f) => s + gz(f), 0)
+    console.info(`[bundle] JS iniziale del wizard: ${(total / 1024).toFixed(1)} kB gzip`)
+    expect(total).toBeLessThan(WIZARD_BUDGET_BYTES)
   })
 })

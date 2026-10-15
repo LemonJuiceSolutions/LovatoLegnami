@@ -1,7 +1,8 @@
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react"
 import { beforeEach, describe, expect, it, vi } from "vitest"
 import { axeViolations } from "@/test/axe"
-import { testStore, wizardData } from "./__fixtures__/data"
+import { memoryStorage, testStore, wizardData } from "./__fixtures__/data"
+import { createWizardStore } from "@/stores/wizard-store"
 import { preparePhotos, ONLY_IMAGES, TOO_MANY } from "./photos"
 import { ThankYou } from "./thank-you"
 import { PreventivoWizard } from "./wizard"
@@ -126,14 +127,17 @@ describe("passo 6 contatti (12.7)", () => {
   })
 
   it("pagina di conferma: codice e riepilogo con il PDF", async () => {
-    const store = testStore()
+    const storage = memoryStorage()
+    const store = createWizardStore({ storage })
+    store.getState().chooseTypology("autoportante-bifalda", null)
     store.getState().markSubmitted({ code: "PRV-2026-00042", token: "tok_abc", typologyTitle: "Pergola bifalda", measures: "Larghezza 500 cm", totalCents: 790_000, rangeCents: [711_000, 869_000], email: "maria@example.it" })
     nav.search = new URLSearchParams("c=PRV-2026-00042")
-    store.getState().chooseTypology("autoportante-bifalda", null)
-    render(<ThankYou store={store} />)
+    render(<ThankYou storage={storage as unknown as Storage} />)
     expect(screen.getByTestId("codice").textContent).toBe("PRV-2026-00042")
-    expect(store.getState().answers.tipologia.slug).toBeNull()
-    expect(store.getState().submitted?.code).toBe("PRV-2026-00042")
+    // la sessione riparte da zero ma conserva l'invio
+    const after = createWizardStore({ storage })
+    expect(after.getState().answers.tipologia.slug).toBeNull()
+    expect(after.getState().submitted?.code).toBe("PRV-2026-00042")
     expect(screen.getByRole("link", { name: /Scarica il riepilogo PDF/ }).getAttribute("href")).toBe("/api/preventivo/tok_abc/pdf")
     expect(screen.getByText("7.900 €")).toBeTruthy()
   })

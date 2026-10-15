@@ -3,9 +3,9 @@
 import * as React from "react"
 import Link from "next/link"
 import { useSearchParams } from "next/navigation"
-import { useStore } from "zustand"
 import { CheckCircle2, FileDown, Phone } from "lucide-react"
-import { wizardStore, type WizardStore } from "@/stores/wizard-store"
+import { clearAnswers, readSubmitted } from "@/stores/wizard-session"
+import type { SubmittedSummary } from "@/stores/wizard-store"
 import { euro } from "./format"
 
 /**
@@ -13,19 +13,16 @@ import { euro } from "./format"
  * browser, il riepilogo dell'invio con i collegamenti al PDF e alla pagina del cliente
  * (il token non è mai nell'indirizzo di questa pagina).
  */
-export function ThankYou({ store: injected }: { store?: WizardStore }) {
-  const store = React.useMemo(() => injected ?? wizardStore(), [injected])
-  const [ready, setReady] = React.useState(() => store.persist.hasHydrated())
+export function ThankYou({ storage }: { storage?: Storage }) {
+  const [submitted, setSubmitted] = React.useState<SubmittedSummary | null>(null)
+  const code = useSearchParams()?.get("c") ?? null
   React.useEffect(() => {
-    void Promise.resolve(store.persist.hasHydrated() ? undefined : store.persist.rehydrate()).then(() => setReady(true))
-  }, [store])
-  const submitted = useStore(store, (s) => s.submitted)
-  const code = useSearchParams()?.get("c") ?? submitted?.code ?? null
-  const mine = ready && submitted && submitted.code === code ? submitted : null
-  // richiesta inviata: il prossimo preventivo riparte da zero (il riepilogo dell'invio resta)
-  React.useEffect(() => {
-    if (mine) store.getState().reset()
-  }, [mine, store])
+    const s = readSubmitted(storage ?? sessionStorage)
+    setSubmitted(s)
+    // richiesta inviata: il prossimo preventivo riparte da zero (il riepilogo dell'invio resta)
+    if (s && s.code === code) clearAnswers(storage ?? sessionStorage)
+  }, [storage, code])
+  const mine = submitted && submitted.code === code ? submitted : null
 
   return (
     <div className="site-container max-w-3xl py-12 sm:py-16">

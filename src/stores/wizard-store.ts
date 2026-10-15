@@ -27,7 +27,8 @@ import { EMPTY_DERIVED, toConfig, type WizardDerived } from "@/components/wizard
  * `toConfig` a ogni risposta, con le regole costruttive arrivate dal server.
  */
 
-export const WIZARD_STORAGE_KEY = "lovato-wizard-v1"
+export { WIZARD_STORAGE_KEY } from "./wizard-session"
+import { WIZARD_STORAGE_KEY } from "./wizard-session"
 
 /** Riepilogo dell'ultimo invio, per la pagina di conferma e il collegamento al PDF. */
 export interface SubmittedSummary {
