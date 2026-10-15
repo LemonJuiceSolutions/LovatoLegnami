@@ -196,3 +196,7 @@ Scelte prese con un default sostituibile, da confermare con l'utente senza blocc
 - **Dati reali**: listino legno/lavorazioni/ferramenta/trattamenti/coperture, tariffe e tempi di montaggio, complicazioni, zone di trasporto, margini, minimo d'ordine, fascia di indicatività, aliquote; lunghezze commerciali e sfrido minimo per sezione; tutto nel seed come segnaposto `DA VALIDARE`.
 - **Contenuti del sito**: fotografie, testi, logo e colori ufficiali Lovato Legnami (la palette P8 è una proposta).
 - **Analytics**: Vercel Analytics attivabile da variabile; nessun tracciamento con cookie.
+
+## Note di implementazione
+
+- **Dipendenze (1.1)**: installate `drizzle-orm`, `drizzle-kit`, `pg`, `@types/pg`, `@electric-sql/pglite`, `next-auth@beta` (5.0.0-beta), `@auth/drizzle-adapter`, `resend`, `@react-pdf/renderer`, `@vercel/blob`. `@vercel/analytics` è fissato a **`~1.3.1`**: dalla 1.4 dichiara peer opzionali (`@sveltejs/kit`, `svelte`, `vue`, …) che fanno fallire la risoluzione di npm contro il `vite` 7 di vitest (ERESOLVE); la 1.3 ha solo `next`/`react` come peer e offre la stessa API `<Analytics />` usata da P7. Cartelle vuote versionate con `.gitkeep` (route group, componenti, `drizzle/`, `docs/`, `pricing/{phases,data}`); i moduli `src/server/*` e `src/domain/pricing` hanno un `index.ts` con `export {}` da riempire nei task successivi.
