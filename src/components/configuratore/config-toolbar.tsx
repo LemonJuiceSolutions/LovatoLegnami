@@ -12,20 +12,19 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import type { ValidationIssue } from "@/domain"
 import { downloadFile } from "@/export/download"
 import { exportFileName } from "@/export/filename"
 import { ConfigFileError, parseConfigFile, serializeConfig } from "@/stores/config-file"
 import type { ConfiguratoreStore } from "@/stores/configuratore-store"
-import { EXAMPLES, exampleConfig } from "@/stores/examples"
 import { configuratoreStore, useConfiguratore } from "@/stores/use-configuratore"
 import { readFileText } from "./form-helpers"
+import { PresetPickerButton } from "./preset-picker"
 
 /**
  * Barra della configurazione (spec `configuratore-ui`, "Stato e persistenza"
- * ed "Esempi precaricati"): salva/carica il file JSON versionato, esempi
- * precaricati, ripristino dei default. Un file non valido mostra il dettaglio
+ * ed "Esempi precaricati"): salva/carica il file JSON versionato, "Esempi
+ * dal catalogo" (preset commerciali, `preset-picker.tsx`), ripristino dei default. Un file non valido mostra il dettaglio
  * degli errori e lascia lo stato invariato.
  */
 
@@ -45,12 +44,10 @@ export function loadConfigText(text: string, store: ConfiguratoreStore = configu
 
 export function ConfigToolbar() {
   const typology = useConfiguratore((s) => s.config.typology)
-  const loadConfig = useConfiguratore((s) => s.loadConfig)
   const resetConfig = useConfiguratore((s) => s.resetConfig)
   const fileInput = React.useRef<HTMLInputElement>(null)
   const [loadError, setLoadError] = React.useState<{ file: string; issues: readonly ValidationIssue[] } | null>(null)
   const [confirmReset, setConfirmReset] = React.useState(false)
-  const [example, setExample] = React.useState("")
 
   const save = () => {
     const { config } = configuratoreStore.getState()
@@ -71,24 +68,7 @@ export function ConfigToolbar() {
 
   return (
     <div className="flex flex-wrap items-center gap-2">
-      <Select
-        value={example}
-        onValueChange={(id) => {
-          loadConfig(exampleConfig(id))
-          setExample("")
-        }}
-      >
-        <SelectTrigger className="h-9 w-[200px]" aria-label="Carica esempio">
-          <SelectValue placeholder="Carica esempio..." />
-        </SelectTrigger>
-        <SelectContent>
-          {EXAMPLES.map((e) => (
-            <SelectItem key={e.id} value={e.id} title={e.description}>
-              {e.name}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+      <PresetPickerButton />
       <Button variant="outline" size="sm" onClick={save}>
         <Save className="mr-1.5 h-4 w-4 shrink-0" />
         Salva configurazione
