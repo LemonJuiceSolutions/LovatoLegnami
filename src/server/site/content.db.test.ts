@@ -5,6 +5,7 @@ import { freshDb } from "@/server/repositories/__tests__/helpers"
 import { getActive, openDraft, publishDraft, saveDraft } from "@/server/repositories/datasets"
 import { blacklistedKeys } from "@/server/public-dto"
 import { invalidatePublicCatalog } from "@/server/quotes/catalog"
+import { buildSitemap } from "@/components/site/seo"
 import { loadSiteContent, loadSiteTypology } from "./content"
 
 beforeAll(async () => {
@@ -29,6 +30,14 @@ describe("contenuti del sito dal dataset attivo (11.2, 11.3)", () => {
     }
     expect(content.gallery.length).toBeGreaterThan(0)
     expect(content.gallery.every((g) => g.kind === "drawing")).toBe(true)
+  })
+
+  it("sitemap (11.5): le tipologie visibili del dataset attivo, nessuna nascosta", async () => {
+    const { typologies } = await loadSiteContent({ log: () => {} })
+    const urls = buildSitemap("https://www.example.it", typologies).map((e) => e.url)
+    expect(urls).toContain("https://www.example.it/pergole/addossata-monofalda")
+    expect(urls).toContain("https://www.example.it/pergole/autoportante-bifalda")
+    expect(urls.some((u) => u.includes("portale-sandwich"))).toBe(false)
   })
 
   it("non espone dati interni: solo il totale della vista cliente", async () => {

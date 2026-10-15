@@ -1,14 +1,15 @@
 import type { Metadata } from "next"
+import { pageMetadata } from "@/components/site/seo"
 import { TypologyList } from "@/components/site/typology-detail"
 import { getSiteContent } from "@/server/site/cached"
 
 export const revalidate = 300
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Pergole in legno",
   description: "Le pergole in legno di Lovato Legnami: addossate al muro o autoportanti, progettate sulle tue misure con prezzo indicativo online.",
-  alternates: { canonical: "/pergole" },
-}
+  path: "/pergole",
+})
 
 export default async function PergolePage() {
   const { typologies } = await getSiteContent()

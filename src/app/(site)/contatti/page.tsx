@@ -1,4 +1,5 @@
 import type { Metadata } from "next"
+import { pageMetadata } from "@/components/site/seo"
 import Link from "next/link"
 import { companyInfo } from "@/components/site/company"
 import { ContactBlock } from "@/components/site/contact-block"
@@ -8,11 +9,11 @@ import { Section } from "@/components/site/section"
 import { sendContactMessage } from "@/server/actions/contact"
 import { PRIVACY_NOTICE_VERSION } from "@/server/consent"
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Contatti",
   description: "Telefono, email, indirizzo e orari di Lovato Legnami a Settimo di Pescantina (Verona). Scrivici per una pergola su misura.",
-  alternates: { canonical: "/contatti" },
-}
+  path: "/contatti",
+})
 
 export default function ContattiPage() {
   const company = companyInfo()

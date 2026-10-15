@@ -1,13 +1,14 @@
 import type { Metadata } from "next"
+import { pageMetadata } from "@/components/site/seo"
 import { companyInfo } from "@/components/site/company"
 import { PrivacyNotice } from "@/components/site/privacy-notice"
 import { PRIVACY_NOTICE_VERSION } from "@/server/consent"
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Informativa sulla privacy",
   description: "Come Lovato Legnami tratta i dati inviati con il form Contatti e con la richiesta di preventivo.",
-  alternates: { canonical: "/privacy" },
-}
+  path: "/privacy",
+})
 
 export default function PrivacyPage() {
   return (

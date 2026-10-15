@@ -1,4 +1,5 @@
 import type { Metadata } from "next"
+import { pageMetadata } from "@/components/site/seo"
 import { Cta } from "@/components/site/cta"
 import { Gallery } from "@/components/site/gallery"
 import { WIZARD_PATH } from "@/components/site/links"
@@ -6,11 +7,11 @@ import { getSiteContent } from "@/server/site/cached"
 
 export const revalidate = 300
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Galleria",
   description: "Pergole in legno di Lovato Legnami: realizzazioni e configurazioni di riferimento, con le misure.",
-  alternates: { canonical: "/galleria" },
-}
+  path: "/galleria",
+})
 
 export default async function GalleriaPage() {
   const { gallery } = await getSiteContent()
