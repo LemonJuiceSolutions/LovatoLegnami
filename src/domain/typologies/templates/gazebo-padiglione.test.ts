@@ -129,6 +129,21 @@ describe("gazebo-padiglione", () => {
     expect(errors(eight)).toEqual([]);
   });
 
+  it.each(["6", "8"])("%s lati: la punta sta sui piani di falda (cantonali a atan(tan α · cos(π/N)))", (lati) => {
+    const N = Number(lati);
+    for (const params of [{ lati, larghezza: 4000 }, { lati, larghezza: 4000, costruzione: "carpenteria", pendenza: 25 }]) {
+      const a = generate(SLUG, params);
+      const alpha = a.meta.pendenza as number;
+      const expected = deg(Math.atan(Math.tan(rad(alpha)) * Math.cos(Math.PI / N)));
+      expect(a.meta.pendenzaCantonali).toBeCloseTo(expected, 9);
+      const cantonali = ofType(a, "cantonale");
+      expect(cantonali).toHaveLength(N);
+      for (const c of cantonali) expect(slopeOf(c), JSON.stringify(params)).toBeCloseTo(expected, 6);
+      if (a.meta.costruzione === "carpenteria")
+        for (const p of ofType(a, "puntone")) expect(slopeOf(p)).toBeCloseTo(alpha, 6);
+    }
+  });
+
   it.each(["4", "6", "8"])("%s lati con monaco e gli altri default: genera (sezione del monaco di default sufficiente)", (lati) => {
     for (const params of [
       { lati, costruzione: "carpenteria" },

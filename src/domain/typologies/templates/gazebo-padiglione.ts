@@ -127,7 +127,10 @@ function geometry(ctx: BuildContext) {
     const nIn = vec3(-d.y, d.x, 0); // verso l'interno (poligono CCW)
     return { from: v, to: w, d, nIn, length: norm(sub(w, v)) };
   });
-  const half = Math.min(W, D) / 2; // distanza in pianta dalla gronda alla punta/colmo
+  // distanza in pianta dalla gronda alla punta/colmo, perpendicolare al lato: con 6/8 lati è l'apotema
+  // (ρ·cos(π/N)), non il raggio ρ = W/2, altrimenti la punta sale sopra i piani di falda e i cantonali
+  // hanno pendenza α invece di atan(tan α · cos(π/N)) dichiarata in `rafterSlope`
+  const half = N === 4 ? Math.min(W, D) / 2 : (W / 2) * Math.cos(Math.PI / N);
   const rafterSlope = radToDeg(Math.atan(t * Math.cos(Math.PI / N)));
   return { N, mode, W, D, H, rect, doubled, slopesCount, punta, cusp, slope, t, V, O, sides, half, rafterSlope };
 }
