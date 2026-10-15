@@ -7,6 +7,8 @@ import type { WizardData, WizardTypology } from "@/server/site/wizard-data"
 import type { WizardStore } from "@/stores/wizard-store"
 import { WIZARD_STEPS, stepIndex, stepPath, type WizardStep } from "./answers"
 import { StepIndicator } from "./step-indicator"
+import { normalizeFinishes } from "./finishes"
+import { StepFinishes } from "./step-finishes"
 import { StepMeasures } from "./step-measures"
 import { StepSpace } from "./step-space"
 import { StepTypology } from "./step-typology"
@@ -62,6 +64,14 @@ function WizardShell({ step }: { step: WizardStep }) {
     if (store.getState().answers.tipologia.slug !== t.slug) store.getState().chooseTypology(t.slug, t.preset)
     go("misure", true)
   }, [hydrated, requested, data.typologies, store, go])
+
+  // finiture coerenti con il listino attivo (una voce tolta dal listino torna alla prima disponibile)
+  React.useEffect(() => {
+    if (!hydrated) return
+    const current = store.getState().answers.finiture
+    const fixed = normalizeFinishes(current, data.options)
+    if (JSON.stringify(fixed) !== JSON.stringify(current)) store.getState().setFinishes(fixed)
+  }, [hydrated, data.options, store])
 
   // senza modello scelto si riparte dal passo 1
   React.useEffect(() => {
@@ -153,6 +163,8 @@ function StepBody({ step }: { step: WizardStep }) {
         return <StepMeasures />
       case "spazio":
         return <StepSpace />
+      case "finiture":
+        return <StepFinishes />
       default:
         return (
           <section aria-labelledby="passo-titolo">

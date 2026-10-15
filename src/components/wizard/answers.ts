@@ -202,7 +202,7 @@ export const DEFAULT_ANSWERS: WizardAnswers = {
     obstacles: [],
     access: "facile",
   },
-  finiture: { species: "abete", quality: "lamellare", treatment: null, tint: null, covering: null },
+  finiture: { species: "abete", quality: "lamellare", treatment: "impregnante-incolore", tint: null, covering: null },
   contatti: { name: "", email: "", phone: "", cap: "", comune: "", notes: "" },
 }
 
