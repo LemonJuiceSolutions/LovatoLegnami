@@ -8,11 +8,9 @@ import type { TypologyCategory, TypologyTemplate } from "@/domain/typologies/tem
 import { generate, getTypology } from "@/domain/typologies/registry"
 import { resolveParams } from "@/domain/typologies/template"
 import { getActive } from "@/server/repositories/datasets"
-import { EstimateRequestSchema } from "@/server/public-dto"
 import { getPublicCatalog, type PublicCatalog } from "@/server/quotes/catalog"
-import { computeEstimate } from "@/server/quotes/estimate"
+import { computeStartingPrice, startingPriceConfig } from "@/server/quotes/starting-price"
 import { CONFIG_SCHEMA_VERSION, defaultConfig, presetConfig, type ConfiguratoreConfig } from "@/stores/config"
-import { serializeConfig } from "@/stores/config-file"
 import { footprint } from "@/components/site/format"
 import type { GalleryItem } from "@/components/site/gallery"
 
@@ -123,20 +121,21 @@ function drawingSvg(config: ConfiguratoreConfig, title: string): string {
   }
 }
 
-/** Prezzo "a partire da": abete lamellare, trattamento più economico, nessuna copertura, accesso facile. */
-export function fromPriceFor(config: ConfiguratoreConfig, catalog: PublicCatalog, presetName: string | null): FromPrice | null {
+/**
+ * Prezzo "a partire da" per le pagine pubbliche: definizione unica condivisa con il
+ * back-office (`computeStartingPrice`: preset di riferimento, adattamento e
+ * dimensionamento, abete lamellare con il trattamento meno caro, nessuna copertura).
+ */
+export function fromPriceFor(slug: string, preset: Preset | undefined, catalog: PublicCatalog): FromPrice | null {
   const { priceList } = catalog
-  const species = priceList.timber.species[0]
-  const quality = priceList.timber.qualities[0]
-  if (!species || !quality) return null
-  const treatment = [...priceList.treatments].sort((a, b) => a.pricePerM2Cents - b.pricePerM2Cents)[0]
-  const request = EstimateRequestSchema.parse({
-    config: JSON.parse(serializeConfig(config)),
-    declared: { access: "facile" },
-    commercial: { species: species.id, quality: quality.id, treatment: treatment?.id ?? null, covering: null },
+  const price = computeStartingPrice(startingPriceConfig(slug, preset), {
+    priceList,
+    priceListVersion: catalog.priceListVersion,
+    ruleSet: catalog.ruleSet,
+    ruleSetVersionId: catalog.ruleSetVersionId,
   })
-  const { response, prepared } = computeEstimate(request, catalog)
-  if (response.quote.status !== "completo") return null
+  if (!price) return null
+  const { prepared, finish } = price
   const box = assemblyBounds(prepared.assembly)
   if (!box) return null
   // misure nominali del cliente (larghezza × profondità della pergola); l'ingombro con gli sbalzi come ripiego
@@ -144,14 +143,18 @@ export function fromPriceFor(config: ConfiguratoreConfig, catalog: PublicCatalog
     const v = prepared.config.params[name]
     return Math.round(typeof v === "number" ? v : fallback)
   }
+  const label = <T extends { id: string; label: string }>(items: readonly T[], id: string | null) => items.find((x) => x.id === id)?.label
+  const species = label(priceList.timber.species, finish.species) ?? finish.species
+  const quality = (label(priceList.timber.qualities, finish.quality) ?? finish.quality).split(" (")[0].toLowerCase()
+  const treatment = label(priceList.treatments, finish.treatment)
   return {
-    totalCents: response.quote.totalCents,
+    totalCents: price.totalCents,
     widthMm: nominal("larghezza", box.max.x - box.min.x),
     depthMm: nominal("profondita", box.max.y - box.min.y),
     heightMm: Math.round(box.max.z - box.min.z),
-    presetName,
-    includes: response.quote.groups.filter((g) => g.amountCents > 0).map((g) => g.label),
-    finish: [`${species.label} ${quality.label.split(" (")[0].toLowerCase()}`, treatment ? treatment.label.toLowerCase() : null].filter(Boolean).join(", "),
+    presetName: preset?.name ?? null,
+    includes: price.quote.groups.filter((g) => g.amountCents > 0).map((g) => g.label),
+    finish: [`${species} ${quality}`, treatment ? treatment.toLowerCase() : null].filter(Boolean).join(", "),
   }
 }
 
@@ -197,7 +200,7 @@ export async function loadSiteContent(deps: LoadDeps = {}): Promise<SiteContent>
     let fromPrice: FromPrice | null = null
     if (catalog?.typologies.has(setting.slug)) {
       try {
-        fromPrice = fromPriceFor(config, catalog, preset?.name ?? null)
+        fromPrice = fromPriceFor(setting.slug, preset, catalog)
       } catch (e) {
         d.log(`sito: prezzo "a partire da" non calcolabile per ${setting.slug} (${e instanceof Error ? e.message : String(e)})`)
       }

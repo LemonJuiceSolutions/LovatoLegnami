@@ -10,7 +10,7 @@ export const dynamic = "force-dynamic"
 
 export default async function AdminTipologiePage() {
   const user = await requireAdminPage(["tipologie:scrivi"], "/admin/tipologie")
-  const [{ status, data }, listino, presetVersion] = await Promise.all([editableDocument("tipologie"), getActive("listino"), getActive("preset")])
+  const [{ status, data }, listino, presetVersion, regole] = await Promise.all([editableDocument("tipologie"), getActive("listino"), getActive("preset"), getActive("regole")])
   if (!data) return <p className="text-sm text-muted-foreground">Nessuna impostazione delle tipologie in archivio: esegui il seed del database.</p>
   const presets = presetsOrCatalog(presetVersion?.data)
   const startingPrices: Record<string, string> = {}
@@ -18,7 +18,7 @@ export default async function AdminTipologiePage() {
     const version = { id: listino.id, version: listino.version, effectiveFrom: listino.effectiveFrom, status: "attiva" as const }
     for (const id of new Set(data.map((t) => t.referencePresetId).filter((v): v is string => !!v))) {
       const preset = presets.find((p) => p.id === id)
-      const price = preset && startingPrice(preset, listino.data, version)
+      const price = preset && startingPrice(preset, listino.data, version, regole?.data)
       if (price) startingPrices[id] = price.label
     }
   }
