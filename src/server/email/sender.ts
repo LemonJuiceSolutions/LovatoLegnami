@@ -1,9 +1,8 @@
 import { getEnv } from "@/server/env";
 
 /**
- * Adattatore email (P7). Questo file nasce con l'accesso (7.2) e contiene solo
- * l'interfaccia e le tre implementazioni; template di richiesta, allegati PDF e outbox
- * arrivano con il task 8.1.
+ * Adattatore email (P7): interfaccia e tre implementazioni. Template in `templates/`,
+ * accodamento e reinvio in `outbox.ts`.
  *
  * - `resendSender`: produzione (`RESEND_API_KEY`);
  * - `consoleSender`: sviluppo, stampa l'email in console (in produzione stampa solo
@@ -50,15 +49,20 @@ export function createConsoleSender(options: { production?: boolean; log?: (line
 export interface MemorySender extends EmailSender {
   readonly sent: EmailMessage[];
   clear(): void;
+  /** Simula un provider in errore (`null` lo ripristina): `send` lancia questo errore. */
+  setFailure(error: Error | null): void;
 }
 
 export function createMemorySender(): MemorySender {
   const sent: EmailMessage[] = [];
+  let failure: Error | null = null;
   return {
     kind: "memory",
     sent,
     clear: () => void sent.splice(0, sent.length),
+    setFailure: (error) => void (failure = error),
     async send(m) {
+      if (failure) throw failure;
       sent.push(m);
       return { id: `mem-${sent.length}` };
     },

@@ -1,8 +1,7 @@
 import type { EmailMessage } from "../sender";
+import { escapeHtml } from "./shared";
 
 /** Email con il collegamento di accesso all'area interna (HTML + testo, italiano). */
-
-const escapeHtml = (s: string) => s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!);
 
 export function accessEmail(params: { to: string; url: string; minutes: number; siteName?: string }): EmailMessage {
   const site = params.siteName ?? "Lovato Legnami";
