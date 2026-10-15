@@ -1,7 +1,11 @@
 "use client"
 
 import * as React from "react"
-import { Box, ClipboardList, SlidersHorizontal } from "lucide-react"
+import { Box, Calculator, ClipboardList, SlidersHorizontal } from "lucide-react"
+import { CommercialForm } from "@/components/preventivo/commercial-form"
+import { PricingPanel, QuoteTotalBadge } from "@/components/preventivo/pricing-panel"
+import { RequestHeader, RequestNotice, type RequestHeaderData } from "@/components/preventivo/request-header"
+import { parseConfigFile } from "@/stores/config-file"
 import { Card, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { cn } from "@/lib/utils"
@@ -65,9 +69,15 @@ export interface ConfiguratoreProps {
   exports?: React.ReactNode
   /** Barra salva/carica/esempi (11.7). */
   toolbar?: React.ReactNode
+  /** Pannello "Preventivo" (sito-preventivi 10.2). */
+  quote?: React.ReactNode
+  /** Totale del preventivo nell'intestazione del pannello. */
+  quoteActions?: React.ReactNode
+  /** Intestazione sopra il layout (richiesta aperta, 10.4). */
+  banner?: React.ReactNode
 }
 
-export function ConfiguratoreLayout({ params, results, exports, toolbar }: ConfiguratoreProps) {
+export function ConfiguratoreLayout({ params, results, exports, toolbar, quote, quoteActions, banner }: ConfiguratoreProps) {
   const [tab, setTab] = React.useState("parametri")
 
   return (
@@ -85,13 +95,17 @@ export function ConfiguratoreLayout({ params, results, exports, toolbar }: Confi
         </div>
       </div>
 
+      {banner}
+
       <Tabs
         value={tab}
         onValueChange={setTab}
         className={cn(
           "flex min-h-0 flex-1 flex-col gap-3",
           "lg:grid lg:grid-cols-[300px_minmax(0,1fr)] lg:grid-rows-[minmax(0,3fr)_minmax(0,2fr)] lg:gap-4",
-          "min-[1760px]:grid-cols-[340px_minmax(0,1fr)_380px] min-[1760px]:grid-rows-[minmax(0,1fr)]"
+          quote
+            ? "min-[1760px]:grid-cols-[340px_minmax(0,1fr)_440px] min-[1760px]:grid-rows-[minmax(0,1fr)]"
+            : "min-[1760px]:grid-cols-[340px_minmax(0,1fr)_380px] min-[1760px]:grid-rows-[minmax(0,1fr)]"
         )}
       >
         <TabsList className="grid w-full grid-cols-3 lg:hidden">
@@ -128,31 +142,90 @@ export function ConfiguratoreLayout({ params, results, exports, toolbar }: Confi
             "lg:col-start-2 lg:row-start-2 min-[1760px]:col-start-3 min-[1760px]:row-start-1"
           )}
         >
-          <div className="grid min-h-0 flex-1 gap-4 lg:grid-cols-2 min-[1760px]:grid-cols-1 min-[1760px]:grid-rows-[minmax(0,1fr)_minmax(0,1fr)]">
-            <Panel title="Esiti" icon={ClipboardList}>
-              {results}
-            </Panel>
-            <Panel title="Esportazioni" icon={Box}>
-              {exports}
-            </Panel>
-          </div>
+          {quote ? (
+            // Esiti ed esportazioni impilati, preventivo accanto (lg) o in mezzo (≥ 1760 px).
+            <div className="grid min-h-0 flex-1 gap-4 lg:grid-cols-2 lg:grid-rows-[minmax(0,1fr)_minmax(0,1fr)] min-[1760px]:grid-cols-1 min-[1760px]:grid-rows-[minmax(0,0.8fr)_minmax(0,2.2fr)_minmax(0,0.8fr)]">
+              <Panel title="Esiti" icon={ClipboardList} className="lg:col-start-1 lg:row-start-1">
+                {results}
+              </Panel>
+              <Panel
+                title="Preventivo"
+                icon={Calculator}
+                actions={quoteActions}
+                className="lg:col-start-2 lg:row-span-2 lg:row-start-1 min-[1760px]:col-start-1 min-[1760px]:row-span-1 min-[1760px]:row-start-2"
+              >
+                {quote}
+              </Panel>
+              <Panel title="Esportazioni" icon={Box} className="lg:col-start-1 lg:row-start-2 min-[1760px]:row-start-3">
+                {exports}
+              </Panel>
+            </div>
+          ) : (
+            <div className="grid min-h-0 flex-1 gap-4 lg:grid-cols-2 min-[1760px]:grid-cols-1 min-[1760px]:grid-rows-[minmax(0,1fr)_minmax(0,1fr)]">
+              <Panel title="Esiti" icon={ClipboardList}>
+                {results}
+              </Panel>
+              <Panel title="Esportazioni" icon={Box}>
+                {exports}
+              </Panel>
+            </div>
+          )}
         </TabsContent>
       </Tabs>
     </div>
   )
 }
 
-/** Pagina completa: avvia il kernel geometrico al mount (il worker parte solo qui). */
-export function Configuratore() {
+/** Richiesta passata dalla pagina server con `?richiesta=<id>` (10.4). */
+export type ConfiguratoreRequest =
+  | { readonly kind: "ok"; readonly request: RequestHeaderData & { readonly config: unknown | null } }
+  | { readonly kind: "missing"; readonly message: string }
+
+/**
+ * Configurazione della richiesta nello store (una sola volta per richiesta): quella del
+ * cliente se leggibile, altrimenti la predefinita.
+ */
+function useRequestConfig(request: ConfiguratoreRequest | undefined) {
+  const key = request ? (request.kind === "ok" ? request.request.id : "missing") : null
   React.useEffect(() => {
+    if (!request) return
+    const store = configuratoreStore.getState()
+    if (request.kind === "ok" && request.request.config) {
+      try {
+        store.loadConfig(parseConfigFile(request.request.config, { keepInvalidParams: true }))
+        return
+      } catch {
+        // configurazione salvata illeggibile: si parte dalla predefinita
+      }
+    }
+    store.resetConfig()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [key])
+}
+
+/** Pagina completa: avvia il kernel geometrico al mount (il worker parte solo qui). */
+export function Configuratore({ request, canSaveFinal = false }: { request?: ConfiguratoreRequest; canSaveFinal?: boolean } = {}) {
+  useRequestConfig(request)
+  React.useEffect(() => {
+    // listino e regole della versione attiva (ripiego sui default con avviso)
+    void configuratoreStore.getState().loadCatalog()
     configuratoreStore.getState().startKernel()
     return () => configuratoreStore.getState().stopKernel()
   }, [])
 
   return (
     <ConfiguratoreLayout
-      params={<ParamsPanel envelope={<EnvelopeForm />} />}
+      params={<ParamsPanel envelope={<EnvelopeForm />} commercial={<CommercialForm />} />}
       results={<ResultsPanel />}
+      quote={<PricingPanel />}
+      quoteActions={<QuoteTotalBadge />}
+      banner={
+        request?.kind === "ok" ? (
+          <RequestHeader request={request.request} canSave={canSaveFinal} />
+        ) : request?.kind === "missing" ? (
+          <RequestNotice message={request.message} />
+        ) : undefined
+      }
       exports={<ExportPanel />}
       toolbar={<ConfigToolbar />}
     />

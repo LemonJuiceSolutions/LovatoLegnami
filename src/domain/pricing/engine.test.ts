@@ -66,7 +66,7 @@ describe("priceAssembly (4.4)", () => {
     expect(q.warnings).toEqual([]);
     // rango di ogni riga nell'ordine delle fasi: mai decrescente
     const rank = (l: QuoteLine): number =>
-      l.code === "minimo-ordine" ? 11 : l.code === "arrotondamento" ? 13 : ({ legno: 0, sfrido: 0, lavorazioni: 1, ferramenta: 2, trattamenti: 3, copertura: 4, montaggio: 5, complicazioni: 6, trasporto: 7, margine: 9, sconti: 10, adeguamenti: 11, iva: 12 } as const)[l.category];
+      l.code === "minimo-ordine" ? 11 : l.code === "arrotondamento" ? 13 : ({ legno: 0, sfrido: 0, lavorazioni: 1, ferramenta: 2, trattamenti: 3, copertura: 4, montaggio: 5, complicazioni: 6, trasporto: 7, manuali: 8, margine: 9, sconti: 10, adeguamenti: 11, iva: 12 } as const)[l.category];
     const ranks = q.lines.map(rank);
     expect(ranks).toEqual([...ranks].sort((a, b) => a - b));
     expect(new Set(ranks)).toEqual(new Set([0, 1, 4, 3, 5, 6, 7, 9, 12, ...(q.totals.roundingCents ? [13] : [])]));

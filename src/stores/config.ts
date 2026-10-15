@@ -4,6 +4,7 @@ import {
   TypologyNotFoundError,
   assemblyBounds,
   checkCollisions,
+  customerView,
   defaultParams,
   evaluateRules,
   floorFunction,
@@ -12,15 +13,25 @@ import {
   isParamVisible,
   listTypologies,
   loadPreset,
+  officeView,
   parseEnvelope,
+  priceAssembly,
   resolveParams,
   wallBuildOptions,
+  type AccessLevel,
+  type AnchoringKind,
   type Assembly,
   type Collision,
+  type CustomerQuote,
   type Envelope,
   type Measures,
+  type OfficeView,
   type ParamValue,
+  type PriceList,
+  type PriceListVersion,
+  type PricingOptionsInput,
   type RuleSet,
+  type SiteFactors,
   type TypologyTemplate,
   type Violation,
 } from "@/domain";
@@ -39,6 +50,47 @@ export interface ExportOptions {
   readonly sat: SatExportOptions;
 }
 
+/**
+ * Opzioni commerciali e fattori di cantiere dichiarati (P9, 10.1): finiture scelte
+ * (specie, qualità, trattamento, copertura) e dati non deducibili dalla geometria
+ * (accesso al cantiere, ancoraggio, CAP di consegna). Campo facoltativo del file di
+ * configurazione: assente = `DEFAULT_COMMERCIAL`.
+ */
+export interface CommercialOptions {
+  readonly species: string;
+  readonly quality: string;
+  readonly treatment: string | null;
+  readonly covering: string | null;
+  readonly access: AccessLevel;
+  readonly anchoring?: AnchoringKind;
+  /** CAP di consegna (5 cifre). */
+  readonly cap?: string;
+}
+
+/** Abete lamellare senza trattamento né copertura, accesso facile (come la stima pubblica). */
+export const DEFAULT_COMMERCIAL: CommercialOptions = {
+  species: "abete",
+  quality: "lamellare",
+  treatment: null,
+  covering: null,
+  access: "facile",
+};
+
+export const commercialOf = (config: Pick<ConfiguratoreConfig, "commercial">): CommercialOptions => config.commercial ?? DEFAULT_COMMERCIAL;
+
+/** Opzioni del motore di prezzo dalle opzioni commerciali (IVA e sconti restano al preventivo definitivo). */
+export function pricingOptionsOf(c: CommercialOptions): PricingOptionsInput {
+  return {
+    species: c.species,
+    quality: c.quality,
+    treatment: c.treatment,
+    covering: c.covering,
+    access: c.access,
+    ...(c.anchoring ? { anchoring: c.anchoring } : {}),
+    ...(c.cap ? { cap: c.cap } : {}),
+  };
+}
+
 export interface ConfiguratoreConfig {
   readonly schemaVersion: typeof CONFIG_SCHEMA_VERSION;
   /** Slug della tipologia. */
@@ -50,6 +102,19 @@ export interface ConfiguratoreConfig {
   /** Affondamento dei pilastri sotto il pavimento (mm, `BuildOptions.embedment`). */
   readonly embedment: number;
   readonly exportOptions: ExportOptions;
+  /** Opzioni commerciali e cantiere dichiarato (facoltativo, 10.1). */
+  readonly commercial?: CommercialOptions;
+}
+
+/**
+ * Listino con cui il configuratore prezza l'assieme (slice `catalog` dello store): senza
+ * listino `derived.quote` resta `null`.
+ */
+export interface PricingCatalog {
+  readonly priceList: PriceList;
+  readonly priceListVersion: PriceListVersion;
+  /** Versione delle regole usate per l'assieme (registrata nel preventivo). */
+  readonly ruleSetVersion?: string;
 }
 
 export interface Derived {
@@ -69,6 +134,14 @@ export interface Derived {
   readonly error: string | null;
   /** `true` se `assembly` non corrisponde più a `config` (parametri non validi o errore). */
   readonly stale: boolean;
+  /** Preventivo dell'assieme in vista ufficio (`null` senza listino o se il calcolo fallisce). */
+  readonly quote: OfficeView | null;
+  /** Stesso preventivo in vista cliente (anteprima). */
+  readonly customerQuote: CustomerQuote | null;
+  /** Fattori di cantiere del preventivo (deviazioni, pavimento, ostacoli, accesso…). */
+  readonly siteFactors: SiteFactors | null;
+  /** Errore del calcolo del prezzo (opzioni non valide…), non blocca l'assieme. */
+  readonly quoteError: string | null;
 }
 
 export const DEFAULT_TYPOLOGY = "addossata-monofalda";
@@ -266,19 +339,50 @@ export const EMPTY_DERIVED: Derived = {
   paramErrors: {},
   error: null,
   stale: true,
+  quote: null,
+  customerQuote: null,
+  siteFactors: null,
+  quoteError: null,
 };
 
 const errorText = (e: unknown) => (e instanceof Error ? e.message : String(e));
 
+const NO_QUOTE = { quote: null, customerQuote: null, siteFactors: null, quoteError: null } as const;
+
 /**
- * Rigenera assieme, violazioni e collisioni dalla configurazione. Con
- * parametri non validi o errori di generazione mantiene i risultati di
- * `previous` (l'assieme non viene rigenerato) e segnala il problema.
+ * Prezzo dell'assieme di `derived` con il listino (vista ufficio, vista cliente, fattori
+ * di cantiere). È sincrono (pochi ms, piano di taglio compreso: P11). Senza listino o
+ * senza assieme i campi del prezzo sono vuoti; un errore del motore finisce in
+ * `quoteError` senza toccare l'assieme.
+ */
+export function priceDerived(config: ConfiguratoreConfig, derived: Derived, pricing?: PricingCatalog): Derived {
+  if (!pricing || !derived.assembly) return { ...derived, ...NO_QUOTE };
+  try {
+    const quote = priceAssembly({
+      assembly: derived.assembly,
+      envelope: config.envelope,
+      options: pricingOptionsOf(commercialOf(config)),
+      priceList: pricing.priceList,
+      version: pricing.priceListVersion,
+      ...(pricing.ruleSetVersion !== undefined ? { ruleSetVersion: pricing.ruleSetVersion } : {}),
+    });
+    return { ...derived, quote: officeView(quote), customerQuote: customerView(quote), siteFactors: quote.siteFactors, quoteError: null };
+  } catch (e) {
+    return { ...derived, ...NO_QUOTE, quoteError: errorText(e) };
+  }
+}
+
+/**
+ * Rigenera assieme, violazioni e collisioni dalla configurazione e, con il listino,
+ * il preventivo (`priceDerived`). Con parametri non validi o errori di generazione
+ * mantiene i risultati di `previous` (l'assieme non viene rigenerato, il preventivo
+ * resta quello dell'ultimo assieme valido) e segnala il problema.
  */
 export function computeDerived(
   config: ConfiguratoreConfig,
   previous: Derived = EMPTY_DERIVED,
   ruleSet: RuleSet = DEFAULT_LOVATO_RULES,
+  pricing?: PricingCatalog,
 ): Derived {
   const keep = (patch: Partial<Derived>): Derived => ({ ...previous, paramErrors: {}, error: null, ...patch, stale: true });
   let template: TypologyTemplate;
@@ -289,6 +393,7 @@ export function computeDerived(
   }
   const paramErrors = paramErrorsOf(template, config.params);
   if (Object.keys(paramErrors).length > 0) return keep({ paramErrors });
+  let derived: Derived;
   try {
     const floorHeightAt = floorFunction(config.envelope);
     // muri reali della pianta fuori squadra (solo con `envelope.plan` e tipologie a muro)
@@ -296,7 +401,7 @@ export function computeDerived(
     const assembly = generate(config.typology, config.params, { floorHeightAt, embedment: config.embedment, ...walls });
     const { violations, measures } = evaluateRules(assembly, ruleSet, { floorHeightAt });
     const collisions = checkCollisions(assembly, config.envelope);
-    return {
+    derived = {
       assembly,
       violations,
       collisions,
@@ -305,10 +410,12 @@ export function computeDerived(
       paramErrors: {},
       error: null,
       stale: false,
+      ...NO_QUOTE,
     };
   } catch (e) {
     return keep({ error: errorText(e) });
   }
+  return priceDerived(config, derived, pricing);
 }
 
 /** Slug delle tipologie registrate (per i selettori della UI). */

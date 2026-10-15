@@ -474,6 +474,8 @@ export const QUOTE_CATEGORIES = [
   "montaggio",
   "complicazioni",
   "trasporto",
+  /** Voci inserite a mano dall'ufficio nel preventivo definitivo (10.4): importi netti, senza margine. */
+  "manuali",
   "sconti",
   "margine",
   "adeguamenti",

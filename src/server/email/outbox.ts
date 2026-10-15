@@ -7,6 +7,7 @@ import { getEmailSender, type EmailMessage, type EmailSender } from "./sender";
 import { CustomerConfirmationSchema, customerConfirmationEmail } from "./templates/conferma-cliente";
 import { OfficeNotificationSchema, officeNotificationEmail } from "./templates/notifica-ufficio";
 import { ContactMessageSchema, contactMessageEmail } from "./templates/messaggio-contatti";
+import { FinalQuoteEmailSchema, finalQuoteEmail } from "./templates/preventivo-definitivo";
 
 /**
  * Outbox delle email (P7): la richiesta è salvata **prima**, poi le email sono accodate in
@@ -23,13 +24,14 @@ import { ContactMessageSchema, contactMessageEmail } from "./templates/messaggio
  * è saltata (niente doppio invio da due `flush` concorrenti).
  */
 
-export const OUTBOX_TEMPLATES = ["conferma-cliente", "notifica-ufficio", "messaggio-contatti"] as const;
+export const OUTBOX_TEMPLATES = ["conferma-cliente", "notifica-ufficio", "messaggio-contatti", "preventivo-definitivo"] as const;
 export type OutboxTemplate = (typeof OUTBOX_TEMPLATES)[number];
 
 const PAYLOAD_SCHEMAS = {
   "conferma-cliente": CustomerConfirmationSchema,
   "notifica-ufficio": OfficeNotificationSchema,
   "messaggio-contatti": ContactMessageSchema,
+  "preventivo-definitivo": FinalQuoteEmailSchema,
 } as const satisfies Record<OutboxTemplate, z.ZodTypeAny>;
 
 export type OutboxPayload<T extends OutboxTemplate> = z.input<(typeof PAYLOAD_SCHEMAS)[T]>;
@@ -111,6 +113,12 @@ export async function renderEntry(row: Pick<EmailOutboxRow, "template" | "to" | 
       const data = ContactMessageSchema.safeParse(row.payload);
       if (!data.success) throw new OutboxPayloadError("dati dell'email non validi o rimossi");
       return contactMessageEmail(row.to, data.data);
+    }
+    case "preventivo-definitivo": {
+      const data = FinalQuoteEmailSchema.safeParse(row.payload);
+      if (!data.success) throw new OutboxPayloadError("dati dell'email non validi o rimossi");
+      const pdfForLead = deps.pdfForLead ?? defaultPdfForLead ?? (await import("@/server/quotes/lead-pdf")).pdfForLead;
+      return finalQuoteEmail(row.to, data.data, await pdfForLead(data.data.leadId));
     }
     default:
       throw new OutboxPayloadError(`template sconosciuto: ${row.template}`);

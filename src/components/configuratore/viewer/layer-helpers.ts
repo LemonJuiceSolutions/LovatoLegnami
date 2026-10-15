@@ -1,4 +1,4 @@
-import { absoluteObstacles, floorFunction, type Envelope, type ObstacleType } from "@/domain"
+import { absoluteObstacles, floorFunction, planOf, sideSegment, type Envelope, type ObstacleType } from "@/domain"
 
 /**
  * Dati dei livelli ingombro, ostacoli e pavimento (funzioni pure, senza Three):
@@ -112,4 +112,35 @@ export function floorGrid(envelope: Pick<Envelope, "box" | "floor">, divisions =
       { x: L, y: P, z: c.backRight, name: "Posteriore destro" },
     ],
   }
+}
+
+export interface EnvelopeOutline {
+  /** Spigoli del prisma della pianta (coppie di vertici x, y, z): base, sommità e montanti. */
+  readonly edges: Float32Array
+  /** Piano del muro: quadrilatero verticale sul lato `wallSide` (4 vertici, antiorario). */
+  readonly wall: Float32Array
+  /** `true` se l'ingombro dichiara una pianta fuori squadra. */
+  readonly planned: boolean
+}
+
+/**
+ * Ingombro come prisma della pianta reale (10.3): con `envelope.plan` il quadrilatero
+ * fuori squadra estruso fino all'altezza del box, altrimenti il box (stessi spigoli del
+ * wireframe di prima); più il piano del muro sul lato `wallSide`.
+ */
+export function envelopeOutline(envelope: Envelope): EnvelopeOutline {
+  const plan = planOf(envelope)
+  const h = envelope.box.height
+  const c = plan.corners
+  const segs: number[] = []
+  for (let i = 0; i < 4; i++) {
+    const a = c[i]
+    const b = c[(i + 1) % 4]
+    segs.push(a.x, a.y, 0, b.x, b.y, 0) // base
+    segs.push(a.x, a.y, h, b.x, b.y, h) // sommità
+    segs.push(a.x, a.y, 0, a.x, a.y, h) // montante
+  }
+  const s = sideSegment(plan, envelope.wallSide)
+  const wall = [s.start.x, s.start.y, 0, s.end.x, s.end.y, 0, s.end.x, s.end.y, h, s.start.x, s.start.y, h]
+  return { edges: new Float32Array(segs), wall: new Float32Array(wall), planned: Boolean(envelope.plan) }
 }

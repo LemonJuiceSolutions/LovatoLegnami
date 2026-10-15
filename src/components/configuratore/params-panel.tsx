@@ -5,8 +5,8 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { ParamFields, StaleNotice } from "./param-form"
 import { TypologyChooser } from "./typology-picker"
 
-/** Contenuto del pannello parametri: sezioni richiudibili (tipologia, sezioni, ingombro). */
-export function ParamsPanel({ envelope }: { envelope?: React.ReactNode }) {
+/** Contenuto del pannello parametri: sezioni richiudibili (tipologia, sezioni, ingombro, opzioni commerciali). */
+export function ParamsPanel({ envelope, commercial }: { envelope?: React.ReactNode; commercial?: React.ReactNode }) {
   return (
     <div className="space-y-3">
       <StaleNotice />
@@ -24,6 +24,12 @@ export function ParamsPanel({ envelope }: { envelope?: React.ReactNode }) {
             <ParamFields part="sections" />
           </AccordionContent>
         </AccordionItem>
+        {commercial && (
+          <AccordionItem value="commerciale">
+            <AccordionTrigger className="py-3 text-sm">Opzioni commerciali</AccordionTrigger>
+            <AccordionContent className="px-1">{commercial}</AccordionContent>
+          </AccordionItem>
+        )}
         {envelope && (
           <AccordionItem value="ingombro" className="border-b-0">
             <AccordionTrigger className="py-3 text-sm">Ingombro del cliente</AccordionTrigger>

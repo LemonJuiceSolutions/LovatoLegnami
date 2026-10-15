@@ -1,5 +1,7 @@
 import { z } from "zod";
 import {
+  ACCESS_LEVELS,
+  ANCHORING_KINDS,
   EnvelopeSchema,
   TypologyNotFoundError,
   ValidationError,
@@ -27,6 +29,25 @@ export const SUPPORTED_SCHEMA_VERSIONS: readonly number[] = [CONFIG_SCHEMA_VERSI
 /** Migrazioni `n → n+1` sui dati grezzi (nessuna finché lo schema è alla versione 1). */
 const MIGRATIONS: Readonly<Record<number, (data: Record<string, unknown>) => Record<string, unknown>>> = {};
 
+const catalogId = z.string().regex(/^[a-z0-9]+(-[a-z0-9]+)*$/, "identificativo non valido").max(64);
+
+/**
+ * Opzioni commerciali nel file (10.1, `ConfiguratoreConfig.commercial`): facoltative e
+ * additive, quindi `schemaVersion` resta 1. Le voci sono id del listino (specie, qualità,
+ * trattamento, copertura); l'esistenza nel listino attivo la verifica il motore di prezzo.
+ */
+export const CommercialSchema = z
+  .object({
+    species: catalogId.default("abete"),
+    quality: catalogId.default("lamellare"),
+    treatment: catalogId.nullable().default(null),
+    covering: catalogId.nullable().default(null),
+    access: z.enum(ACCESS_LEVELS).default("facile"),
+    anchoring: z.enum(ANCHORING_KINDS).optional(),
+    cap: z.string().regex(/^\d{5}$/, "CAP non valido (5 cifre)").optional(),
+  })
+  .strict();
+
 export const ConfigFileSchema = z
   .object({
     schemaVersion: z.literal(CONFIG_SCHEMA_VERSION),
@@ -35,6 +56,7 @@ export const ConfigFileSchema = z
     envelope: EnvelopeSchema,
     embedment: z.number().finite().nonnegative("deve essere maggiore o uguale a 0").default(0),
     exportOptions: z.object({ sat: SatExportOptionsSchema.default({}) }).strict().default({}),
+    commercial: CommercialSchema.optional(),
   })
   .strict();
 
@@ -57,6 +79,7 @@ export function serializeConfig(config: ConfiguratoreConfig): string {
     envelope: config.envelope,
     embedment: config.embedment,
     exportOptions: config.exportOptions,
+    ...(config.commercial ? { commercial: config.commercial } : {}),
   };
   return `${JSON.stringify(file, null, 2)}\n`;
 }
@@ -132,5 +155,6 @@ export function parseConfigFile(input: string | unknown, options: ParseConfigOpt
     envelope: file.envelope as Envelope,
     embedment: file.embedment,
     exportOptions: file.exportOptions,
+    ...(file.commercial ? { commercial: file.commercial } : {}),
   };
 }

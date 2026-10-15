@@ -18,7 +18,9 @@ import {
 } from "@/domain"
 import type { ActionResult } from "@/stores/configuratore-store"
 import { useConfiguratore } from "@/stores/use-configuratore"
+import { SiteDeclaredFields } from "@/components/preventivo/commercial-form"
 import { NumberField } from "./fields"
+import { PlanSection } from "./plan-form"
 
 /**
  * Form dell'ingombro del cliente (spec `configuratore-ui` e `ingombro-cliente`):
@@ -243,8 +245,8 @@ export function EnvelopeForm() {
       <div className="space-y-3">
         <SectionTitle>Box d&apos;ingombro</SectionTitle>
         <div className="grid grid-cols-2 gap-3">
-          <NumberField id="env-width" label="Larghezza (fronte)" unit="mm" value={box.width} error={errors.width} onValueChange={(width) => run("width", setBox({ width }))} />
-          <NumberField id="env-depth" label="Profondità" unit="mm" value={box.depth} error={errors.depth} onValueChange={(depth) => run("depth", setBox({ depth }))} />
+          <NumberField id="env-width" label="Larghezza (fronte)" unit="mm" value={envelope.plan ? Math.round(box.width) : box.width} error={errors.width} disabled={Boolean(envelope.plan)} hint={envelope.plan ? "Dalla pianta" : undefined} onValueChange={(width) => run("width", setBox({ width }))} />
+          <NumberField id="env-depth" label="Profondità" unit="mm" value={envelope.plan ? Math.round(box.depth) : box.depth} error={errors.depth} disabled={Boolean(envelope.plan)} hint={envelope.plan ? "Dalla pianta" : undefined} onValueChange={(depth) => run("depth", setBox({ depth }))} />
           <NumberField id="env-height" label="Altezza" unit="mm" value={box.height} error={errors.height} onValueChange={(height) => run("height", setBox({ height }))} />
           <SmallSelect<WallSide>
             id="env-wall"
@@ -268,6 +270,13 @@ export function EnvelopeForm() {
       <Separator />
 
       <div className="space-y-3">
+        <SectionTitle>Pianta</SectionTitle>
+        <PlanSection />
+      </div>
+
+      <Separator />
+
+      <div className="space-y-3">
         <div className="flex items-center justify-between gap-2">
           <SectionTitle>Ostacoli</SectionTitle>
           <Button variant="outline" size="sm" className="h-8" onClick={addGutter}>
@@ -281,6 +290,13 @@ export function EnvelopeForm() {
         ) : (
           envelope.obstacles.map((o) => <ObstacleEditor key={o.id} obstacle={o} />)
         )}
+      </div>
+
+      <Separator />
+
+      <div className="space-y-3">
+        <SectionTitle>Cantiere</SectionTitle>
+        <SiteDeclaredFields />
       </div>
 
       <Separator />

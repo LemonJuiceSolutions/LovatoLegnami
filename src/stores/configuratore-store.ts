@@ -1,7 +1,6 @@
 import { createJSONStorage, persist, type StateStorage } from "zustand/middleware";
 import { createStore, type Mutate, type StoreApi } from "zustand/vanilla";
 import {
-  DEFAULT_LOVATO_RULES,
   ObstacleSchema,
   ValidationError,
   issuesFromZod,
@@ -12,19 +11,23 @@ import {
   type RuleSet,
   type ValidationIssue,
 } from "@/domain";
+import { DEFAULT_CATALOG, catalogFromResponse, fallbackCatalog, fetchActiveDatasets, pricingOf, type CatalogState } from "./catalog";
 import { SatExportOptionsSchema, type SatExportOptions } from "@/export/sat/options";
 import type { PieceResult } from "@/geometry/protocol";
 import {
   EMPTY_DERIVED,
+  commercialOf,
   compatibleCarryOver,
   computeDerived,
   defaultConfig,
   hiddenParamNames,
   presetConfig,
+  priceDerived,
+  type CommercialOptions,
   type ConfiguratoreConfig,
   type Derived,
 } from "./config";
-import { parseConfigFile } from "./config-file";
+import { CommercialSchema, parseConfigFile } from "./config-file";
 import {
   INITIAL_KERNEL_STATE,
   kernelSlice,
@@ -94,12 +97,23 @@ export interface ConfiguratoreActions {
   resetConfig(typology?: string): void;
   /** Seleziona i pezzi (pannello esiti, viewer); `[]` annulla la selezione. */
   selectPieces(ids: readonly string[]): void;
+  /** Opzioni commerciali e cantiere dichiarato (ricalcola solo il preventivo). */
+  setCommercial(patch: Partial<CommercialOptions>): ActionResult;
+  /**
+   * Carica listino e regole attivi dall'archivio (`GET /api/admin/dataset/attivi`); in
+   * caso di errore resta sui dati di default con `catalog.error`. Non lancia mai.
+   */
+  loadCatalog(fetcher?: () => Promise<unknown>): Promise<CatalogState>;
+  /** Sostituisce il catalogo (test, simulatore) e ricalcola assieme, regole e preventivo. */
+  setCatalog(catalog: CatalogState): void;
 }
 
 export interface ConfiguratoreState extends ConfiguratoreActions, KernelActions {
   readonly config: ConfiguratoreConfig;
   readonly derived: Derived;
   readonly kernel: KernelState;
+  /** Listino e regole in uso (archivio o default, non persistiti). */
+  readonly catalog: CatalogState;
   /** Id dei pezzi selezionati (stato di interfaccia, non persistito). */
   readonly selection: readonly string[];
 }
@@ -109,9 +123,21 @@ export type ConfiguratoreStore = StoreApi<ConfiguratoreState>;
 export interface ConfiguratoreStoreOptions extends KernelSliceOptions {
   /** Configurazione iniziale (default `defaultConfig()`). */
   readonly initialConfig?: ConfiguratoreConfig;
-  /** Regole costruttive (default `DEFAULT_LOVATO_RULES`). */
+  /** Regole costruttive iniziali (default `DEFAULT_LOVATO_RULES`; sostituite da `loadCatalog`). */
   readonly ruleSet?: RuleSet;
+  /** Catalogo iniziale (default: dati di default, origine `default`). */
+  readonly catalog?: CatalogState;
 }
+
+/** Catalogo iniziale dalle opzioni dello store. */
+function initialCatalog(options: ConfiguratoreStoreOptions): CatalogState {
+  const base = options.catalog ?? DEFAULT_CATALOG;
+  return options.ruleSet ? { ...base, ruleSet: options.ruleSet } : base;
+}
+
+/** Assieme, regole e preventivo della configurazione con il catalogo. */
+const deriveWith = (config: ConfiguratoreConfig, previous: Derived, catalog: CatalogState): Derived =>
+  computeDerived(config, previous, catalog.ruleSet, pricingOf(catalog));
 
 const OK: ActionResult = { ok: true };
 const NO_SELECTION: readonly string[] = [];
@@ -147,7 +173,8 @@ function nextObstacleId(envelope: Envelope): string {
 
 /** Stato e azioni del configuratore (riusato con o senza `persist`). */
 export function configuratoreSlice(options: ConfiguratoreStoreOptions = {}) {
-  const ruleSet = options.ruleSet ?? DEFAULT_LOVATO_RULES;
+  const catalog0 = initialCatalog(options);
+  let pendingCatalog: Promise<CatalogState> | undefined;
   return (
     set: StoreApi<ConfiguratoreState>["setState"],
     get: StoreApi<ConfiguratoreState>["getState"],
@@ -168,10 +195,12 @@ export function configuratoreSlice(options: ConfiguratoreStoreOptions = {}) {
         config.envelope === prev.envelope &&
         config.embedment === prev.embedment;
       if (sameGeometry) {
-        set({ config });
+        // Solo opzioni commerciali cambiate: stesso assieme, nuovo preventivo.
+        if (config.commercial !== prev.commercial) set({ config, derived: priceDerived(config, get().derived, pricingOf(get().catalog)) });
+        else set({ config });
         return;
       }
-      const derived = computeDerived(config, get().derived, ruleSet);
+      const derived = deriveWith(config, get().derived, get().catalog);
       set({ config, derived, selection: pruneSelection(get().selection, derived) });
     };
 
@@ -189,8 +218,9 @@ export function configuratoreSlice(options: ConfiguratoreStoreOptions = {}) {
     const initialConfig = options.initialConfig ?? defaultConfig();
     return {
       config: initialConfig,
-      derived: computeDerived(initialConfig, EMPTY_DERIVED, ruleSet),
+      derived: deriveWith(initialConfig, EMPTY_DERIVED, catalog0),
       kernel: INITIAL_KERNEL_STATE,
+      catalog: catalog0,
       selection: NO_SELECTION,
       ...kernel,
 
@@ -287,6 +317,36 @@ export function configuratoreSlice(options: ConfiguratoreStoreOptions = {}) {
         if (ids.length === current.length && ids.every((id, i) => id === current[i])) return;
         set({ selection: ids.length === 0 ? NO_SELECTION : [...ids] });
       },
+      setCommercial(patch) {
+        const parsed = CommercialSchema.safeParse({ ...commercialOf(get().config), ...patch });
+        if (!parsed.success)
+          return failure(new ValidationError("opzioni commerciali non valide", issuesFromZod(parsed.error).map((i) => ({ ...i, path: `commercial.${i.path}` }))));
+        const commercial: CommercialOptions = parsed.data;
+        update({ commercial });
+        return OK;
+      },
+      setCatalog(catalog) {
+        const { config } = get();
+        const derived = deriveWith(config, get().derived, catalog);
+        set({ catalog, derived, selection: pruneSelection(get().selection, derived) });
+      },
+      loadCatalog(fetcher = fetchActiveDatasets) {
+        if (pendingCatalog) return pendingCatalog;
+        set({ catalog: { ...get().catalog, loading: true } });
+        pendingCatalog = (async () => {
+          let next: CatalogState;
+          try {
+            next = catalogFromResponse(await fetcher());
+          } catch {
+            next = fallbackCatalog();
+          }
+          get().setCatalog(next);
+          return next;
+        })().finally(() => {
+          pendingCatalog = undefined;
+        });
+        return pendingCatalog;
+      },
     };
   };
 }
@@ -316,7 +376,6 @@ export type PersistentConfiguratoreStore = Mutate<ConfiguratoreStore, [["zustand
  * (errore inline come prima del ricaricamento); `derived` è ricalcolato.
  */
 export function createPersistentConfiguratoreStore(options: PersistentStoreOptions = {}): PersistentConfiguratoreStore {
-  const ruleSet = options.ruleSet ?? DEFAULT_LOVATO_RULES;
   return createStore<ConfiguratoreState>()(
     persist(configuratoreSlice(options), {
       name: STORAGE_KEY,
@@ -329,7 +388,7 @@ export function createPersistentConfiguratoreStore(options: PersistentStoreOptio
         if (saved === undefined) return current;
         try {
           const config = parseConfigFile(saved, { keepInvalidParams: true });
-          return { ...current, config, derived: computeDerived(config, current.derived, ruleSet) };
+          return { ...current, config, derived: deriveWith(config, current.derived, current.catalog) };
         } catch {
           return current;
         }
