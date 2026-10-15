@@ -2,6 +2,7 @@ import { z } from "zod";
 import { ValidationError, formatPath, type ValidationIssue } from "../components/errors";
 import { parseSectionLabel, sectionLabel } from "../components/sections";
 import { HARDWARE_KINDS, JOINT_TYPES, MACHINING_TYPES, PIECE_FAMILIES, PIECE_TYPES } from "../components/types";
+import type { AssemblyCutPlan } from "./assembly-cuts";
 import type { Cents } from "./money";
 
 /**
@@ -498,6 +499,8 @@ export const WARNING_CODES = [
   "zona-da-verificare",
   "non-ricavabile",
   "lunghezze-mancanti",
+  /** Aliquota IVA o sconto delle opzioni non presenti nel listino (gruppo 4). */
+  "opzione-sconosciuta",
 ] as const;
 export type PricingWarningCode = (typeof WARNING_CODES)[number];
 
@@ -511,9 +514,13 @@ export interface PricingWarning {
 }
 
 export interface QuoteTotals {
+  /** Somma delle righe di costo (prima di margini e sconti). */
   readonly costCents: Cents;
   readonly marginCents: Cents;
+  /** Somma degli sconti (≤ 0). */
   readonly discountCents: Cents;
+  /** Adeguamento al minimo d'ordine (≥ 0). */
+  readonly minimumAdjustmentCents: Cents;
   readonly taxableCents: Cents;
   readonly vatPct: number;
   readonly vatCents: Cents;
@@ -524,14 +531,20 @@ export interface QuoteTotals {
 
 export interface Quote {
   readonly status: "completo" | "incompleto";
+  /** Tipologia dell'assieme preventivato (se nota). */
+  readonly typologySlug?: string;
   readonly priceListVersion: PriceListVersion;
   readonly ruleSetVersion?: string;
   readonly options: PricingOptions;
+  /** Righe nell'ordine delle fasi: costi, margini, sconti, minimo, IVA, arrotondamento. */
   readonly lines: readonly QuoteLine[];
+  /** Righe raggruppate per categoria, nell'ordine di `QUOTE_CATEGORIES`. */
   readonly groups: readonly QuoteGroup[];
   readonly totals: QuoteTotals;
   readonly warnings: readonly PricingWarning[];
-  readonly siteFactors?: SiteFactors;
+  readonly siteFactors: SiteFactors;
   /** Id delle regole di complicazione scattate, in ordine. */
   readonly firedRules: readonly string[];
+  /** Piano di taglio del legno (vista ufficio). */
+  readonly cutPlan: AssemblyCutPlan;
 }
