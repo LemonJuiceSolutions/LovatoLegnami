@@ -1,6 +1,4 @@
 import {
-  evaluateRules,
-  generate,
   listTypologies,
   MVP_VISIBLE_TYPOLOGIES,
   PRESET_CATALOG,
@@ -11,6 +9,8 @@ import {
   type TypologySettings,
 } from "@/domain";
 import { assemblyFromConfig } from "@/server/quotes/generate";
+import { preparePublicAssembly } from "@/server/quotes/pipeline";
+import { startingPriceConfig } from "@/server/quotes/starting-price";
 import { presetAssemblyConfig } from "./preset-config";
 
 /**
@@ -33,18 +33,34 @@ export const visibleTypologies = (settings: TypologySettings | null | undefined)
   settings ? settings.filter((t) => t.visible).map((t) => t.slug) : [...MVP_VISIBLE_TYPOLOGIES];
 
 /**
- * Regole: ogni tipologia registrata generata con i parametri di default e valutata con il
- * set in bozza. Errore di generazione o violazione bloccante su una tipologia **visibile**
- * ⇒ rifiuto "tipologie non generabili: …"; sulle altre è solo un avviso.
+ * Regole: ogni tipologia registrata nella configurazione che il cliente vede per prima
+ * (preset di riferimento delle impostazioni, altrimenti il primo preset della tipologia,
+ * altrimenti i default) passata **dallo stesso flusso del wizard e della stima pubblica**
+ * (`preparePublicAssembly`: adattamento all'ingombro e auto-dimensionamento) e valutata
+ * con il set in bozza. Errore di generazione o violazione bloccante **residua** su una
+ * tipologia **visibile** ⇒ rifiuto "tipologie non generabili: …"; sulle altre è un avviso.
+ *
+ * Correzione C del gruppo 12: la prova generava i soli default **senza** auto-dimensionare,
+ * quindi un interasse massimo più stretto (es. 700 mm) era rifiutato perché la bifalda di
+ * default ne ha uno maggiore, mentre il wizard e la stima lo correggono da soli
+ * ricalcolando il numero di travetti. Ora è bloccante solo ciò che il cliente non potrebbe
+ * comunque ottenere (regole che l'auto-dimensionamento non risolve, parametri impossibili).
  */
-export function checkRuleSet(ruleSet: RuleSet, visible: readonly string[]): PublishCheck {
+export function checkRuleSet(
+  ruleSet: RuleSet,
+  visible: readonly string[],
+  presets: readonly Preset[] = PRESET_CATALOG,
+  settings: TypologySettings | null = null,
+): PublishCheck {
   const broken: string[] = [];
   const hidden: string[] = [];
   for (const { slug } of listTypologies()) {
     let failed = false;
     try {
-      const assembly = generate(slug);
-      failed = !evaluateRules(assembly, ruleSet).valid;
+      const refId = settings?.find((t) => t.slug === slug)?.referencePresetId;
+      const preset = (refId ? presets.find((p) => p.id === refId) : undefined) ?? presets.find((p) => p.typologySlug === slug);
+      const prepared = preparePublicAssembly(startingPriceConfig(slug, preset), ruleSet);
+      failed = prepared.violations.some((v) => v.severity === "errore");
     } catch {
       failed = true;
     }
@@ -52,7 +68,7 @@ export function checkRuleSet(ruleSet: RuleSet, visible: readonly string[]): Publ
   }
   return {
     blocking: broken.length ? [`tipologie non generabili: ${broken.join(", ")}`] : [],
-    warnings: hidden.length ? [`tipologie non visibili sul sito che con i default violano le regole: ${hidden.join(", ")}`] : [],
+    warnings: hidden.length ? [`tipologie non visibili sul sito che con queste regole non sono realizzabili: ${hidden.join(", ")}`] : [],
   };
 }
 

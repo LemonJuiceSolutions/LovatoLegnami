@@ -59,6 +59,15 @@ describe("pubblicazione (9.4)", () => {
     expect(nextCache.revalidateTag).not.toHaveBeenCalled();
   });
 
+  it("interasse massimo 700 con la bifalda visibile ⇒ accettato: la prova auto-dimensiona come il wizard (correzione C)", async () => {
+    const stricter = rules.map((r) => ((r as { kind: string }).kind === "max-joist-spacing" ? { ...(r as object), max: 700 } : r));
+    expect((await saveDraftSection({ dataset: "regole", path: "rules", value: stricter, expectedUpdatedAt: null })).ok).toBe(true);
+    const preview = await getPublishPreview("regole");
+    expect(preview.ok && preview.data.blocking).toEqual([]);
+    const res = await publishDataset({ dataset: "regole", effectiveFrom: "2026-01-01", notes: "interasse 700", expectedUpdatedAt: await draftLock("regole") });
+    expect(res).toMatchObject({ ok: true, data: { version: 2 } });
+  });
+
   it("pubblicazione valida ⇒ nuova attiva, precedente archiviata, registro e cache invalidata", async () => {
     const lighter = rules.map((r) => ((r as { kind: string }).kind === "max-joist-spacing" ? { ...(r as object), max: 1000 } : r));
     expect((await saveDraftSection({ dataset: "regole", path: "rules", value: lighter, expectedUpdatedAt: null })).ok).toBe(true);

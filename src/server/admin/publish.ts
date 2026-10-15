@@ -12,8 +12,8 @@ import { checkPresets, checkPriceList, checkRuleSet, checkTypologySettings, pres
 export async function runPublishChecks(dataset: Dataset, doc: unknown): Promise<PublishCheck> {
   switch (dataset) {
     case "regole": {
-      const settings = (await getActive("tipologie"))?.data ?? null;
-      return checkRuleSet(doc as RuleSet, visibleTypologies(settings));
+      const [settings, presets] = await Promise.all([getActive("tipologie").then((v) => v?.data ?? null), getActive("preset").then((v) => v?.data)]);
+      return checkRuleSet(doc as RuleSet, visibleTypologies(settings), presetsOrCatalog(presets), settings);
     }
     case "listino":
       return checkPriceList(doc as PriceList, presetsOrCatalog((await getActive("preset"))?.data));
