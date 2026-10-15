@@ -50,7 +50,9 @@ const imposedSlope = (attacco: string): number | undefined => WALL_SLOPE[attacco
  * Con il muro reale (`ctx.wallPlane`, P4) sbalzo e quota d'attacco valgono nel
  * punto del muro più vicino (`realWall`): le mensole restano parallele (stessa
  * falda per i travetti) e arrivano al muro reale con la testa tagliata sul
- * suo piano (taglio composto), il piede delle saette scivola sul muro.
+ * suo piano (taglio composto), il piede delle saette scivola fino al muro (taglio
+ * a piombo parallelo al fronte, a contatto nel punto più vicino: i fori della
+ * staffa per listone restano paralleli alla faccia di testa).
  */
 function geometry(ctx: BuildContext) {
   const W = ctx.num("larghezza");
@@ -185,14 +187,17 @@ export const pensilinaSbalzo: TypologyTemplate = {
       mensole.forEach((m, i) => {
         const bottom = plane(applyToPoint(m.pose, vec3(0, 0, -sm.h / 2)), Z);
         const x = g.xs[i];
-        const yWall = wallY(x); // piede sul muro reale
+        // piede contro il muro reale ma tagliato a piombo parallelo al fronte, nel punto del muro più vicino
+        // sulla larghezza della saetta: un taglio composto attraverserebbe i fori della staffa per listone
+        const yWall = real ? Math.min(wallY(x - ss.b / 2), wallY(x + ss.b / 2)) : g.S;
+        const foot = real ? plane(vec3(0, yWall, 0), vec3(0, -1, 0)) : wall;
         const zUnder = g.H + (yWall - g.S) * t - run * t; // intradosso della mensola a `run` dal muro
         const F = vec3(x, yWall, zUnder - run);
         const T = intersectLinePlane(F, ax, bottom).point;
         const ref = `saetta-${i}`;
         steps.push(
           placeStep({ ref, type: "controvento", section: ss, length: norm(sub(T, F)) + ss.h, pose: fromBasis(sub(F, scale(ax, ss.h / 2)), ax, az) }),
-          headCutOnPlane(ref, wall, "testa-inizio"),
+          headCutOnPlane(ref, foot, "testa-inizio"),
           headCutOnPlane(ref, bottom, "testa-fine"),
           { kind: "hardware", code: footCode, pieces: [ref], anchor: "piede" },
           { kind: "hardware", code: BRACE_FOOT_SCREWS.code, pieces: [ref, m.ref], params: { count: BRACE_FOOT_SCREWS.count } },

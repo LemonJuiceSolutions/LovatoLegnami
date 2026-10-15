@@ -32,7 +32,8 @@ describe("addossata-monofalda con il muro reale", () => {
       if (p.type !== "travetto") return expect(p).toEqual(q);
       expect(p.length).toBeCloseTo(q.length + p.section.h * Math.tan(rad(15)), 6);
       expect(headFine(p).angle).toBeCloseTo(15, 9);
-      expect(headFine(p).angle2).toBeUndefined();
+      const footCut = p.machinings.find((m): m is TaglioTesta => m.type === "taglio-testa" && m.face === "testa-inizio")!;
+      expect(footCut.angle2).toBeUndefined();
     });
   });
 
@@ -125,9 +126,14 @@ describe("addossata-sandwich e pensilina con il muro reale", () => {
     }
     expect(ms.at(-1)!.length).toBeGreaterThan(ms[0].length);
     expect(behind(a, wall)).toBeGreaterThanOrEqual(-1e-3);
-    // piede delle saette sul muro reale
-    for (const p of a.pieces.filter((q) => q.type === "controvento"))
-      expect(Math.min(...pieceHullVertices(p).map((v) => signedDistance(wall, v)))).toBeCloseTo(0, 6);
+    // piede delle saette contro il muro reale: a contatto nel punto più vicino, scostamento ≤ b·tan 5°
+    for (const p of a.pieces.filter((q) => q.type === "controvento")) {
+      const d = Math.min(...pieceHullVertices(p).map((v) => signedDistance(wall, v)));
+      expect(d).toBeGreaterThanOrEqual(-1e-6);
+      expect(d).toBeLessThanOrEqual(p.section.b * Math.tan(rad(5)) + 1e-6);
+      const footCut = p.machinings.find((m): m is TaglioTesta => m.type === "taglio-testa" && m.face === "testa-inizio")!;
+      expect(footCut.angle2).toBeUndefined();
+    }
     expect(a.pieces.filter((p) => p.type === "travetto")).toEqual(base.pieces.filter((p) => p.type === "travetto"));
   });
 });
