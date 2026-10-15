@@ -20,3 +20,7 @@ public/occt/
 
 # Dati locali: PGlite di sviluppo e file caricati (P5, P7)
 .data/
+
+# Variabili di produzione dello stack Docker (generate sul server da gen-env.sh)
+deploy/hetzner/.env.production
+deploy/hetzner/.env.production.bak-*

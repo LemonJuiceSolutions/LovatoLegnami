@@ -1,0 +1,26 @@
+# Contesto del build Docker: solo i sorgenti. Dipendenze, build e dati si rifanno nell'immagine.
+.git
+.github
+.claude
+.playwright-mcp
+.vercel
+node_modules
+.next
+out
+.data
+public/occt
+coverage
+*.tsbuildinfo
+next-env.d.ts
+.DS_Store
+# segreti e variabili d'ambiente (mai nell'immagine)
+.env
+.env.*
+!.env.example
+deploy/hetzner/.env.production
+# cartelle di lavoro e appunti
+scratch
+scratchpad
+tmp
+openspec
+docs

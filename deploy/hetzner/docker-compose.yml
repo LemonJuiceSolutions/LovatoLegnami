@@ -1,0 +1,82 @@
+# Stack di Lovato Legnami su un host condiviso (Hetzner): docs/deploy.md, "Deploy su Hetzner".
+#
+#   docker compose -f deploy/hetzner/docker-compose.yml --env-file deploy/hetzner/.env.production up -d --build
+#
+# Host condiviso con altri container: l'app ascolta SOLO su 127.0.0.1:3310 (la espone Caddy
+# di sistema), il database non pubblica porte ed è su una rete interna senza uscita; rete,
+# volumi e limiti di memoria sono propri di questo progetto.
+name: lovato
+
+services:
+  lovato-app:
+    build:
+      context: ../..
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:?NEXT_PUBLIC_SITE_URL mancante (deploy/hetzner/.env.production)}
+        NEXT_PUBLIC_ANALYTICS: ${NEXT_PUBLIC_ANALYTICS:-0}
+    image: lovato-app:latest
+    container_name: lovato-app
+    env_file: .env.production
+    environment:
+      # 2 GB di limite al container: heap di Node sotto il limite, margine per buffer e PDF.
+      NODE_OPTIONS: --max-old-space-size=1536
+    ports:
+      - "127.0.0.1:3310:3000"
+    volumes:
+      # Foto dei clienti e immagini del sito (archivio su disco: senza BLOB_READ_WRITE_TOKEN).
+      - lovato-uploads:/app/.data/uploads
+    depends_on:
+      lovato-db:
+        condition: service_healthy
+    networks:
+      - lovato-internal
+      - lovato-edge
+    mem_limit: 2g
+    restart: unless-stopped
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
+
+  lovato-db:
+    image: postgres:16.10-bookworm
+    container_name: lovato-db
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-lovato}
+      POSTGRES_DB: ${POSTGRES_DB:-lovato}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD mancante (deploy/hetzner/.env.production)}
+    volumes:
+      - lovato-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\""]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+    networks:
+      - lovato-internal
+    mem_limit: 512m
+    shm_size: 128m
+    restart: unless-stopped
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
+
+networks:
+  # Solo app ↔ database, senza accesso all'esterno.
+  lovato-internal:
+    name: lovato-internal
+    internal: true
+  # Rete dell'app per la porta pubblicata su 127.0.0.1.
+  lovato-edge:
+    name: lovato-edge
+
+volumes:
+  lovato-uploads:
+    name: lovato-uploads
+  lovato-db-data:
+    name: lovato-db-data

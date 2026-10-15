@@ -1,0 +1,18 @@
+# >>> lovato-legnami (deploy/hetzner/Caddyfile.snippet) >>>
+# Da AGGIUNGERE in fondo al Caddyfile di sistema (deploy.sh lo fa una volta sola).
+# L'app ascolta solo su 127.0.0.1:3310. Caddy imposta X-Forwarded-For/Proto/Host e
+# l'app ha AUTH_TRUST_HOST=true: l'accesso con Auth.js funziona su entrambi gli host.
+
+lovato.91-98-45-4.sslip.io {
+	encode zstd gzip
+	reverse_proxy 127.0.0.1:3310
+}
+
+configuratore.91-98-45-4.sslip.io {
+	encode zstd gzip
+	# Solo la radice: / → /configuratore (302); tutto il resto passa all'app così com'è.
+	@radice path /
+	redir @radice /configuratore 302
+	reverse_proxy 127.0.0.1:3310
+}
+# <<< lovato-legnami <<<

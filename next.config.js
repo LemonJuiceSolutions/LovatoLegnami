@@ -17,8 +17,16 @@ const SECURITY_HEADERS = [
   { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
 ]
 
+/**
+ * Build per il container Docker (`deploy/hetzner/`): con `NEXT_OUTPUT=standalone` Next
+ * produce `.next/standalone/` (server Node minimo e solo i moduli tracciati). Su Vercel e in
+ * locale la variabile è assente e il build resta quello di sempre.
+ */
+const STANDALONE = process.env.NEXT_OUTPUT === "standalone"
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  ...(STANDALONE ? { output: "standalone" } : {}),
   env: {
     // Sempre definita al build (anche se assente: "0"), così la condizione di
     // `components/site/site-analytics.tsx` è costante e webpack elimina l'import di
@@ -31,6 +39,12 @@ const nextConfig = {
     // `@react-pdf/renderer` (PDF del preventivo, runtime Node) carica font AFM e moduli
     // ESM da node_modules: impacchettato da webpack perderebbe i file dei font standard.
     serverComponentsExternalPackages: ["@electric-sql/pglite", "pg", "@react-pdf/renderer"],
+    // pdfkit (sotto `@react-pdf/renderer`) carica i font standard (Helvetica…) con import
+    // dinamici `#standard-fonts/*` e il profilo ICC con `fs`: il tracciamento dei file non li
+    // vede. Senza, `.next/standalone` (e le funzioni serverless) non genererebbero il PDF.
+    outputFileTracingIncludes: {
+      "/**": ["./node_modules/pdfkit/js/standard-fonts/**", "./node_modules/pdfkit/js/data/**"],
+    },
   },
   async headers() {
     return [

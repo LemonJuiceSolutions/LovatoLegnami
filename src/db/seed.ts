@@ -82,8 +82,9 @@ async function main() {
   await closeDb();
 }
 
-// Eseguito come script (`tsx src/db/seed.ts`), non quando importato dai test.
-if (process.argv[1] && /[\\/]src[\\/]db[\\/]seed\.ts$/.test(process.argv[1])) {
+// Eseguito come script (`tsx src/db/seed.ts`, o `node tools/seed.cjs` nell'immagine Docker),
+// non quando importato dai test.
+if (process.argv[1] && /[\\/](src[\\/]db[\\/]seed\.ts|tools[\\/]seed\.cjs)$/.test(process.argv[1])) {
   main().catch((e) => {
     console.error("[db:seed] errore:", e instanceof Error ? e.message : e);
     process.exit(1);
