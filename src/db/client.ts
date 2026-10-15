@@ -72,19 +72,27 @@ export async function migrate(handle: DbHandle): Promise<void> {
   }
 }
 
-let current: Promise<DbHandle> | undefined;
+/**
+ * Connessione condivisa su `globalThis`: Next (in sviluppo e nel bundle delle server
+ * action) può caricare questo modulo in più grafi dello stesso processo; con PGlite su disco
+ * due istanze sulla stessa cartella non vedono le scritture l'una dell'altra (salvataggio
+ * da una server action invisibile alla pagina fino al riavvio). Una sola istanza per processo.
+ */
+const GLOBAL_KEY = Symbol.for("lovato.db.handle");
+type Holder = { [GLOBAL_KEY]?: Promise<DbHandle> };
+const holder = globalThis as Holder;
 
 /** Connessione del processo (aperta alla prima chiamata, secondo `getEnv()`). */
 export function getDbHandle(): Promise<DbHandle> {
-  if (!current) {
+  if (!holder[GLOBAL_KEY]) {
     const opening = openDb({ databaseUrl: getEnv().databaseUrl });
     // Un'apertura fallita non resta in cache: la chiamata successiva riprova.
     opening.catch(() => {
-      if (current === opening) current = undefined;
+      if (holder[GLOBAL_KEY] === opening) holder[GLOBAL_KEY] = undefined;
     });
-    current = opening;
+    holder[GLOBAL_KEY] = opening;
   }
-  return current;
+  return holder[GLOBAL_KEY];
 }
 
 export async function getDb(): Promise<Db> {
@@ -93,7 +101,7 @@ export async function getDb(): Promise<Db> {
 
 /** Chiude e dimentica la connessione del processo (test e script). */
 export async function closeDb(): Promise<void> {
-  const handle = current;
-  current = undefined;
+  const handle = holder[GLOBAL_KEY];
+  holder[GLOBAL_KEY] = undefined;
   if (handle) await (await handle).close();
 }
