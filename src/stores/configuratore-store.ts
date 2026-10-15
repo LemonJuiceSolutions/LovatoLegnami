@@ -16,7 +16,7 @@ import { SatExportOptionsSchema, type SatExportOptions } from "@/export/sat/opti
 import type { PieceResult } from "@/geometry/protocol";
 import {
   EMPTY_DERIVED,
-  carryOverParams,
+  compatibleCarryOver,
   computeDerived,
   defaultConfig,
   hiddenParamNames,
@@ -67,7 +67,7 @@ export interface FloorPatch {
 }
 
 export interface ConfiguratoreActions {
-  /** Cambia tipologia mantenendo i parametri comuni compatibili (es. `larghezza`). */
+  /** Cambia tipologia mantenendo i parametri comuni compatibili (es. `larghezza`) con cui l'assieme si genera. */
   setTypology(slug: string): ActionResult;
   setParam(name: string, value: ParamValue): void;
   /** Più parametri insieme (es. proposte di auto-dimensionamento o adattamento). */
@@ -177,7 +177,7 @@ export function configuratoreSlice(options: ConfiguratoreStoreOptions = {}) {
 
       setTypology(slug) {
         try {
-          update({ typology: slug, params: carryOverParams(get().config.params, slug) });
+          update({ typology: slug, params: compatibleCarryOver(get().config.params, slug) });
           set({ selection: NO_SELECTION });
           return OK;
         } catch (e) {

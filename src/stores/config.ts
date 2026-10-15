@@ -206,6 +206,40 @@ export function carryOverParams(
   return out;
 }
 
+const generates = (typology: string, params: Readonly<Record<string, ParamValue>>): boolean => {
+  try {
+    generate(typology, params);
+    return true;
+  } catch {
+    return false;
+  }
+};
+
+/**
+ * Come `carryOverParams`, ma garantisce che l'assieme si generi: i parametri
+ * comuni ammessi uno per uno possono essere incompatibili tra loro con i
+ * default della nuova tipologia (es. la larghezza di un'addossata è troppo
+ * stretta per i pilastri del carport, la profondità rende rettangolare la
+ * base del gazebo con cuspide). Se l'insieme non genera, i parametri sono
+ * riportati uno alla volta, nell'ordine, tenendo solo quelli con cui
+ * l'assieme resta generabile; se nemmeno i default generano, restano i default.
+ */
+export function compatibleCarryOver(
+  params: Readonly<Record<string, ParamValue>>,
+  typology: string,
+): Record<string, ParamValue> {
+  const all = carryOverParams(params, typology);
+  if (generates(typology, all)) return all;
+  const defaults = carryOverParams({}, typology);
+  const out: Record<string, ParamValue> = { ...defaults };
+  for (const [name, value] of Object.entries(all)) {
+    if (value === defaults[name]) continue;
+    const next = { ...out, [name]: value };
+    if (generates(typology, next)) out[name] = value;
+  }
+  return out;
+}
+
 /** Errori dei singoli parametri rispetto al template (messaggio con l'intervallo ammesso). */
 export function paramErrorsOf(
   template: TypologyTemplate,

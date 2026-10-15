@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { getTypology } from "@/domain";
+import { getTypology, listTypologies } from "@/domain";
 import {
   createConfiguratoreStore,
   selectErrors,
@@ -171,3 +171,27 @@ describe("store configuratore – selezione dei pezzi", () => {
     expect(store.getState().selection).toEqual([]);
   });
 });
+
+describe("setTypology tra tutte le tipologie", () => {
+  it("l'assieme si genera sempre (parametri comuni incompatibili tornano al default)", () => {
+    const slugs = listTypologies().map((t) => t.slug)
+    for (const from of slugs)
+      for (const to of slugs) {
+        const store = createConfiguratoreStore()
+        store.getState().resetConfig(from)
+        expect(store.getState().setTypology(to).ok).toBe(true)
+        const { derived, config } = store.getState()
+        expect(derived.error, `${from} → ${to}`).toBeNull()
+        expect(derived.assembly?.typologySlug, `${from} → ${to}`).toBe(to)
+        expect(config.typology).toBe(to)
+      }
+  })
+
+  it("conserva i comuni compatibili (larghezza da addossata a portale)", () => {
+    const store = createConfiguratoreStore()
+    store.getState().resetConfig("addossata-monofalda")
+    store.getState().setParam("larghezza", 4200)
+    store.getState().setTypology("portale-sandwich")
+    expect(store.getState().config.params.larghezza).toBe(4200)
+  })
+})

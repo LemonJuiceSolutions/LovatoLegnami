@@ -75,11 +75,23 @@ describe("store – parametri enum e cambio tipologia", () => {
   it("costruzione compatibile conservata al cambio tipologia", () => {
     const store = createConfiguratoreStore({ initialConfig: defaultConfig("portale-sandwich") });
     store.getState().setParam("costruzione", "carpenteria");
-    expect(store.getState().setTypology("addossata-sandwich")).toEqual({ ok: true });
+    expect(store.getState().setTypology("gazebo-padiglione")).toEqual({ ok: true });
     expect(store.getState().config.params.costruzione).toBe("carpenteria");
+    expect(store.getState().derived.error).toBeNull();
     expect(store.getState().derived.assembly?.params.costruzione).toBe("carpenteria");
-    store.getState().setTypology("gazebo-padiglione");
+    store.getState().setTypology("monofalda-scalare");
     expect(store.getState().config.params.costruzione).toBe("carpenteria");
+    expect(store.getState().derived.assembly?.typologySlug).toBe("monofalda-scalare");
+  });
+
+  it("costruzione incompatibile con i default della nuova tipologia → default (l'assieme si genera)", () => {
+    // addossata sandwich: attacco di default a listoni paralleli, che richiede la costruzione bullonata
+    const store = createConfiguratoreStore({ initialConfig: defaultConfig("portale-sandwich") });
+    store.getState().setParam("costruzione", "carpenteria");
+    expect(store.getState().setTypology("addossata-sandwich")).toEqual({ ok: true });
+    expect(store.getState().config.params.costruzione).toBe("bullonata");
+    expect(store.getState().derived.error).toBeNull();
+    expect(store.getState().derived.assembly?.typologySlug).toBe("addossata-sandwich");
   });
 
   it("enum con valore non tra le opzioni della nuova tipologia → default", () => {
