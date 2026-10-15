@@ -129,6 +129,22 @@ describe("gazebo-padiglione", () => {
     expect(errors(eight)).toEqual([]);
   });
 
+  it.each(["4", "6", "8"])("%s lati con monaco e gli altri default: genera (sezione del monaco di default sufficiente)", (lati) => {
+    for (const params of [
+      { lati, costruzione: "carpenteria" },
+      { lati, costruzione: "bullonata", punta: "monaco" },
+      { lati, costruzione: "carpenteria", larghezza: 2000 },
+      { lati, costruzione: "carpenteria", larghezza: 6000 },
+    ]) {
+      const a = generate(SLUG, params);
+      expect(ofType(a, "monaco").length, JSON.stringify(params)).toBeGreaterThan(0);
+    }
+    // solo con le dimensioni di default: le luci (cantonali 70×70, larghezza 6000) non c'entrano col monaco
+    expect(errors(generate(SLUG, { lati, costruzione: "carpenteria" }))).toEqual([]);
+    // monaco esplicitamente stretto: errore che cita sezioneMonaco
+    if (lati === "6") expect(() => generate(SLUG, { lati, costruzione: "carpenteria", sezioneMonaco: "250×250" })).toThrow(/sezioneMonaco/);
+  });
+
   it("8 falde su base quadrata: cantonali e puntoni intermedi a pendenza piena", () => {
     const a = generate(SLUG, { falde: "doppie" });
     expect(ofType(a, "cantonale")).toHaveLength(4);

@@ -451,11 +451,12 @@ export const PRESET_CATALOG: readonly Preset[] = [
     id: "gazebo-ottagonale-4000",
     name: "Gazebo ottagonale Ø4000",
     typologySlug: "gazebo-padiglione",
-    params: { lati: "8", larghezza: 4000, costruzione: "carpenteria", punta: "monaco", pendenza: 25, sezioneCantonaleCarpenteria: "90×90" },
+    params: { lati: "8", larghezza: 4000, costruzione: "carpenteria", punta: "monaco", pendenza: 25, sezioneCantonaleCarpenteria: "90×90", sezioneMonaco: "250×250" },
     source: `${SRC} §3 TPL-5 ed estensioni (gazebo ottagonale vero, non offerto dal sito)`,
     notes: [
       "[dedotto] Il sito non vende gazebo ottagonali in kit: pianta regolare di diametro 4000 sugli assi dei pilastri, in carpenteria tradizionale con monaco centrale.",
       "Cantonali in carpenteria 90×90 (il 70×70 della ferramenta GAZEBO supera la luce tabellata), 2 viti 8×240 per battuta [dedotto].",
+      "[dedotto] Monaco 250×250 (sufficiente per 8 lati; il default della tipologia è 300×300 per servire anche i 6 lati).",
     ],
     expected: {
       pieces: { pilastro: 8, trave: 8, cantonale: 8, monaco: 1 },

@@ -242,7 +242,12 @@ export const gazeboPadiglione: TypologyTemplate = {
       ...sectionParam("sezioneCantonaleCarpenteria", "Sezione cantonali e puntoni (carpenteria)", "cantonale", "90×90"),
       visibleWhen: (p) => p.costruzione === "carpenteria",
     },
-    { ...sectionParam("sezioneMonaco", "Sezione monaco", "monaco", "250×250"), visibleWhen: (p) => p.costruzione === "carpenteria" || p.punta === "monaco" },
+    {
+      // 300×300: il minimo a passo 10 mm che accoglie le teste dei cantonali 90×90 anche con 6 lati
+      // (due teste a ±30° sulla stessa faccia richiedono ≥ 280); 250 basta per 4 e 8 lati. DA VALIDARE CON UFFICIO TECNICO.
+      ...sectionParam("sezioneMonaco", "Sezione monaco", "monaco", "300×300"),
+      visibleWhen: (p) => p.costruzione === "carpenteria" || p.punta === "monaco",
+    },
     { ...sectionParam("sezioneColmo", "Sezione colmo", "colmo", "120×120"), visibleWhen: (p) => p.lati === "4" && p.larghezza !== p.profondita },
     { ...sectionParam("sezioneArcareccio", "Sezione arcarecci", "travetto", "45×90"), visibleWhen: (p) => (p.arcarecci as number) > 0 },
   ],

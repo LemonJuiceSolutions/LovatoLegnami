@@ -81,6 +81,7 @@ describe("kernel: tutte le tipologie e tutti i preset", () => {
       ["monofalda-scalare dardo", () => generate("monofalda-scalare", { giunzione: "dardo-di-giove" })],
       ["monofalda-scalare mezzo legno", () => generate("monofalda-scalare", { giunzione: "mezzo-legno", costruzione: "carpenteria" })],
       ["gazebo carpenteria", () => generate("gazebo-padiglione", { costruzione: "carpenteria", montantiIntermedi: 2, arcarecci: 600, grigliati: 2 })],
+      ["gazebo 6 lati carpenteria", () => generate("gazebo-padiglione", { lati: "6", costruzione: "carpenteria" })],
       ["gazebo 8 lati bullonata", () => generate("gazebo-padiglione", { lati: "8", costruzione: "bullonata", arcarecci: 600 })],
       ["pensilina staffa 25°", () => generate("pensilina-sbalzo", { attacco: "staffa-inclinata-25" })],
     ];
