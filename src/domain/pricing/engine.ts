@@ -130,6 +130,8 @@ export function priceAssembly(input: PriceAssemblyInput): Quote {
     siteFactors: factors,
     firedRules: state.firedRules,
     cutPlan: ctx.cutPlan,
+    indicativityPct: priceList.indicativityPct,
+    roundingStepCents: priceList.roundingStepCents,
   };
 }
 

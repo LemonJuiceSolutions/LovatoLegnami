@@ -547,4 +547,7 @@ export interface Quote {
   readonly firedRules: readonly string[];
   /** Piano di taglio del legno (vista ufficio). */
   readonly cutPlan: AssemblyCutPlan;
+  /** Dal listino, per la vista cliente: fascia di indicatività (±%) e passo di arrotondamento. */
+  readonly indicativityPct: number;
+  readonly roundingStepCents: Cents;
 }
