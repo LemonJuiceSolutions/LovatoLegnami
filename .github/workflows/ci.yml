@@ -1,0 +1,48 @@
+# Verifiche di rilascio (P12, task 13.4): ogni push e pull request esegue lint, test
+# (unit + dom), test del database su PGlite in memoria, build e test del bundle.
+# Nessun servizio esterno: senza DATABASE_URL si usa PGlite, le email vanno in console.
+# I test del kernel geometrico (`npm run test:geometry`, WASM OCCT) sono in un job a parte.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  verifica:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      NEXT_TELEMETRY_DISABLED: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm test
+      - run: npm run test:db
+      - run: npm run build
+      - run: npm run test:bundle
+
+  geometria:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run test:geometry

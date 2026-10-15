@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next"
 import { Archivo, Fraunces } from "next/font/google"
 import { siteUrl } from "@/components/site/links"
 import { SiteFooter } from "@/components/site/site-footer"
+import SiteAnalytics from "@/components/site/site-analytics"
 import { SiteHeader } from "@/components/site/site-header"
 import "./site.css"
 
@@ -47,6 +48,7 @@ export default function SiteLayout({ children }: { children: React.ReactNode }) 
         {children}
       </main>
       <SiteFooter />
+      <SiteAnalytics />
     </div>
   )
 }

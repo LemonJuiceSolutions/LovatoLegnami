@@ -126,3 +126,15 @@ describe("bundle del sito pubblico (11.6)", () => {
     expect(total).toBeLessThan(WIZARD_BUDGET_BYTES)
   })
 })
+
+/**
+ * 13.4 (P12): `@vercel/analytics` entra nel build solo con `NEXT_PUBLIC_ANALYTICS=1`.
+ * Senza la variabile (build predefinito, CI) nessun chunk contiene lo script delle
+ * statistiche; con la variabile attiva al build il test non si applica.
+ */
+describe("analytics opzionale (13.4)", () => {
+  it.skipIf(process.env.NEXT_PUBLIC_ANALYTICS === "1")("senza NEXT_PUBLIC_ANALYTICS il bundle non contiene @vercel/analytics", () => {
+    const found = allChunks().filter((chunk) => /_vercel\/insights|@vercel\/analytics/.test(text(chunk)))
+    expect(found).toEqual([])
+  })
+})

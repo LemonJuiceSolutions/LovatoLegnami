@@ -8,6 +8,12 @@ const OCCT_CACHE = "public, max-age=31536000, immutable"
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  env: {
+    // Sempre definita al build (anche se assente: "0"), così la condizione di
+    // `components/site/site-analytics.tsx` è costante e webpack elimina l'import di
+    // `@vercel/analytics` quando le statistiche sono spente.
+    NEXT_PUBLIC_ANALYTICS: process.env.NEXT_PUBLIC_ANALYTICS === "1" ? "1" : "0",
+  },
   experimental: {
     // Driver del database caricati da node_modules a runtime (non impacchettati):
     // PGlite porta un WASM e file di dati, `pg` ha dipendenze native opzionali.
