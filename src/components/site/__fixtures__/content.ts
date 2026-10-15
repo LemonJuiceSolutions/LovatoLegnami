@@ -18,6 +18,7 @@ export function fakeTypology(over: Partial<SiteTypology> = {}): SiteTypology {
     drawingSvg: DRAWING,
     features: ["Larghezza da 2,00 a 7,00 m"],
     fromPrice: { totalCents: 789_000, widthMm: 5000, depthMm: 4000, heightMm: 2900, presetName: "Bifalda libera", includes: ["Struttura in legno"], finish: "Abete lamellare" },
+    preset: null,
     ...over,
   }
 }

@@ -57,6 +57,8 @@ export interface SiteTypology {
   readonly drawingSvg: string
   readonly features: readonly string[]
   readonly fromPrice: FromPrice | null
+  /** Preset di riferimento (parametri risolti): il punto di partenza del wizard. */
+  readonly preset: { readonly id: string; readonly name: string; readonly params: Readonly<Record<string, number | string | boolean>> } | null
 }
 
 export interface SiteContent {
@@ -219,6 +221,7 @@ export async function loadSiteContent(deps: LoadDeps = {}): Promise<SiteContent>
       drawingSvg: drawingSvg(config, setting.title),
       features: templateFeatures(template),
       fromPrice,
+      preset: preset ? { id: preset.id, name: preset.name, params: { ...config.params } } : null,
     }
   })
   return { typologies, gallery: buildGallery(visible, presetList), source }
