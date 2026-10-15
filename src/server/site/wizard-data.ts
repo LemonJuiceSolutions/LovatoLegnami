@@ -1,7 +1,7 @@
 import { unstable_cache } from "next/cache"
 import { DEFAULT_LOVATO_RULES, type PriceList, type RuleSet } from "@/domain"
 import { CONSENT_TEXT, PRIVACY_NOTICE_VERSION } from "@/server/consent"
-import { getPublicCatalog, type PublicCatalog } from "@/server/quotes/catalog"
+import { loadPublicCatalog, type PublicCatalog } from "@/server/quotes/catalog"
 import { loadSiteContent, type SiteContent } from "./content"
 import { SITE_CONTENT_TAG } from "./cached"
 
@@ -77,7 +77,7 @@ export async function loadWizardData(deps: WizardDataDeps = {}): Promise<WizardD
   const content = await (deps.content ?? (() => loadSiteContent({ log })))()
   let catalog: PublicCatalog | null = null
   try {
-    catalog = await (deps.catalog ?? getPublicCatalog)()
+    catalog = await (deps.catalog ?? loadPublicCatalog)() // lettura fresca: risultato in cache di Next
   } catch (e) {
     log(`wizard: listino o regole non disponibili, prezzo su richiesta (${e instanceof Error ? e.message : String(e)})`)
   }

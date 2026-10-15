@@ -8,7 +8,7 @@ import type { TypologyCategory, TypologyTemplate } from "@/domain/typologies/tem
 import { generate, getTypology } from "@/domain/typologies/registry"
 import { resolveParams } from "@/domain/typologies/template"
 import { getActive } from "@/server/repositories/datasets"
-import { getPublicCatalog, type PublicCatalog } from "@/server/quotes/catalog"
+import { loadPublicCatalog, type PublicCatalog } from "@/server/quotes/catalog"
 import { computeStartingPrice, startingPriceConfig } from "@/server/quotes/starting-price"
 import { CONFIG_SCHEMA_VERSION, defaultConfig, presetConfig, type ConfiguratoreConfig } from "@/stores/config"
 import { footprint } from "@/components/site/format"
@@ -170,7 +170,8 @@ export interface LoadDeps {
 const defaultDeps: Required<LoadDeps> = {
   settings: async () => (await getActive("tipologie"))?.data ?? null,
   presets: async () => (await getActive("preset"))?.data ?? null,
-  catalog: () => getPublicCatalog(),
+  // lettura fresca: il risultato è già in cache di Next (vedi `loadPublicCatalog`)
+  catalog: () => loadPublicCatalog(),
   log: (m) => console.warn(m),
 }
 

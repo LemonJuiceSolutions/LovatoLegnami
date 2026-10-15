@@ -30,8 +30,16 @@ export class CatalogUnavailableError extends Error {
 
 export const CATALOG_TTL_MS = 60_000;
 
-let cached: { value: PublicCatalog; day: string } | undefined;
-let pending: Promise<PublicCatalog> | undefined;
+/**
+ * Stato della cache su `globalThis`: Next carica questo modulo in più grafi dello stesso
+ * processo (pagine RSC, route handler, server action). Con variabili di modulo
+ * `invalidatePublicCatalog()` chiamato dalla server action di pubblicazione non svuotava
+ * la cache usata dalle pagine, che ricalcolavano il sito con il listino vecchio.
+ */
+const GLOBAL_KEY = Symbol.for("lovato.publicCatalog");
+type CatalogState = { cached?: { value: PublicCatalog; day: string }; pending?: Promise<PublicCatalog>; generation: number };
+const holder = globalThis as { [GLOBAL_KEY]?: CatalogState };
+const state = (holder[GLOBAL_KEY] ??= { generation: 0 });
 
 const today = () => new Intl.DateTimeFormat("sv-SE", { timeZone: "Europe/Rome" }).format(new Date());
 
@@ -61,21 +69,39 @@ async function load(): Promise<PublicCatalog> {
   };
 }
 
-/** Catalogo pubblico attivo oggi (cache 60 s, una sola lettura concorrente). */
+/** Catalogo pubblico attivo oggi (cache 60 s condivisa nel processo, una sola lettura concorrente). */
 export async function getPublicCatalog(now: number = Date.now()): Promise<PublicCatalog> {
   const day = today();
+  const { cached } = state;
   if (cached && cached.day === day && now - cached.value.loadedAt < CATALOG_TTL_MS) return cached.value;
-  pending ??= load()
-    .then((value) => {
-      cached = { value, day };
-      return value;
-    })
-    .finally(() => {
-      pending = undefined;
-    });
-  return pending;
+  if (!state.pending) {
+    const generation = state.generation;
+    const pending = load()
+      .then((value) => {
+        // una lettura iniziata prima di un'invalidazione non torna in cache
+        if (state.generation === generation) state.cached = { value, day };
+        return value;
+      })
+      .finally(() => {
+        if (state.pending === pending) state.pending = undefined;
+      });
+    state.pending = pending;
+  }
+  return state.pending;
+}
+
+/**
+ * Catalogo letto ora dal database, senza la cache in memoria: per i contenuti del sito, che
+ * hanno già la cache di Next (`unstable_cache`, 300 s, tag `tipologie`). Dopo una
+ * pubblicazione il ricalcolo deve vedere la nuova versione anche in un'istanza (o un grafo
+ * di moduli) la cui cache in memoria non è stata invalidata.
+ */
+export function loadPublicCatalog(): Promise<PublicCatalog> {
+  return load();
 }
 
 export function invalidatePublicCatalog(): void {
-  cached = undefined;
+  state.cached = undefined;
+  state.pending = undefined;
+  state.generation += 1;
 }
