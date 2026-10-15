@@ -4,6 +4,8 @@ import * as React from "react"
 import { Box, Calculator, ClipboardList, SlidersHorizontal } from "lucide-react"
 import { CommercialForm } from "@/components/preventivo/commercial-form"
 import { PricingPanel, QuoteTotalBadge } from "@/components/preventivo/pricing-panel"
+import { RequestHeader, RequestNotice, type RequestHeaderData } from "@/components/preventivo/request-header"
+import { parseConfigFile } from "@/stores/config-file"
 import { Card, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { cn } from "@/lib/utils"
@@ -174,8 +176,36 @@ export function ConfiguratoreLayout({ params, results, exports, toolbar, quote, 
   )
 }
 
+/** Richiesta passata dalla pagina server con `?richiesta=<id>` (10.4). */
+export type ConfiguratoreRequest =
+  | { readonly kind: "ok"; readonly request: RequestHeaderData & { readonly config: unknown | null } }
+  | { readonly kind: "missing"; readonly message: string }
+
+/**
+ * Configurazione della richiesta nello store (una sola volta per richiesta): quella del
+ * cliente se leggibile, altrimenti la predefinita.
+ */
+function useRequestConfig(request: ConfiguratoreRequest | undefined) {
+  const key = request ? (request.kind === "ok" ? request.request.id : "missing") : null
+  React.useEffect(() => {
+    if (!request) return
+    const store = configuratoreStore.getState()
+    if (request.kind === "ok" && request.request.config) {
+      try {
+        store.loadConfig(parseConfigFile(request.request.config, { keepInvalidParams: true }))
+        return
+      } catch {
+        // configurazione salvata illeggibile: si parte dalla predefinita
+      }
+    }
+    store.resetConfig()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [key])
+}
+
 /** Pagina completa: avvia il kernel geometrico al mount (il worker parte solo qui). */
-export function Configuratore() {
+export function Configuratore({ request, canSaveFinal = false }: { request?: ConfiguratoreRequest; canSaveFinal?: boolean } = {}) {
+  useRequestConfig(request)
   React.useEffect(() => {
     // listino e regole della versione attiva (ripiego sui default con avviso)
     void configuratoreStore.getState().loadCatalog()
@@ -189,6 +219,13 @@ export function Configuratore() {
       results={<ResultsPanel />}
       quote={<PricingPanel />}
       quoteActions={<QuoteTotalBadge />}
+      banner={
+        request?.kind === "ok" ? (
+          <RequestHeader request={request.request} canSave={canSaveFinal} />
+        ) : request?.kind === "missing" ? (
+          <RequestNotice message={request.message} />
+        ) : undefined
+      }
       exports={<ExportPanel />}
       toolbar={<ConfigToolbar />}
     />

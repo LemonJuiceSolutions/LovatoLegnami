@@ -101,7 +101,7 @@ export function officeView(quote: Quote): OfficeView {
 // ---------------------------------------------------------------------------
 // Vista cliente
 
-export const CUSTOMER_GROUPS = ["struttura", "ferramenta-finiture", "copertura", "montaggio-trasporto"] as const;
+export const CUSTOMER_GROUPS = ["struttura", "ferramenta-finiture", "copertura", "montaggio-trasporto", "altre-voci"] as const;
 export type CustomerGroupId = (typeof CUSTOMER_GROUPS)[number];
 
 /** Voci della vista cliente e categorie che raccolgono. */
@@ -110,6 +110,8 @@ export const CUSTOMER_GROUP_CATEGORIES: Readonly<Record<CustomerGroupId, readonl
   "ferramenta-finiture": ["ferramenta", "trattamenti"],
   copertura: ["copertura"],
   "montaggio-trasporto": ["montaggio", "complicazioni", "trasporto"],
+  /** Voci manuali del preventivo definitivo (mai presenti nel preventivo online). */
+  "altre-voci": ["manuali"],
 };
 
 export const CUSTOMER_GROUP_LABELS: Readonly<Record<CustomerGroupId, string>> = {
@@ -117,6 +119,7 @@ export const CUSTOMER_GROUP_LABELS: Readonly<Record<CustomerGroupId, string>> = 
   "ferramenta-finiture": "Ferramenta e finiture",
   copertura: "Copertura",
   "montaggio-trasporto": "Montaggio e trasporto",
+  "altre-voci": "Altre voci",
 };
 
 const cents = z.number().int();

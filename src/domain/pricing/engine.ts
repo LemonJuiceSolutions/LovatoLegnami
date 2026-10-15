@@ -9,7 +9,8 @@ import { coveringPhase } from "./phases/covering";
 import { hardwarePhase } from "./phases/hardware";
 import { labourPhase } from "./phases/labour";
 import { machiningPhase } from "./phases/machining";
-import { EMPTY_STATE, type Phase, type PricingAssembly, type PricingContext } from "./phases/shared";
+import { MoneyError } from "./money";
+import { EMPTY_STATE, line, type Phase, type PricingAssembly, type PricingContext } from "./phases/shared";
 import { timberPhase } from "./phases/timber";
 import { computeTotals } from "./phases/totals";
 import { transportPhase } from "./phases/transport";
@@ -64,6 +65,35 @@ export interface PriceAssemblyInput {
   readonly siteFactorsOptions?: SiteFactorsOptions;
   /** Limiti del miglioramento del taglio (default di `planCuts`). */
   readonly cutTuning?: PlanTuning;
+  /**
+   * Voci manuali dell'ufficio (preventivo definitivo, 10.4): importi netti in centesimi
+   * (anche negativi), categoria `manuali`, dopo i costi e prima di margini e sconti; non
+   * hanno margine ma entrano nel subtotale su cui si calcolano sconti percentuali e IVA.
+   */
+  readonly manualLines?: readonly ManualLine[];
+}
+
+/** Voce manuale del preventivo definitivo. */
+export interface ManualLine {
+  readonly description: string;
+  readonly amountCents: number;
+}
+
+/** Righe `manuale-<n>` delle voci manuali (descrizione su una riga, importo intero). */
+export function manualQuoteLines(manual: readonly ManualLine[], versionLabel: string): QuoteLine[] {
+  return manual.map((m, i) => {
+    if (!Number.isInteger(m.amountCents)) throw new MoneyError(`voce manuale ${i + 1}: importo non intero (centesimi)`);
+    return line({
+      code: `manuale-${i + 1}`,
+      category: "manuali",
+      label: m.description.replace(/\s+/g, " ").trim() || `Voce ${i + 1}`,
+      quantity: 1,
+      unit: "pz",
+      unitPriceCents: m.amountCents,
+      amountCents: m.amountCents,
+      explain: ["voce inserita dall'ufficio", versionLabel],
+    });
+  });
 }
 
 /** Etichette dei gruppi per categoria. */
@@ -77,6 +107,7 @@ export const CATEGORY_LABELS: Readonly<Record<QuoteCategory, string>> = {
   montaggio: "Montaggio",
   complicazioni: "Complicazioni di cantiere",
   trasporto: "Trasporto",
+  manuali: "Voci aggiuntive",
   sconti: "Sconti",
   margine: "Margini",
   adeguamenti: "Adeguamenti",
@@ -114,8 +145,9 @@ export function priceAssembly(input: PriceAssemblyInput): Quote {
     cutPlan: planAssemblyCuts(assembly, priceList, options, input.cutTuning),
   };
   const state = COST_PHASES.reduce((s, [, phase]) => phase(ctx, s), EMPTY_STATE);
-  const totals = computeTotals(state.lines, priceList, options, ctx.versionLabel);
-  const lines = [...state.lines, ...totals.lines];
+  const costLines = input.manualLines?.length ? [...state.lines, ...manualQuoteLines(input.manualLines, ctx.versionLabel)] : state.lines;
+  const totals = computeTotals(costLines, priceList, options, ctx.versionLabel);
+  const lines = [...costLines, ...totals.lines];
   const warnings = [...state.warnings, ...totals.warnings];
   return {
     status: warnings.some((w) => w.blocking) ? "incompleto" : "completo",

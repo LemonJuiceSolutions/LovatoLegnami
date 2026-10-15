@@ -12,8 +12,8 @@ import { fmt, fmtPrice, line } from "./shared";
 export const MATERIAL_CATEGORIES: readonly QuoteCategory[] = ["legno", "sfrido", "lavorazioni", "ferramenta", "trattamenti", "copertura"];
 /** Categorie a cui si applica il margine manodopera (cantiere). */
 export const LABOUR_CATEGORIES: readonly QuoteCategory[] = ["montaggio", "complicazioni"];
-/** Categorie di costo (tutto ciò che precede i margini). Il trasporto non ha margine. */
-export const COST_CATEGORIES: readonly QuoteCategory[] = [...MATERIAL_CATEGORIES, ...LABOUR_CATEGORIES, "trasporto"];
+/** Categorie di costo (tutto ciò che precede i margini). Trasporto e voci manuali non hanno margine. */
+export const COST_CATEGORIES: readonly QuoteCategory[] = [...MATERIAL_CATEGORIES, ...LABOUR_CATEGORIES, "trasporto", "manuali"];
 
 export interface TotalsResult {
   readonly lines: readonly QuoteLine[];
