@@ -5,7 +5,7 @@ import { sectionLabel } from "../../components/sections";
 import { FAMILY_OF, type Curve, type HeadFace, type MachiningSpec, type Piece, type PieceType, type Pose, type Section } from "../../components/types";
 import { hardwareFor } from "../../hardware/catalog";
 import { applyToPoint, axisOf, degToRad, fromBasis, invertRigid, radToDeg } from "../../math/mat4";
-import { type Plane, intersectLinePlane, plane, transformPlane } from "../../math/plane";
+import { GeometryError, type Plane, intersectLinePlane, plane, transformPlane } from "../../math/plane";
 import { type Vec3, add, cross, dot, norm, normalize, scale, sub, vec3 } from "../../math/vec3";
 import {
   BOLT_STEP_CODE,
@@ -230,17 +230,19 @@ export interface JoistSeat {
  *   supporto: faccia d'appoggio orizzontale, faccia di battuta verticale.
  * L'asse X locale sale lungo la falda (testa-inizio = gronda).
  */
-export function joistSteps(ref: string, x: number, falda: Falda, sec: Section, uStart: number, uTop: number, seats: readonly JoistSeat[]): BuildStep[] {
+export function joistSteps(ref: string, x: number, falda: Falda, sec: Section, uStart: number, uTop: number | Plane, seats: readonly JoistSeat[]): BuildStep[] {
   const s = degToRad(falda.slope);
   const [c, sn, t] = [Math.cos(s), Math.sin(s), Math.tan(s)];
   const h = sec.h;
-  const length = (uTop + h * sn - uStart) / c;
   const z0 = falda.underside(uStart);
   // asse: dallo spigolo inferiore di gronda, mezzo spessore lungo la normale alla falda
   const uAxis = uStart - (h / 2) * sn;
   const origin = vec3(x, falda.yOf(uAxis), z0 + (h / 2) * c);
   const xAxis = vec3(0, falda.dir * c, sn);
   const zAxis = vec3(0, -falda.dir * sn, c);
+  // testa alta su un piano (muro reale): box fino al piano, taglio composto dal piano
+  const wall = typeof uTop === "number" ? undefined : uTop;
+  const length = wall ? lengthToPlane(origin, xAxis, zAxis, sec, wall) : ((uTop as number) + h * sn - uStart) / c;
   const machinings: MachiningSpec[] = [
     { type: "taglio-testa", face: "testa-inizio", at: (h / 2) * t, angle: falda.slope },
     ...seats.map((seat): MachiningSpec => {
@@ -248,12 +250,90 @@ export function joistSteps(ref: string, x: number, falda: Falda, sec: Section, u
       const dz = seat.z - z0;
       return { type: "becco-uccello", face: "inferiore", at: du * c + dz * sn, depth: -du * sn + dz * c, angle: falda.slope };
     }),
-    { type: "taglio-testa", face: "testa-fine", at: length - (h / 2) * t, angle: falda.slope },
+    ...(wall ? [] : [{ type: "taglio-testa", face: "testa-fine", at: length - (h / 2) * t, angle: falda.slope } as const]),
   ];
   return [
     { kind: "place", ref, type: "travetto", section: sec, length, pose: fromBasis(origin, xAxis, zAxis) },
     ...machinings.map((spec): BuildStep => ({ kind: "machining", target: ref, spec })),
+    ...(wall ? [headCutOnPlane(ref, wall, "testa-fine")] : []),
   ];
+}
+
+/* ------------------------------------------------------------------ */
+/* Muro reale (P4, fuorisquadra)                                       */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Piano reale del muro per il template: orientamento di `given` (verticale,
+ * normale verso l'interno, entro 45° da quella del muro implicito), posato
+ * alla profondità del template nel punto del muro più vicino, cioè per il
+ * punto di `span` (punti del muro implicito, es. le estremità della
+ * larghezza) con la minima distanza lungo la normale: tutti i punti di
+ * `span` restano dal lato interno e il muro reale si allontana da lì. Così la
+ * profondità del template è misurata al punto del muro più vicino (P4) e
+ * `fitToEnvelope` la cerca come con il box. Senza `given` torna `implicit`.
+ */
+export function realWall(ctx: BuildContext, implicit: Plane, given: Plane | undefined, span: readonly Vec3[]): Plane {
+  if (!given) return implicit;
+  const n = normalize(given.normal);
+  if (Math.abs(n.z) > 1e-6) throw new TemplateError(ctx.slug, "il piano del muro deve essere verticale");
+  if (dot(n, normalize(implicit.normal)) < Math.SQRT1_2)
+    throw new TemplateError(ctx.slug, "il piano del muro non è compatibile con il muro della tipologia (rotazione oltre 45°)");
+  const q = span.reduce((best, p) => (dot(n, p) < dot(n, best) ? p : best));
+  return plane(q, n);
+}
+
+/**
+ * Lunghezza del box di un pezzo (origine e assi della posa, sezione centrata)
+ * perché ogni spigolo longitudinale raggiunga il piano: il taglio di testa sul
+ * piano asporta poi tutta la sezione. Il piano non deve essere parallelo
+ * all'asse.
+ */
+export function lengthToPlane(origin: Vec3, xAxis: Vec3, zAxis: Vec3, sec: Section, pl: Plane): number {
+  const yAxis = cross(zAxis, xAxis);
+  const nx = dot(pl.normal, xAxis);
+  if (Math.abs(nx) < 1e-9) throw new GeometryError("piano parallelo all'asse del pezzo");
+  const a = dot(pl.normal, sub(pl.point, origin));
+  let best = -Infinity;
+  for (const y of [-sec.b / 2, sec.b / 2])
+    for (const z of [-sec.h / 2, sec.h / 2]) best = Math.max(best, (a - y * dot(pl.normal, yAxis) - z * dot(pl.normal, zAxis)) / nx);
+  return best;
+}
+
+/** Banchina lungo il muro reale e retta dello spigolo d'appoggio. */
+export interface WallPlate {
+  readonly placed: Placed;
+  /** Spigolo superiore a valle (lato interno) alla quota del piano verticale x = cost. */
+  seatAt(x: number): { readonly y: number; readonly z: number };
+}
+
+/**
+ * Banchina (o dormiente) con la faccia posteriore sul piano del muro reale
+ * (`wall`, normale verso l'interno), ruotata in pianta come il muro e
+ * inclinata lungo l'asse perché lo spigolo superiore interno segua
+ * `edgeZ(y)` (lineare in y: la quota dell'appoggio della falda). Le teste
+ * restano nella fascia `x ∈ [x0, x1]` (box a squadra accorciato quanto basta).
+ * Con muro ortogonale al fronte è la banchina orizzontale di sempre.
+ */
+export function wallPlate(ref: string, sec: Section, wall: Plane, x0: number, x1: number, edgeZ: (y: number) => number): WallPlate {
+  const n = normalize(wall.normal);
+  const t = vec3(-n.y, n.x, 0); // lungo il muro, verso +X
+  const q = add(wall.point, scale(n, sec.b)); // piano verticale dello spigolo interno
+  const e0 = vec3(q.x, q.y, edgeZ(q.y));
+  const X = normalize(vec3(t.x, t.y, edgeZ(q.y + t.y) - e0.z));
+  let Z = normalize(cross(n, X));
+  if (Z.z < 0) Z = scale(Z, -1);
+  const a0 = sub(sub(e0, scale(n, sec.b / 2)), scale(Z, sec.h / 2)); // asse in corrispondenza di e0
+  const margin = (sec.b / 2) * Math.abs(n.x) + (sec.h / 2) * Math.abs(Z.x);
+  const s0 = (x0 + margin - a0.x) / X.x;
+  const s1 = (x1 - margin - a0.x) / X.x;
+  return {
+    placed: { ref, type: "banchina", section: sec, length: s1 - s0, pose: fromBasis(add(a0, scale(X, s0)), X, Z) },
+    seatAt(x) {
+      const y = q.y + ((x - q.x) / t.x) * t.y;
+      return { y, z: edgeZ(y) };
+    },
+  };
 }
 
 /**

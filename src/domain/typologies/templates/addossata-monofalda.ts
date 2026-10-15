@@ -1,4 +1,6 @@
 import { degToRad } from "../../math/mat4";
+import { plane } from "../../math/plane";
+import { vec3 } from "../../math/vec3";
 import type { BuildContext, BuildStep, TypologyTemplate } from "../template";
 import {
   alongX,
@@ -9,9 +11,12 @@ import {
   joistSpaces,
   joistSteps,
   numberParam,
+  placeStep,
+  realWall,
   seatOffset,
   sectionParam,
   spread,
+  wallPlate,
   type Falda,
 } from "./shared";
 
@@ -34,6 +39,12 @@ const MARGINE_FORI = 150;
  * `profondita` è la distanza orizzontale tra gli assi di trave e banchina:
  * il dislivello tra le facce superiori di banchina e trave è
  * `profondita·tan(pendenza)`.
+ *
+ * Con il muro reale (`ctx.wallPlane`, fuorisquadra P4) la profondità vale nel
+ * punto del muro più vicino (`realWall`); trave, pilastri e saette non
+ * cambiano, la banchina è ruotata in pianta e aderente al muro
+ * (`wallPlate`, teste entro [0, larghezza]) e ogni travetto arriva al muro
+ * con la propria lunghezza e il taglio di testa composto del piano.
  */
 function geometry(ctx: BuildContext) {
   const W = ctx.num("larghezza");
@@ -53,7 +64,7 @@ function geometry(ctx: BuildContext) {
   const zTopTrave = H + st.h;
   const underside = (u: number) => zTopTrave - c / Math.cos(s) + (u - yT) * Math.tan(s);
   const zTopBanchina = underside(yB) + c / Math.cos(s);
-  return { W, P, H, slope, s, sbalzo, st, sb, sj, yT, yB, yMuro, zTopTrave, zTopBanchina, underside, uEdgeTrave };
+  return { W, P, H, slope, s, c, sbalzo, st, sb, sj, yT, yB, yMuro, zTopTrave, zTopBanchina, underside, uEdgeTrave };
 }
 
 export const addossataMonofalda: TypologyTemplate = {
@@ -64,6 +75,7 @@ export const addossataMonofalda: TypologyTemplate = {
   category: "addossata",
   tags: ["monofalda", "banchina", "carpenteria", "travetti inclinati"],
   reference: "T-B (addossata monofalda, change configuratore-pergole)",
+  wallPlanes: 1,
   params: [
     ...commonParams({
       larghezza: 6000,
@@ -86,17 +98,25 @@ export const addossataMonofalda: TypologyTemplate = {
     const lateral = ctx.num("sbalzoLaterale");
     const steps: BuildStep[] = [];
 
+    // muro reale (fuorisquadra): orientamento dal piano dato, profondità al punto più vicino
+    const wall = ctx.wallPlane
+      ? realWall(ctx, plane(vec3(0, g.yMuro, 0), vec3(0, -1, 0)), ctx.wallPlane, [vec3(0, g.yMuro, 0), vec3(g.W, g.yMuro, 0)])
+      : undefined;
+    const plate = wall ? wallPlate("banchina", g.sb, wall, 0, g.W, (y) => g.underside(y + g.sb.b / 2) + g.c / Math.cos(g.s)) : undefined;
+
     // banchina a muro con fori passanti per ancoranti, a passo ≤ passoFori
-    steps.push({ kind: "place", ref: "banchina", type: "banchina", section: g.sb, length: g.W, pose: alongX(0, g.yB, g.zTopBanchina - g.sb.h / 2) });
-    const m = Math.min(MARGINE_FORI, g.W / 4);
-    const nFori = Math.max(2, Math.ceil((g.W - 2 * m) / ctx.num("passoFori") - 1e-9) + 1);
+    const lb = plate ? plate.placed.length : g.W;
+    if (plate) steps.push(placeStep(plate.placed));
+    else steps.push({ kind: "place", ref: "banchina", type: "banchina", section: g.sb, length: g.W, pose: alongX(0, g.yB, g.zTopBanchina - g.sb.h / 2) });
+    const m = Math.min(MARGINE_FORI, lb / 4);
+    const nFori = Math.max(2, Math.ceil((lb - 2 * m) / ctx.num("passoFori") - 1e-9) + 1);
     steps.push({
       kind: "repeat",
       count: nFori,
       each: (i) => ({
         kind: "machining",
         target: "banchina",
-        spec: { type: "foro", face: "destra", diameter: DIAMETRO_FORI, offset: 0, at: m + (i * (g.W - 2 * m)) / (nFori - 1) },
+        spec: { type: "foro", face: "destra", diameter: DIAMETRO_FORI, offset: 0, at: m + (i * (lb - 2 * m)) / (nFori - 1) },
       }),
     });
 
@@ -113,7 +133,12 @@ export const addossataMonofalda: TypologyTemplate = {
     ];
     const xs = spread(0, g.W, g.sj.b, joistSpaces(g.W - g.sj.b, ctx.num("interasse")));
     const uTop = g.yMuro - g.sj.h * Math.sin(g.s);
-    xs.forEach((x, i) => steps.push(...joistSteps(`travetto-${i}`, x, falda, g.sj, g.uEdgeTrave - g.sbalzo, uTop, seats)));
+    xs.forEach((x, i) => {
+      if (plate && wall) {
+        const seat = plate.seatAt(x);
+        steps.push(...joistSteps(`travetto-${i}`, x, falda, g.sj, g.uEdgeTrave - g.sbalzo, wall, [seats[0], { u: seat.y, z: seat.z }]));
+      } else steps.push(...joistSteps(`travetto-${i}`, x, falda, g.sj, g.uEdgeTrave - g.sbalzo, uTop, seats));
+    });
 
     // saette tra pilastri e trave
     if (ctx.bool("controventi")) {

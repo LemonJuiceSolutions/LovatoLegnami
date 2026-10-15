@@ -8,6 +8,7 @@ import { HardwareError } from "../hardware/errors";
 import { countItem, expandBolt, expandBracket, expandJointNode, isCountedKind, type HardwareExpansion } from "../hardware/expand";
 import { mergeHardware } from "../hardware/list";
 import type { HardwareAnchor } from "../hardware/types";
+import type { Plane } from "../math/plane";
 import type { Vec3 } from "../math/vec3";
 import { parseSectionLabel, sectionLabel } from "../components/sections";
 import {
@@ -209,6 +210,15 @@ export interface BuildContext {
   floorHeightAt: FloorHeightFn;
   /** Affondamento dei pilastri sotto la quota del pavimento (mm, ≥ 0; default 0). */
   embedment: number;
+  /**
+   * Piano reale del muro (P4, fuorisquadra) per le tipologie a muro; assente =
+   * piano implicito del template (ortogonale al fronte). Il template ne usa
+   * l'orientamento e lo posa alla propria profondità nel punto del muro più
+   * vicino (vedi `realWall`).
+   */
+  readonly wallPlane?: Plane;
+  /** Secondo muro (tipologia a L: muro laterale sinistro). */
+  readonly wallPlane2?: Plane;
 }
 
 /** Valore costante o funzione pura del contesto. */
@@ -315,6 +325,12 @@ export interface TypologyTemplate {
    * il nome differisce (es. la pensilina adatta `sbalzo` alla profondità).
    */
   readonly fitAliases?: Readonly<Partial<Record<"altezza" | "profondita" | "larghezza", string>>>;
+  /**
+   * Muri reali che il template sa seguire (`BuildOptions.wallPlane`, e
+   * `wallPlane2` con 2): 1 = muro posteriore, 2 = posteriore e sinistro.
+   * Assente = tipologia autoportante (le opzioni sono ignorate).
+   */
+  readonly wallPlanes?: 1 | 2;
   build(ctx: BuildContext): readonly BuildStep[];
   /** Metadati opzionali dell'assieme (es. quota d'imposta). */
   meta?(ctx: BuildContext): Readonly<Record<string, ParamValue>>;
@@ -328,6 +344,14 @@ export interface BuildOptions {
    * si somma alla lunghezza di ogni pilastro e ne abbassa il piede.
    */
   readonly embedment?: number;
+  /**
+   * Piano del muro ricavato dall'ingombro (`wallPlane(envelope)`, normale verso
+   * l'interno): condizione di cantiere, non parametro. Ignorato dalle tipologie
+   * autoportanti.
+   */
+  readonly wallPlane?: Plane;
+  /** Piano del secondo muro (tipologia a L: lato sinistro). */
+  readonly wallPlane2?: Plane;
 }
 
 const resolve = <T>(v: Resolvable<T>, ctx: BuildContext): T =>
@@ -352,6 +376,8 @@ function createContext(template: TypologyTemplate, params: ResolvedParams, optio
     enum: (name) => get(name, "enum") as string,
     floorHeightAt: options.floorHeightAt ?? flatFloor,
     embedment,
+    ...(options.wallPlane ? { wallPlane: options.wallPlane } : {}),
+    ...(options.wallPlane2 ? { wallPlane2: options.wallPlane2 } : {}),
   };
 }
 
