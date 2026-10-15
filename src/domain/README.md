@@ -151,6 +151,55 @@ caricato con `loadRuleSet(json)`, che rifiuta tipi di vincolo sconosciuti citand
 della regola. Le regole valutano le **misure effettive** dell'assieme
 (`measureAssembly`), non i parametri, quindi valgono per ogni tipologia.
 
+## Pianta fuori squadra
+
+L'ingombro può dichiarare una **pianta quadrilatera** (`envelope.plan.corners`, angoli in
+senso antiorario: anteriore sinistro, anteriore destro, posteriore destro, posteriore
+sinistro). Assente = il rettangolo del box: tutto resta come prima. La pianta deve
+essere convessa e il box è il rettangolo che la contiene (`boxOfPlan`); il cliente la
+dà con lati e diagonali (`planFromDiagonals`, tolleranza 20 mm, "misure non coerenti:
+ricontrolla le diagonali" se non tornano; `measuresFromPlan` è l'inverso).
+
+- `planOf`, `sideSegment`, `sidePlane`, `wallPlane`: pianta e piani verticali dei lati
+  (normale verso l'interno). Gli ostacoli dei lati seguono il lato reale (OBB) e
+  `checkCollisions`/`fitToEnvelope` lavorano sul prisma della pianta.
+- `planDeviations`: rotazione dei lati e deviazione degli angoli da 90°; alimentano i
+  fattori di cantiere `planDeviationDeg`/`wallDeviationDeg` (regola "fuorisquadra").
+- Tipologie a muro (`template.wallPlanes`): `BuildOptions.wallPlane` (e `wallPlane2` per
+  la pergola a L) porta il muro reale. Il template ne usa l'orientamento e lo posa alla
+  propria profondità nel punto del muro più vicino; cambiano solo i pezzi a muro
+  (banchina lungo il muro, travi/travetti/mensole con lunghezza individuale e taglio di
+  testa composto). `wallBuildOptions(template, envelope)` dà le opzioni giuste (vuote
+  senza pianta, per le autoportanti o con il muro in squadra): lo usano `fitToEnvelope`
+  e il configuratore.
+
+```ts
+import {
+  DEFAULT_LOVATO_RULES,
+  boxOfPlan,
+  checkCollisions,
+  fitToEnvelope,
+  generate,
+  getTypology,
+  parseEnvelope,
+  planDeviations,
+  planFromDiagonals,
+  wallBuildOptions,
+} from "@/domain";
+
+// misure del cliente: fronte e muro 5 m, fianchi 3 m, diagonali diverse
+const plan = planFromDiagonals({ front: 5000, back: 5000, left: 3000, right: 3000, d1: 5900, d2: 5760 });
+const skewed = parseEnvelope({ box: boxOfPlan(plan, 3500), plan });
+const deviation = planDeviations(plan).maxCornerDeg; // ≈ 1,6°
+
+const template = getTypology("addossata-monofalda");
+const options = wallBuildOptions(template, skewed);
+const onWall = generate(template.slug, { larghezza: 5000 }, options);
+const fitted = fitToEnvelope(template, skewed, {}, DEFAULT_LOVATO_RULES); // usa i muri reali da sé
+
+export const fuorisquadra = { deviation, collisions: checkCollisions(onWall, skewed).length, fitted: fitted.ok };
+```
+
 ## Preventivazione
 
 `pricing/` è il motore di prezzo (puro, deterministico, centesimi interi). Flusso:

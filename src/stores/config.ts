@@ -14,6 +14,7 @@ import {
   loadPreset,
   parseEnvelope,
   resolveParams,
+  wallBuildOptions,
   type Assembly,
   type Collision,
   type Envelope,
@@ -290,7 +291,9 @@ export function computeDerived(
   if (Object.keys(paramErrors).length > 0) return keep({ paramErrors });
   try {
     const floorHeightAt = floorFunction(config.envelope);
-    const assembly = generate(config.typology, config.params, { floorHeightAt, embedment: config.embedment });
+    // muri reali della pianta fuori squadra (solo con `envelope.plan` e tipologie a muro)
+    const walls = wallBuildOptions(template, config.envelope);
+    const assembly = generate(config.typology, config.params, { floorHeightAt, embedment: config.embedment, ...walls });
     const { violations, measures } = evaluateRules(assembly, ruleSet, { floorHeightAt });
     const collisions = checkCollisions(assembly, config.envelope);
     return {

@@ -1,5 +1,6 @@
 import { type Plane, plane } from "../math/plane";
 import { vec3 } from "../math/vec3";
+import type { BuildOptions, TypologyTemplate } from "../typologies/template";
 import type { Envelope, EnvelopeBox, WallSide } from "./types";
 
 /**
@@ -353,4 +354,30 @@ function adjust(start: Plan, m: PlanMeasures): Plan {
 export function measuresFromPlan(plan: Plan): PlanMeasures {
   const [fl, fr, br, bl] = plan.corners;
   return { front: dist2(fl, fr), back: dist2(bl, br), left: dist2(fl, bl), right: dist2(fr, br), d1: dist2(fl, br), d2: dist2(fr, bl) };
+}
+
+/* ------------------------------------------------------------------ */
+/* Piani dei muri per la generazione                                   */
+/* ------------------------------------------------------------------ */
+
+/** Rotazione minima di un lato muro (gradi) perché il piano reale sia passato al template. */
+export const WALL_DEVIATION_EPS_DEG = 1e-6;
+
+/**
+ * Opzioni di generazione con i muri reali dell'ingombro (P4): solo se l'ingombro
+ * dichiara una pianta, la tipologia sa seguire i muri (`template.wallPlanes`) e
+ * almeno un muro è ruotato rispetto al lato del box (il template usa del piano
+ * solo l'orientamento: un muro parallelo al box darebbe il muro implicito, così
+ * una pianta con il muro in squadra genera l'assieme di sempre). Un muro
+ * (addossate, pensilina): il muro posteriore, solo se è il lato muro
+ * dell'ingombro (i template costruiscono il muro sul lato posteriore). Due muri
+ * (pergola a L): posteriore e sinistro. Altrimenti `{}`.
+ */
+export function wallBuildOptions(template: Pick<TypologyTemplate, "wallPlanes">, envelope: Pick<Envelope, "box" | "plan" | "wallSide">): Pick<BuildOptions, "wallPlane" | "wallPlane2"> {
+  if (!envelope.plan || !template.wallPlanes) return {};
+  const sides = planDeviations(envelope.plan).sides;
+  const rotated = (side: WallSide) => Math.abs(sides[side]) > WALL_DEVIATION_EPS_DEG;
+  if (template.wallPlanes === 2)
+    return rotated("posteriore") || rotated("sinistro") ? { wallPlane: sidePlane(envelope, "posteriore"), wallPlane2: sidePlane(envelope, "sinistro") } : {};
+  return envelope.wallSide === "posteriore" && rotated("posteriore") ? { wallPlane: sidePlane(envelope, "posteriore") } : {};
 }

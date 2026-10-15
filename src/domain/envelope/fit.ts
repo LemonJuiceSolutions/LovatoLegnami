@@ -5,6 +5,7 @@ import { getTypology } from "../typologies/registry";
 import { type NumberParamSpec, type TypologyTemplate, buildAssembly } from "../typologies/template";
 import { type Collision, ENVELOPE_ID, checkCollisions } from "./collisions";
 import { floorFunction } from "./floor";
+import { wallBuildOptions } from "./plan";
 import type { Envelope, Side } from "./types";
 
 /**
@@ -167,6 +168,8 @@ export function fitToEnvelope(
   const toReal = (p: Readonly<Record<string, ParamValue>>) => Object.fromEntries(Object.entries(p).map(([k, v]) => [realName(k), v]));
   const locked: Readonly<Record<string, ParamValue>> = Object.fromEntries(Object.entries(lockedParams).map(([k, v]) => [dimName.get(k) ?? k, v]));
   const floorHeightAt = floorFunction(envelope);
+  // muri reali della pianta per le tipologie a muro (P4); le autoportanti restano rettangolari nel prisma
+  const walls = wallBuildOptions(template, envelope);
   const cache = new Map<string, Trial>();
 
   const trial = (params: Readonly<Record<string, ParamValue>>): Trial => {
@@ -175,7 +178,7 @@ export function fitToEnvelope(
     if (hit) return hit;
     let t: Trial;
     try {
-      const assembly = buildAssembly(template, toReal(params), { floorHeightAt, embedment: options.embedment });
+      const assembly = buildAssembly(template, toReal(params), { floorHeightAt, embedment: options.embedment, ...walls });
       const collisions = checkCollisions(assembly, envelope, options.tolerance ?? 0);
       const { violations } = evaluateRules(assembly, ruleSet, { floorHeightAt });
       t = { assembly, collisions, violations, errors: violations.filter((v) => v.severity === "errore") };

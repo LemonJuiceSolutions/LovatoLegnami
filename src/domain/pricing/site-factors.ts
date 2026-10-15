@@ -1,6 +1,7 @@
 import { assemblyBounds, minClearHeight } from "../assembly/bounds";
 import type { Assembly } from "../components/types";
 import { floorFunction } from "../envelope/floor";
+import { planDeviations, planOf } from "../envelope/plan";
 import { absoluteObstacles, type Envelope } from "../envelope/types";
 import { aabb, aabbIntersects } from "../math/aabb";
 import { originOf } from "../math/mat4";
@@ -12,25 +13,31 @@ import type { AccessLevel, AnchoringKind, SiteFactors } from "./types";
  * ed enum calcolati dal dominio (ingombro + assieme) più quelli dichiarati dal cliente o
  * dall'ufficio (accesso, ancoraggio). Sono l'unico ingresso delle regole di complicazione.
  *
- * Deviazioni dallo squadro: arrivano dalla pianta dell'ingombro (gruppo 5, fuorisquadra)
- * tramite un `PlanDeviationProvider`. Finché la pianta non esiste il provider di default
- * restituisce 0; il gruppo 5 sostituisce `defaultPlanDeviations` (o passa il proprio
- * provider in `SiteFactorsOptions.planDeviations`) senza toccare il resto.
+ * Deviazioni dallo squadro: dalla pianta dell'ingombro (P4, fuorisquadra) tramite un
+ * `PlanDeviationProvider`; il default `defaultPlanDeviations` legge `planDeviations` della
+ * pianta (0 senza pianta), `SiteFactorsOptions.planDeviations` lo sostituisce.
  */
 
 /** Deviazioni dallo squadro (gradi, ≥ 0). */
 export interface PlanDeviationSummary {
   /** Massima deviazione di un angolo della pianta da 90°. */
   readonly planDeviationDeg: number;
-  /** Deviazione del lato muro dalla perpendicolare al fronte (tipologie addossate). */
+  /**
+   * Rotazione del lato muro (`wallSide`) rispetto al lato del box: per il muro posteriore
+   * è l'angolo tra muro e fronte, cioè quanto il muro esce dalla perpendicolare ai fianchi
+   * (tipologie addossate: taglio composto delle teste a muro).
+   */
   readonly wallDeviationDeg: number;
 }
 
 /** Calcola le deviazioni dalla pianta dell'ingombro (punto di aggancio del gruppo 5). */
 export type PlanDeviationProvider = (envelope: Envelope) => PlanDeviationSummary;
 
-/** Pianta rettangolare implicita (nessuna `Envelope.plan` prima del gruppo 5): deviazioni 0. */
-export const defaultPlanDeviations: PlanDeviationProvider = () => ({ planDeviationDeg: 0, wallDeviationDeg: 0 });
+/** Deviazioni della pianta dell'ingombro (`planDeviations(planOf(envelope))`): 0 con pianta rettangolare. */
+export const defaultPlanDeviations: PlanDeviationProvider = (envelope) => {
+  const d = planDeviations(planOf(envelope));
+  return { planDeviationDeg: d.maxCornerDeg, wallDeviationDeg: Math.abs(d.sides[envelope.wallSide]) };
+};
 
 /** Fattori dichiarati (non calcolabili) e sostituzioni esplicite. */
 export interface DeclaredSiteFactors {
