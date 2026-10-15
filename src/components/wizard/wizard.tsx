@@ -158,7 +158,7 @@ function WizardShell({ step }: { step: WizardStep }) {
             )}
             {next && step !== "contatti" && (
               <button type="button" onClick={onNext} className="site-btn site-btn-primary" aria-describedby={problem ? errorId : undefined}>
-                {next === "riepilogo" ? "Vedi il prezzo" : next === "contatti" ? "Richiedi il preventivo" : "Avanti"}
+                {next === "riepilogo" ? "Vedi il prezzo" : next === "contatti" ? "Richiedi preventivo" : "Avanti"}
                 <ArrowRight className="h-5 w-5" aria-hidden="true" />
               </button>
             )}

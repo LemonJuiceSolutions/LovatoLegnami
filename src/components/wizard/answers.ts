@@ -222,7 +222,7 @@ export interface MeasureField {
 
 const DIMENSION_COPY: Readonly<Record<FitDimension, { label: string; hint: string }>> = {
   larghezza: { label: "Larghezza", hint: "Lungo il fronte, da un pilastro esterno all'altro." },
-  profondita: { label: "Profondità", hint: "Dal fronte fino al muro (o al lato opposto)." },
+  profondita: { label: "Profondità", hint: "Dalla trave sul fronte fino al muro (o alla trave dietro)." },
   altezza: { label: "Altezza sotto trave", hint: "Lo spazio libero per passare, da terra alla trave." },
 }
 

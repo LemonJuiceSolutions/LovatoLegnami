@@ -44,6 +44,8 @@ export function StepSummary() {
             derived.error && <Notice tone="warning">{derived.error}</Notice>
           )}
 
+          <MobilePrice estimate={estimate} />
+
           <div className="grid gap-6 sm:grid-cols-2">
             <div className="rounded-2xl border border-border bg-card p-5">
               <SummaryTitle step="misure">Misure finali</SummaryTitle>
@@ -129,6 +131,19 @@ function PlanSketch({ plan, width, depth, wall }: { plan: EnvelopePlan | null; w
         {dev >= 0.5 ? `Fuori squadra di circa ${Math.round(dev)}°.` : "In squadra."}
       </figcaption>
     </figure>
+  )
+}
+
+/** Su telefono il prezzo compare subito sotto il 3D (la scheda completa è più in basso). */
+function MobilePrice({ estimate }: { estimate: EstimateState }) {
+  const quote = estimate.status === "ok" ? estimate.quote : estimate.status === "loading" ? estimate.quote : null
+  return (
+    <a href="#prezzo-titolo" className="flex items-center justify-between gap-4 rounded-2xl border-2 border-primary/30 bg-card px-5 py-4 lg:hidden">
+      <span className="text-sm font-semibold uppercase tracking-[0.12em] text-[hsl(var(--site-gold-ink))]">Prezzo indicativo</span>
+      <span className="site-display text-[1.7rem] leading-none tabular-nums">
+        {quote && quote.status === "completo" ? euro(quote.totalCents) : estimate.status === "error" || quote?.status === "incompleto" ? "su richiesta" : "…"}
+      </span>
+    </a>
   )
 }
 

@@ -200,6 +200,25 @@ function postsInfo(template: TypologyTemplate, answers: WizardAnswers, assembly:
   }
 }
 
+/**
+ * Pianta del cliente con il **fianco sinistro aperto**: la pergola parte sempre
+ * dall'angolo anteriore sinistro (x = 0), quindi un fianco sinistro inclinato verso
+ * l'interno la farebbe "urtare" senza rimedio (l'adattamento può solo restringere).
+ * I fianchi di uno spazio addossato non sono pareti: il fianco sinistro diventa verticale
+ * in x = 0 (l'angolo posteriore scorre lungo la linea del muro, quindi l'inclinazione del
+ * muro non cambia); il fianco destro resta quello misurato (se è inclinato verso l'interno
+ * l'adattamento riduce la larghezza) e porta la deviazione dalla squadra.
+ */
+export function openSides(plan: EnvelopePlan): EnvelopePlan {
+  const [fl, fr, br, bl] = plan.corners
+  const left = Math.min(fl.x, bl.x)
+  // punto della linea del muro (br → bl) con x = left
+  const t = bl.x === br.x ? 0 : (left - bl.x) / (bl.x - br.x)
+  const backLeft = { x: 0, y: bl.y + t * (bl.y - br.y) }
+  const corners = [{ x: 0, y: fl.y }, { x: fr.x - left, y: fr.y }, { x: br.x - left, y: br.y }, backLeft] as const
+  return { corners } as unknown as EnvelopePlan
+}
+
 /** Ingombro dalle risposte: pianta dalle diagonali o rettangolo che contiene la pergola richiesta. */
 function envelopeFor(
   template: TypologyTemplate,
@@ -213,17 +232,25 @@ function envelopeFor(
   if (wall && space.wallShape === "diagonali") {
     const d = space.diagonals
     try {
-      plan = planFromDiagonals({ front: d.front * 10, back: d.back * 10, left: d.left * 10, right: d.right * 10, d1: d.d1 * 10, d2: d.d2 * 10 })
+      plan = openSides(planFromDiagonals({ front: d.front * 10, back: d.back * 10, left: d.left * 10, right: d.right * 10, d1: d.d1 * 10, d2: d.d2 * 10 }))
     } catch (e) {
       if (!(e instanceof PlanMeasuresError)) throw e
       planError = PLAN_ERROR
     }
   }
   if (plan && isWallTypology(template)) {
-    // la pergola addossata arriva al muro: profondità dalla pianta, l'adattamento la porta a filo
+    // la pergola addossata arriva al muro: la profondità è quella che porta il retro del legno
+    // al punto del muro più vicino al fronte (il template posa lì il muro reale e lo segue);
+    // l'adattamento all'ingombro sistema l'eventuale residuo
     const name = dimensionParam(template, "profondita")
     const spec = template.params.find((p): p is NumberParamSpec => p.name === name && p.kind === "number")
-    if (spec) params[name] = Math.min(spec.max, Math.max(spec.min, Math.round(boxOfPlan(plan, 1).depth)))
+    const current = params[name]
+    if (spec && typeof current === "number") {
+      const flat = assemblyBounds(generate(template.slug, params, { floorHeightAt: flatFloor }))
+      const extra = flat ? flat.max.y - current : 0
+      const nearestWall = Math.min(plan.corners[2].y, plan.corners[3].y)
+      params[name] = Math.min(spec.max, Math.max(spec.min, Math.floor(nearestWall - extra - WALL_GAP)))
+    }
   }
   // pergola richiesta su pavimento piano: misura del rettangolo che la contiene
   const probe = generate(template.slug, params, { floorHeightAt: flatFloor })

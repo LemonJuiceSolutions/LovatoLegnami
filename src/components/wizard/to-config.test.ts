@@ -59,6 +59,31 @@ describe("toConfig (12.1)", () => {
     expect(d.notes.join(" ")).toMatch(/muro fuori squadra di circa 2°/i)
   })
 
+  it("muro fuori squadra + grondaia + pendenza ⇒ pergola a filo del muro senza collisioni né verifica", () => {
+    const d = toConfig(
+      monofalda((a) => ({
+        ...a,
+        misure: { ...a.misure, larghezza: 450 },
+        spazio: {
+          ...a.spazio,
+          wallShape: "diagonali",
+          diagonals: { front: 450, back: 450, left: 300, right: 300, d1: 548, d2: 534 },
+          obstacles: [{ ...newObstacle("grondaia", "g"), elevation: 270 }],
+          floor: "dislivello",
+          floorDrop: 5,
+        },
+      })),
+      rules,
+    )
+    expect(d.prepared!.collisions).toEqual([])
+    expect(d.prepared!.needsReview).toBe(false)
+    // fianco sinistro aperto: angoli sinistri in x = 0, deviazione misurata conservata
+    expect(d.plan!.corners[0].x).toBe(0)
+    expect(d.plan!.corners[3].x).toBe(0)
+    expect(planDeviations(d.plan!).maxCornerDeg).toBeGreaterThan(1)
+    expect(d.notes.join(" ")).not.toMatch(/verifica del nostro ufficio/)
+  })
+
   it("diagonali incoerenti ⇒ messaggio semplice e pianta rettangolare", () => {
     const d = toConfig(
       monofalda((a) => ({ ...a, spazio: { ...a.spazio, wallShape: "diagonali", diagonals: { front: 500, back: 500, left: 300, right: 300, d1: 900, d2: 576 } } })),
