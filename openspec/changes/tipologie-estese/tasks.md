@@ -80,7 +80,7 @@ Riferimenti: `specs/*/spec.md` per il comportamento, `design.md` per le decision
 
 ## 12. Viewer (spec `visualizzatore-3d`, prerequisito: task 12.x di `configuratore-pergole`)
 
-- [ ] 12.1 Aggiornare `piece-mesh.tsx`: fallback box dei pezzi curvi come catena di box da `pieceObbs` (colore famiglia `ARC`); la mesh del kernel resta prioritaria. Verificare manualmente con il preset "Carport arco 5×3" disabilitando il WASM che l'arco appare come catena di box e, con il kernel, come solido curvo; test di rendering che per un arco vengono creati `ceil(sweep/15°)` box.
+- [x] 12.1 Aggiornare `piece-mesh.tsx`: fallback box dei pezzi curvi come catena di box da `pieceObbs` (colore famiglia `ARC`); la mesh del kernel resta prioritaria. Verificare manualmente con il preset "Carport arco 5×3" disabilitando il WASM che l'arco appare come catena di box e, con il kernel, come solido curvo; test di rendering che per un arco vengono creati `ceil(sweep/15°)` box.
 - [ ] 12.2 Implementare `hardware-layer.tsx` (cilindri per i bulloni lungo l'asse tra i pezzi collegati, box per staffe/giunti/cuspidi da `HardwareItem.pose` e `dims`; etichetta `Html` al passaggio del mouse con codice e pezzi) e il toggle "ferramenta" nei livelli dello store. Verificare manualmente che sulla pergola sandwich ogni bullone attraversa tavola–pilastro–tavola e che il toggle rimuove tutti i simboli; test di rendering del conteggio dei simboli per un assieme con 12 bulloni.
 
 ## 13. Integrazione e verifica finale

@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest"
-import { Vector3 } from "three"
-import { generate, getTypology, defaultParams, multiply, rotationZ, translation, vec3, applyToPoint } from "@/domain"
+import { Quaternion, Vector3 } from "three"
+import { generate, getTypology, defaultParams, multiply, rotationZ, translation, vec3, applyToPoint, pieceObbs } from "@/domain"
 import { pieceCacheKey } from "@/geometry/cache"
-import { familyLegend, poseToMatrix4, poseToTransform, usableKernelMesh } from "./viewer-helpers"
+import { curvedFallbackBoxes, familyLegend, poseToMatrix4, poseToTransform, usableKernelMesh } from "./viewer-helpers"
 
 describe("poseToMatrix4", () => {
   it("rispetta l'ordine per righe del dominio (p' = M·p)", () => {
@@ -60,5 +60,28 @@ describe("usableKernelMesh", () => {
     expect(usableKernelMesh(piece, { ...base, error: { message: "x" } } as never)).toBeUndefined()
     expect(usableKernelMesh(piece, { ...base, mesh: { ...mesh, indices: new Uint32Array() } })).toBeUndefined()
     expect(usableKernelMesh({ ...piece, length: piece.length + 10 }, base)).toBeUndefined()
+  })
+})
+
+describe("pezzi curvi in modalità semplificata", () => {
+  const arc = generate("carport-arco").pieces.find((p) => p.curve)!
+
+  it("ceil(sweep/15°) box di tratto, uno per OBB di pieceObbs", () => {
+    const boxes = curvedFallbackBoxes(arc)
+    expect(boxes.length).toBe(Math.ceil(arc.curve!.sweep / 15))
+    const obbs = pieceObbs(arc)
+    boxes.forEach((b, i) => {
+      expect(b.position[0]).toBeCloseTo(obbs[i].center.x, 6)
+      expect(b.scale[2]).toBeCloseTo(2 * obbs[i].halfSize.z, 6)
+      // la rotazione porta l'asse X locale sull'asse tangente del tratto
+      const x = new Vector3(1, 0, 0).applyQuaternion(new Quaternion(...b.quaternion))
+      expect(x.x).toBeCloseTo(obbs[i].axes[0].x, 6)
+      expect(x.z).toBeCloseTo(obbs[i].axes[0].z, 6)
+    })
+  })
+
+  it("pezzi dritti: nessun box di tratto", () => {
+    const straight = generate("carport-arco").pieces.find((p) => !p.curve)!
+    expect(curvedFallbackBoxes(straight)).toEqual([])
   })
 })

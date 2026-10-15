@@ -1,5 +1,5 @@
 import { Matrix4, Quaternion, Vector3 } from "three"
-import { PIECE_FAMILIES, type Assembly, type Mat4, type Piece, type PieceFamily } from "@/domain"
+import { PIECE_FAMILIES, pieceObbs, type Assembly, type Mat4, type OBB, type Piece, type PieceFamily } from "@/domain"
 import { pieceCacheKey } from "@/geometry/cache"
 import type { PieceMesh as PieceMeshData, PieceResult } from "@/geometry/protocol"
 
@@ -56,4 +56,30 @@ export function usableKernelMesh(piece: Piece, result: PieceResult | undefined):
   if (!result || result.error || !result.mesh) return undefined
   if (result.mesh.indices.length === 0 || result.mesh.positions.length === 0) return undefined
   return result.cacheKey === pieceCacheKey(piece) ? result.mesh : undefined
+}
+
+export interface BoxTransform extends Transform {
+  /** Dimensioni del box (scala di un box unitario centrato). */
+  readonly scale: [number, number, number]
+}
+
+/** OBB (sistema assieme) → posizione, rotazione e scala di un box unitario centrato. */
+export function obbTransform(o: OBB): BoxTransform {
+  const [a, b, c] = o.axes
+  const basis = new Matrix4().makeBasis(new Vector3(a.x, a.y, a.z), new Vector3(b.x, b.y, b.z), new Vector3(c.x, c.y, c.z))
+  const q = new Quaternion().setFromRotationMatrix(basis)
+  return {
+    position: [o.center.x, o.center.y, o.center.z],
+    quaternion: [q.x, q.y, q.z, q.w],
+    scale: [2 * o.halfSize.x, 2 * o.halfSize.y, 2 * o.halfSize.z],
+  }
+}
+
+/**
+ * Box della modalità semplificata di un pezzo curvo (spec `visualizzatore-3d`,
+ * "Pezzi curvi nel viewer"): i tratti di `pieceObbs` (`ceil(sweep/15°)`), nel
+ * sistema assieme. Per i pezzi dritti `[]` (si usa il box sezione × lunghezza).
+ */
+export function curvedFallbackBoxes(piece: Piece): BoxTransform[] {
+  return piece.curve ? pieceObbs(piece).map(obbTransform) : []
 }
