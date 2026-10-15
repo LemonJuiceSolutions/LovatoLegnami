@@ -88,6 +88,14 @@ const obstacleId = (existing: readonly SimpleObstacle[]) => {
   return id
 }
 
+/**
+ * Storage vuoto per il rendering sul server: Node < 25 non ha `sessionStorage` e senza uno
+ * storage `persist` non aggiungerebbe `store.persist` (prerender del wizard in errore su
+ * `persist.hasHydrated`). Nel browser si usa sempre `sessionStorage`.
+ */
+const NO_STORAGE: StateStorage = { getItem: () => null, setItem: () => {}, removeItem: () => {} }
+export const browserSessionStorage = (): StateStorage => (typeof sessionStorage === "undefined" ? NO_STORAGE : sessionStorage)
+
 export type WizardStore = StoreApi<WizardState> & { persist: { rehydrate(): Promise<void> | void; hasHydrated(): boolean } }
 
 export function createWizardStore(options: WizardStoreOptions = {}): WizardStore {
@@ -160,7 +168,7 @@ export function createWizardStore(options: WizardStoreOptions = {}): WizardStore
       {
         name: WIZARD_STORAGE_KEY,
         version: 1,
-        storage: createJSONStorage<Persisted>(() => options.storage ?? sessionStorage),
+        storage: createJSONStorage<Persisted>(() => options.storage ?? browserSessionStorage()),
         partialize: (s) => ({ step: s.step, answers: s.answers, submitted: s.submitted }),
         skipHydration: options.skipHydration,
         merge: (persisted, current) => {
