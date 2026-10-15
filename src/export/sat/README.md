@@ -188,6 +188,36 @@ Esportazioni usare **Confronta campione** (sceglie il `.sat` della macchina e mo
 Esito della prova (da compilare): CNC/CAM `________`, versione ACIS `____`, modalità file `____________`,
 nome body `sì/no`, data `__________`, note `______________________________`.
 
+## Pezzi curvi
+
+Gli archi lamellari del carport (`curve: { radius, sweep }` sul pezzo `arco`) non richiedono estensioni del writer:
+il kernel li costruisce come **rivoluzione** del rettangolo di sezione attorno a un asse parallelo a Y locale
+(design E6), quindi la B-rep contiene solo superfici piane e cilindriche e curve rette o circolari.
+
+Cosa contiene un arco senza lavorazioni: un body, 6 facce (2 `cone-surface` intradosso `R − h/2` ed estradosso
+`R + h/2`, 2 `plane-surface` laterali a settore anulare, 2 `plane-surface` di testa), 12 spigoli di cui 4 su
+`ellipse-curve` (archi di cerchio con `t0 < t1`) e 8 su `straight-curve`, 8 vertici. Ogni foro aggiunge una
+`cone-surface` (riferimento in TS puro: `arcBrep` in `src/geometry/neutral-brep-box.ts`; test reale:
+`src/geometry/tipologie-estese.geometry.test.ts`).
+
+Vincoli del dominio (E2) che tengono il SAT su piane/cilindriche, applicati da `createMachining`
+(`MachiningError` "non ammessa su pezzi curvi"):
+
+- solo `foro` sulle facce `sinistra`/`destra`, con asse parallelo all'asse del cilindro: spigoli circolari sulle
+  facce piane laterali, nessuna intersezione con le facce cilindriche;
+- solo `taglio-testa` senza `angle2`: piano parallelo all'asse del cilindro ⇒ spigoli rettilinei (un piano obliquo
+  darebbe ellissi, non supportate);
+- `at` sui curvi è la coordinata **curvilinea** lungo l'asse.
+
+Se la rivoluzione o una booleana sul curvo fallisce, il pezzo va in `errors` (`PieceBuildError`/`SatBodyError`) e
+gli altri sono scritti; il viewer mostra l'arco come catena di box di tratto.
+
+Cosa aspettarsi nel CAM: l'arco deve arrivare come solido chiuso con intradosso ed estradosso cilindrici (non
+sfaccettati), nominato `ARC-nn`, nella posa dell'assieme (piede sulla staffa a P greco, testa orizzontale tra le
+tavole). Verificare nella prova: raggio e sviluppo letti dal CAM uguali a quelli della distinta, fori M8 della testa
+riconosciuti come fori passanti, nessun avviso di riparazione. Esito ancora da raccogliere: vedi la checklist sopra
+(da ripetere con il preset "Carport 5×3").
+
 ## Limiti (MVP)
 
 - **Superfici**: solo piane (`plane-surface`) e cilindriche (`cone-surface` con semiangolo 0); **curve**: solo rette

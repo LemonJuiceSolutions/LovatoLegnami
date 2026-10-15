@@ -85,8 +85,8 @@ Riferimenti: `specs/*/spec.md` per il comportamento, `design.md` per le decision
 
 ## 13. Integrazione e verifica finale
 
-- [ ] 13.1 Verifica manuale in `npm run dev`: selettore tipologie con tutte le 10 miniature → carica "Pergola libera 4×6" → passa a `carpenteria` → esporta SAT, STEP, CSV (verifica tabella ferramenta nel CSV e body degli archi nel SAT del carport) → salva JSON → ricarica. Annotare in `src/export/sat/README.md` la sezione "Pezzi curvi" (vincoli E2/E6 e cosa aspettarsi nel CAM).
-- [ ] 13.2 Eseguire `npm run lint`, `npm test`, `npm run test:geometry`, `npm run build` e verificare che tutti passano; aggiornare il `README.md` di progetto (elenco tipologie con categoria, preset, ferramenta, limiti noti: monaco quadrato per 6/8 lati, sede piana del cantonale, dardo senza chiave).
+- [x] 13.1 Verifica manuale in `npm run dev`: selettore tipologie con tutte le 10 miniature → carica "Pergola libera 4×6" → passa a `carpenteria` → esporta SAT, STEP, CSV (verifica tabella ferramenta nel CSV e body degli archi nel SAT del carport) → salva JSON → ricarica. Annotare in `src/export/sat/README.md` la sezione "Pezzi curvi" (vincoli E2/E6 e cosa aspettarsi nel CAM).
+- [x] 13.2 Eseguire `npm run lint`, `npm test`, `npm run test:geometry`, `npm run build` e verificare che tutti passano; aggiornare il `README.md` di progetto (elenco tipologie con categoria, preset, ferramenta, limiti noti: monaco quadrato per 6/8 lati, sede piana del cantonale, dardo senza chiave).
 
 ## Workflow follow-up
 
