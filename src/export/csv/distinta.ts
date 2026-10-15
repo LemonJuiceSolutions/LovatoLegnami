@@ -1,4 +1,4 @@
-import type { Assembly, Machining, Piece, PieceType, Section } from "@/domain/components/types";
+import type { Assembly, HardwareItem, HardwareKind, Machining, Piece, PieceType, Section } from "@/domain/components/types";
 import { pieceCacheKey } from "@/geometry/cache";
 
 /**
@@ -7,11 +7,16 @@ import { pieceCacheKey } from "@/geometry/cache";
  * cache dei solidi: id, pezzo e giunto delle lavorazioni non contano, numeri
  * arrotondati a 1e-6 mm). Formato per Excel italiano: separatore `;`, UTF-8
  * con BOM, decimali con virgola, righe CRLF.
+ *
+ * Dopo la tabella dei pezzi, una riga vuota e la tabella della ferramenta
+ * (E7, `tipologie-estese`): una riga per codice con le quantità sommate e gli
+ * id dei pezzi collegati; senza ferramenta resta la sola intestazione.
  */
 
 export const DISTINTA_COLUMNS = ["ID", "Tipo", "Sezione", "Lunghezza", "Quantità", "Lavorazioni"] as const;
 export const CSV_EXTENSION = "csv";
 export const CSV_MIME_TYPE = "text/csv;charset=utf-8";
+export const HARDWARE_COLUMNS = ["Codice", "Descrizione", "Quantità", "Pezzi"] as const;
 const BOM = "﻿";
 
 export interface DistintaRow {
@@ -28,9 +33,24 @@ export interface DistintaRow {
   readonly key: string;
 }
 
+/** Riga della tabella ferramenta: tutte le voci di un codice. */
+export interface HardwareRow {
+  readonly code: string;
+  readonly kind: HardwareKind;
+  readonly description: string;
+  /** Quantità sommata delle voci del codice. */
+  readonly quantity: number;
+  /** Id dei pezzi collegati (unione, ordine di prima comparsa). */
+  readonly pieceIds: readonly string[];
+  /** Id delle voci di ferramenta del codice (`BUL-01`, …), nell'ordine dell'assieme. */
+  readonly itemIds: readonly string[];
+}
+
 export interface Distinta {
   /** Righe nell'ordine di prima comparsa del gruppo nell'assieme. */
   readonly rows: readonly DistintaRow[];
+  /** Ferramenta raggruppata per codice, nell'ordine di prima comparsa. */
+  readonly hardwareRows: readonly HardwareRow[];
   /** Contenuto del file `.csv` (con BOM). */
   readonly csv: string;
 }
@@ -74,7 +94,30 @@ export function distintaRows(pieces: readonly Piece[]): DistintaRow[] {
   }));
 }
 
-export function distintaToCsv(rows: readonly DistintaRow[]): string {
+/** Ferramenta raggruppata per codice (quantità sommate, pezzi uniti). */
+export function hardwareRows(items: readonly HardwareItem[]): HardwareRow[] {
+  const groups = new Map<string, { first: HardwareItem; quantity: number; pieceIds: string[]; itemIds: string[] }>();
+  for (const it of items) {
+    let g = groups.get(it.code);
+    if (!g) {
+      g = { first: it, quantity: 0, pieceIds: [], itemIds: [] };
+      groups.set(it.code, g);
+    }
+    g.quantity += it.quantity;
+    g.itemIds.push(it.id);
+    for (const id of it.pieceIds) if (!g.pieceIds.includes(id)) g.pieceIds.push(id);
+  }
+  return [...groups.values()].map(({ first, quantity, pieceIds, itemIds }) => ({
+    code: first.code,
+    kind: first.kind,
+    description: first.description,
+    quantity,
+    pieceIds,
+    itemIds,
+  }));
+}
+
+export function distintaToCsv(rows: readonly DistintaRow[], hardware: readonly HardwareRow[] = []): string {
   const lines = [
     DISTINTA_COLUMNS.join(";"),
     ...rows.map((r) =>
@@ -82,12 +125,18 @@ export function distintaToCsv(rows: readonly DistintaRow[]): string {
         .map(csvField)
         .join(";"),
     ),
+    "",
+    HARDWARE_COLUMNS.join(";"),
+    ...hardware.map((h) =>
+      [h.code, h.description, formatDecimal(h.quantity, 3), h.pieceIds.join(", ")].map(csvField).join(";"),
+    ),
   ];
   return `${BOM}${lines.join("\r\n")}\r\n`;
 }
 
-/** Distinta dell'assieme: righe raggruppate e testo CSV. */
-export function buildDistinta(assembly: Pick<Assembly, "pieces">): Distinta {
+/** Distinta dell'assieme: righe dei pezzi, righe della ferramenta e testo CSV (`hardware` assente = nessuna voce). */
+export function buildDistinta(assembly: Pick<Assembly, "pieces"> & { readonly hardware?: Assembly["hardware"] }): Distinta {
   const rows = distintaRows(assembly.pieces);
-  return { rows, csv: distintaToCsv(rows) };
+  const hw = hardwareRows(assembly.hardware ?? []);
+  return { rows, hardwareRows: hw, csv: distintaToCsv(rows, hw) };
 }

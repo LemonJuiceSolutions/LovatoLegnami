@@ -63,7 +63,7 @@ Riferimenti: `specs/*/spec.md` per il comportamento, `design.md` per le decision
 ## 9. Export (spec `export-cnc`)
 
 - [x] 9.1 Test SAT dei pezzi curvi in `src/export/sat/writer.test.ts` con `arcBrep` (8.4): un arco → 1 body con 2 `cone-surface`, 4 `ellipse-curve`, 8 `straight-curve`, validatore senza errori; test geometry in `sat.geometry.test.ts` con la B-rep reale dell'arco del kernel. Verificare che `npm test` e `npm run test:geometry` passano.
-- [ ] 9.2 Estendere `src/export/csv/distinta.ts`: `buildDistinta(assembly)` → `{rows, hardwareRows, csv}` con la tabella `Codice;Descrizione;Quantità;Pezzi` dopo una riga vuota (E7). Verificare con test: preset "Pergola libera 4×6" → `bullone-m12x200` 12 e `vite-6x160` 36; tipologia in carpenteria senza ferramenta → solo intestazione della seconda tabella; i test esistenti della distinta restano verdi.
+- [x] 9.2 Estendere `src/export/csv/distinta.ts`: `buildDistinta(assembly)` → `{rows, hardwareRows, csv}` con la tabella `Codice;Descrizione;Quantità;Pezzi` dopo una riga vuota (E7). Verificare con test: preset "Pergola libera 4×6" → `bullone-m12x200` 12 e `vite-6x160` 36; tipologia in carpenteria senza ferramenta → solo intestazione della seconda tabella; i test esistenti della distinta restano verdi.
 - [ ] 9.3 Test di pipeline `src/export/__tests__/pipeline-estese.test.ts`: per ogni nuova tipologia con i default, B-rep neutra da `pieceBoxBrep`/`arcBrep`, `exportSat` in modalità unica e per pezzo, validatore verde, numero di body = numero di pezzi (ferramenta esclusa: assieme con 20 pezzi e 15 voci → 20 body), distinta con entrambe le tabelle. Verificare che `npm test` passa.
 
 ## 10. Store (prerequisito: task 10.x di `configuratore-pergole`)

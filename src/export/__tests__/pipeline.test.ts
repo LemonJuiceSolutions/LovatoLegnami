@@ -44,7 +44,8 @@ describe("pipeline dominio → export", () => {
   it.each(SLUGS)("%s di default: distinta CSV coerente con i pezzi", (slug) => {
     const { assembly, distinta } = pipeline(slug);
     const lines = distinta.csv.trimEnd().split("\r\n");
-    expect(lines.length).toBe(distinta.rows.length + 1);
+    // tabella pezzi, riga vuota, tabella ferramenta (E7 di `tipologie-estese`)
+    expect(lines.length).toBe(distinta.rows.length + 3 + distinta.hardwareRows.length);
     const total = distinta.rows.reduce((s, r) => s + r.quantity, 0);
     expect(total).toBe(assembly.pieces.length);
     const ids = distinta.rows.flatMap((r) => r.ids).sort();
