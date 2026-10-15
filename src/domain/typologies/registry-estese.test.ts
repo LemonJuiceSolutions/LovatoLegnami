@@ -6,6 +6,7 @@ import { parseEnvelope } from "../envelope/types";
 import { multiply, translation } from "../math/mat4";
 import { vec3 } from "../math/vec3";
 import { DEFAULT_LOVATO_RULES } from "../rules/data/default-lovato";
+import { listPresets } from "../presets/catalog";
 import { evaluateRules } from "../rules/engine";
 import { createRegistry, generate } from "./registry";
 import { TYPOLOGY_CATEGORIES } from "./template";
@@ -52,6 +53,10 @@ describe("registro completo delle tipologie (6.4)", () => {
     }
     const categories = new Set(BUILTIN_TEMPLATES.map((t) => t.category));
     expect([...categories].sort()).toEqual([...TYPOLOGY_CATEGORIES].sort());
+  });
+
+  it("ognuna ha almeno un preset a catalogo (gruppo 7)", () => {
+    for (const t of BUILTIN_TEMPLATES) expect(listPresets(t.slug).length, t.slug).toBeGreaterThan(0);
   });
 
   it("la validazione del registro completo dura meno di 200 ms", () => {

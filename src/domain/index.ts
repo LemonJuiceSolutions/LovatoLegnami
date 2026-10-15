@@ -16,5 +16,7 @@ export * from "./rules";
 export * from "./envelope";
 // Ferramenta: catalogo, bulloni passanti, staffe, giunti a N vie, elenco ferramenta
 export * from "./hardware";
+// Preset commerciali: catalogo dal riferimento, listPresets, loadPreset
+export * from "./presets";
 // Matematica di base (vettori, matrici di posa, box)
 export * from "./math";
