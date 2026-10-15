@@ -2,20 +2,75 @@
   "extends": "next/core-web-vitals",
   "overrides": [
     {
-      "files": ["src/domain/**/*.ts", "src/domain/**/*.tsx"],
+      "files": [
+        "src/domain/**/*.ts",
+        "src/domain/**/*.tsx"
+      ],
       "rules": {
         "no-restricted-imports": [
           "error",
           {
             "paths": [
-              { "name": "react", "message": "src/domain è TypeScript puro: niente React." },
-              { "name": "react-dom", "message": "src/domain è TypeScript puro: niente React DOM." },
-              { "name": "three", "message": "src/domain è TypeScript puro: niente Three." },
-              { "name": "replicad", "message": "src/domain è TypeScript puro: niente kernel geometrico." },
-              { "name": "replicad-opencascadejs", "message": "src/domain è TypeScript puro: niente kernel geometrico." }
+              {
+                "name": "react",
+                "message": "src/domain è TypeScript puro: niente React."
+              },
+              {
+                "name": "react-dom",
+                "message": "src/domain è TypeScript puro: niente React DOM."
+              },
+              {
+                "name": "three",
+                "message": "src/domain è TypeScript puro: niente Three."
+              },
+              {
+                "name": "replicad",
+                "message": "src/domain è TypeScript puro: niente kernel geometrico."
+              },
+              {
+                "name": "replicad-opencascadejs",
+                "message": "src/domain è TypeScript puro: niente kernel geometrico."
+              }
             ],
             "patterns": [
-              { "group": ["react/*", "react-dom/*", "three/*", "replicad/*", "@react-three/*"], "message": "src/domain è TypeScript puro: import vietato." }
+              {
+                "group": [
+                  "react/*",
+                  "react-dom/*",
+                  "three/*",
+                  "replicad/*",
+                  "@react-three/*"
+                ],
+                "message": "src/domain è TypeScript puro: import vietato."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": [
+        "src/components/**/*.ts",
+        "src/components/**/*.tsx",
+        "src/stores/**/*.ts",
+        "src/stores/**/*.tsx",
+        "src/lib/**/*.ts",
+        "src/lib/**/*.tsx"
+      ],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": [
+                  "@/db",
+                  "@/db/*",
+                  "@/server/*",
+                  "!@/server/auth/permissions"
+                ],
+                "message": "Codice client: niente accesso diretto a database o moduli server (usa server actions o API)."
+              }
             ]
           }
         ]

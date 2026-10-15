@@ -17,3 +17,6 @@ public/occt/
 
 # Artefatti di Playwright MCP
 .playwright-mcp/
+
+# Dati locali: PGlite di sviluppo e file caricati (P5, P7)
+.data/
