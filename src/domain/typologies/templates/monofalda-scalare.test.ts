@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { assemblyBounds, pieceAabb } from "../../assembly/bounds";
 import type { Assembly, Piece } from "../../components/types";
 import { applyToPoint, axisOf } from "../../math/mat4";
 import { vec3 } from "../../math/vec3";
@@ -46,12 +47,26 @@ describe("monofalda-scalare", () => {
     const a = camper();
     const correnti = ofType(a, "trave");
     expect(correnti).toHaveLength(2 * 3); // 2 linee × 3 campate
-    const rowYs = [300, 300 + 2463.3333333333335, 300 + 2 * 2463.3333333333335, 7690];
-    const ends = correnti.flatMap(yRange).filter((y) => y > 10 && y < 7980);
+    // quote in pianta spostate di y0: la fascia frontale sta tra y = 0 e y = 38
+    const y0 = a.meta.yCorrenti as number;
+    expect(y0).toBeCloseTo(38 - 145 * Math.sin(((a.meta.pendenza as number) * Math.PI) / 180), 9);
+    const rowYs = [300, 300 + 2463.3333333333335, 300 + 2 * 2463.3333333333335, 7690].map((y) => y + y0);
+    const ends = correnti.flatMap(yRange).filter((y) => y > y0 + 10 && y < y0 + 7980);
     // ogni estremità interna cade sulla trave sandwich di una fila intermedia (assi a ±105, asse del corrente spostato di (h/2)·sin α)
     for (const y of ends) expect(rowYs.slice(1, 3).some((r) => Math.abs(y - r) <= 110)).toBe(true);
     expect(new Set(ends.map((y) => rowYs.findIndex((r) => Math.abs(y - r) <= 110))).size).toBe(2);
     for (const c of correnti) expect((Math.asin(Math.abs(axisOf(c.pose, 0).z)) * 180) / Math.PI).toBeCloseTo(a.meta.pendenza as number, 6);
+  });
+
+  it("fascia frontale a filo del fronte y = 0 e correnti tagliati a piombo contro la fascia (bullonata e carpenteria)", () => {
+    for (const costruzione of ["bullonata", "carpenteria"]) {
+      const a = camper({ costruzione });
+      const fascia = pieceAabb(ofType(a, "fascia")[0]);
+      expect(fascia.min.y).toBeCloseTo(0, 6);
+      expect(assemblyBounds(a)!.min.y).toBeCloseTo(0, 6);
+      for (const c of ofType(a, "trave")) expect(pieceAabb(c).min.y).toBeGreaterThanOrEqual(fascia.max.y - 1e-6);
+      expect(Math.min(...ofType(a, "trave").map((c) => pieceAabb(c).min.y))).toBeCloseTo(fascia.max.y, 6);
+    }
   });
 
   it("dardo di Giove: due lavorazioni complementari per giunzione", () => {

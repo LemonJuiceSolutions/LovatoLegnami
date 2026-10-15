@@ -19,6 +19,7 @@ import {
   numberParam,
   placeStep,
   sectionParam,
+  seatOffset,
   spread,
 } from "./shared";
 
@@ -49,9 +50,16 @@ type Giunzione = "dritta" | "mezzo-legno" | "dardo-di-giove";
  *   traversi con la pendenza esatta; il tronco a valle di un giunto
  *   sovrapposto appoggia sul tronco a monte;
  * - fascia frontale 38×300 a piombo sulle teste anteriori dei correnti
- *   (tagliate a piombo); travetti lungo X opzionali sopra i correnti.
+ *   (tagliate a piombo); travetti lungo X opzionali sopra i correnti;
+ * - la faccia anteriore della fascia sta in y = 0 (fronte dell'ingombro): i
+ *   correnti partono da y = `y0` = b fascia − (h corrente − sede)·sin(pendenza),
+ *   così il taglio a piombo per lo spigolo superiore della testa cade in
+ *   y = b fascia, e tutte le quote in pianta sono spostate di `y0`.
  */
 function geometry(ctx: BuildContext) {
+  const mode = constructionOf(ctx);
+  const sc = ctx.section("sezioneCorrente");
+  const sf = ctx.section("sezioneFascia");
   const W = ctx.num("larghezza");
   const P = ctx.num("profondita");
   const H = ctx.num("altezza");
@@ -61,9 +69,12 @@ function geometry(ctx: BuildContext) {
   const t = Math.tan(degToRad(slope));
   const bay = (P - 2 * sbalzo) / (file - 1);
   if (bay < MIN_BAY) throw new ParamError("file", file, `campata di ${Math.round(bay)} mm tra le file: servono almeno ${MIN_BAY} mm`);
-  const rowYs = Array.from({ length: file }, (_, k) => sbalzo + k * bay);
+  // sede dei correnti sugli spigoli dei traversi (carpenteria, becco d'uccello: come joistsOnBeams)
+  const drop = mode === "carpenteria" ? seatOffset(slope, [ctx.section("sezioneTrave").b], sc) : 0;
+  const y0 = sf.b - (sc.h - drop) * Math.sin(degToRad(slope));
+  const rowYs = Array.from({ length: file }, (_, k) => y0 + sbalzo + k * bay);
   const undersides = rowYs.map((_, k) => H + (file - 1 - k) * bay * t);
-  return { W, P, H, file, sbalzo, slope, t, bay, salto: bay * t, rowYs, undersides };
+  return { mode, sc, sf, W, P, H, file, sbalzo, slope, t, bay, salto: bay * t, y0, rowYs, undersides };
 }
 
 export const monofaldaScalare: TypologyTemplate = {
@@ -117,9 +128,8 @@ export const monofaldaScalare: TypologyTemplate = {
 
   build(ctx) {
     const g = geometry(ctx);
-    const mode = constructionOf(ctx);
+    const { mode, sc, sf } = g;
     const sp = ctx.section("sezionePilastro");
-    const sc = ctx.section("sezioneCorrente");
     const lateral = ctx.num("sbalzoLaterale");
     const n = ctx.num("pilastriPerFila");
     if (g.W - 2 * lateral < 500) throw new ParamError("sbalzoLaterale", lateral, "pilastri d'estremità troppo vicini");
@@ -153,8 +163,8 @@ export const monofaldaScalare: TypologyTemplate = {
       throw new ParamError("lunghezzaGiunto", lap, `la sovrapposizione deve coprire il traverso: almeno ${Math.ceil((2 * half) / Math.cos(degToRad(g.slope)))} mm`);
     const correnti: Placed[][] = postXs.map(() => []);
     for (let k = 0; k < g.file - 1; k++) {
-      const y0 = k === 0 ? 0 : lap ? g.rowYs[k] - lapHalf : g.rowYs[k] + half;
-      const y1 = k === g.file - 2 ? g.P : lap ? g.rowYs[k + 1] + lapHalf : g.rowYs[k + 1] + half;
+      const y0 = k === 0 ? g.y0 : lap ? g.rowYs[k] - lapHalf : g.rowYs[k] + half;
+      const y1 = k === g.file - 2 ? g.y0 + g.P : lap ? g.rowYs[k + 1] + lapHalf : g.rowYs[k + 1] + half;
       // il tronco a valle di un giunto sovrapposto appoggia sul tronco a monte, non sul traverso
       const supports = rows.filter((_, r) => r === k + 1 || (r === k && (k === 0 || !lap))).flatMap((r) => r.beams);
       const lines: JoistLine[] = postXs.map((x, i) => ({ ref: `corrente-${i}-${k}`, section: sc, from: { x, y: y0 }, to: { x, y: y1 } }));
@@ -181,7 +191,6 @@ export const monofaldaScalare: TypologyTemplate = {
     const frontTop = applyToPoint(c0.pose, vec3(frontFace === "testa-fine" ? c0.length : 0, 0, sc.h / 2));
     const front = plane(vec3(0, frontTop.y, 0), vec3(0, -1, 0));
     for (const line of correnti) steps.push(headCutOnPlane(line[0].ref, front, frontFace));
-    const sf = ctx.section("sezioneFascia");
     const fascia: Placed = {
       ref: "fascia",
       type: "fascia",
@@ -196,7 +205,7 @@ export const monofaldaScalare: TypologyTemplate = {
       const sj = ctx.section("sezioneTravetto");
       const c0 = correnti[0][0];
       const topPlane = plane(applyToPoint(c0.pose, vec3(0, 0, sc.h / 2)), axisOf(c0.pose, 2));
-      const ys = spread(sf.b, g.P - sf.b, sj.b, joistSpaces(g.P - 2 * sf.b - sj.b, ctx.num("interasse")));
+      const ys = spread(g.y0 + sf.b, g.y0 + g.P - sf.b, sj.b, joistSpaces(g.P - 2 * sf.b - sj.b, ctx.num("interasse")));
       const joists: JoistLine[] = ys.map((y, i) => ({ ref: `travetto-${i}`, section: sj, from: { x: 0, y }, to: { x: g.W, y } }));
       steps.push(...joistsOnBeams(ctx, mode, { joists, seat: topPlane, supports: correnti.flat() }).steps);
     }
@@ -214,6 +223,7 @@ export const monofaldaScalare: TypologyTemplate = {
       pendenza: g.slope,
       campata: g.bay,
       salto: g.salto,
+      yCorrenti: g.y0,
       ...Object.fromEntries(g.undersides.map((z, k) => [`intradossoFila${k + 1}`, z])),
     };
   },
