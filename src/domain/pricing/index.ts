@@ -11,3 +11,5 @@ export type { Cents } from "./money";
 export * from "./types";
 // Listino seed v1 (DA VALIDARE)
 export * from "./data/default-listino";
+// Ottimizzazione di taglio 1D (P2)
+export * from "./cutting-stock";
