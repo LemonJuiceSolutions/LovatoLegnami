@@ -14,6 +14,14 @@ const config: Config = {
       screens: { "2xl": "1400px" },
     },
     extend: {
+      // Sito pubblico (P8): carattere display e larghezza del contenitore da `.theme-site`.
+      fontFamily: {
+        display: ["var(--site-display-font)", "Georgia", "serif"],
+      },
+      maxWidth: {
+        site: "var(--site-max)",
+        measure: "var(--site-measure)",
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",

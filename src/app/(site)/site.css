@@ -1,0 +1,277 @@
+/*
+ * Tema del sito pubblico (P8, spec `sito-pubblico`): ridefinisce i token shadcn solo
+ * dentro `.theme-site`, così l'area interna resta invariata. Palette dall'identità di
+ * Lovato Legnami (lovatosrl.it): verde bosco #1B5A41, oro #BA8B49, carbone #231F20,
+ * salvia #9EC2AF. Il fondo è un bianco calce appena verde (non crema): legno e verde
+ * sono nei disegni, non nelle campiture.
+ *
+ * Contrasti (WCAG AA, testo normale ≥ 4,5:1), chiaro: carbone su calce 15,6:1, verde
+ * bosco su calce 7,9:1, testo attenuato su calce 6,4:1, oro scuro (`--site-gold-ink`)
+ * su calce 5,1:1. Scuro: avorio su bosco notte 15,8:1, salvia su bosco notte 9,2:1,
+ * testo attenuato 7,3:1. L'oro pieno (#BA8B49) è solo decorativo (linee, quote).
+ */
+
+.theme-site {
+  --background: 90 18% 96%;
+  --foreground: 345 6% 13%;
+  --card: 0 0% 100%;
+  --card-foreground: 345 6% 13%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 345 6% 13%;
+  --primary: 156 54% 23%;
+  --primary-foreground: 90 18% 97%;
+  --secondary: 148 22% 90%;
+  --secondary-foreground: 156 54% 16%;
+  --muted: 90 14% 91%;
+  --muted-foreground: 150 7% 33%;
+  --accent: 36 45% 91%;
+  --accent-foreground: 30 45% 20%;
+  --destructive: 4 70% 42%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 80 10% 82%;
+  --input: 80 10% 70%;
+  --ring: 156 54% 23%;
+  --radius: 0.375rem;
+
+  /* Token propri del sito */
+  --site-gold: 35 45% 51%;
+  --site-gold-ink: 34 52% 33%;
+  --site-sage: 149 25% 69%;
+  --site-wood: 28 52% 36%;
+  --site-paper: 90 18% 96%;
+  --site-display-font: var(--font-site-display), "Iowan Old Style", Georgia, serif;
+  --site-body-font: var(--font-site-body), system-ui, -apple-system, "Segoe UI", sans-serif;
+  --site-radius: 0.375rem;
+  --site-measure: 66ch;
+  --site-max: 76rem;
+  --site-gutter: clamp(1rem, 4vw, 2.5rem);
+
+  font-family: var(--site-body-font);
+  font-size: 1.0625rem;
+  line-height: 1.6;
+  background: hsl(var(--background));
+  color: hsl(var(--foreground));
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+.theme-site.dark {
+  --background: 152 26% 8%;
+  --foreground: 60 14% 92%;
+  --card: 152 22% 11%;
+  --card-foreground: 60 14% 92%;
+  --popover: 152 22% 11%;
+  --popover-foreground: 60 14% 92%;
+  --primary: 149 30% 72%;
+  --primary-foreground: 156 54% 11%;
+  --secondary: 152 18% 16%;
+  --secondary-foreground: 60 14% 92%;
+  --muted: 152 16% 14%;
+  --muted-foreground: 100 8% 70%;
+  --accent: 36 28% 19%;
+  --accent-foreground: 36 60% 82%;
+  --destructive: 4 70% 62%;
+  --destructive-foreground: 152 26% 8%;
+  --border: 150 12% 22%;
+  --input: 150 10% 34%;
+  --ring: 149 30% 72%;
+
+  --site-gold: 36 55% 60%;
+  --site-gold-ink: 36 60% 68%;
+  --site-wood: 30 50% 58%;
+  --site-paper: 152 26% 8%;
+}
+
+/* Fondo della pagina anche oltre il contenuto (rimbalzo dello scorrimento). */
+body:has(.theme-site) {
+  background: hsl(90 18% 96%);
+}
+body:has(.theme-site.dark) {
+  background: hsl(152 26% 8%);
+}
+
+/* ------------------------------------------------------------------ */
+/* Tipografia                                                          */
+/* ------------------------------------------------------------------ */
+
+.theme-site .site-display {
+  font-family: var(--site-display-font);
+  font-optical-sizing: auto;
+  font-variation-settings: "SOFT" 30;
+  font-weight: 420;
+  letter-spacing: -0.02em;
+  line-height: 1.02;
+  text-wrap: balance;
+}
+
+.theme-site .site-h1 {
+  font-size: clamp(2.6rem, 1.6rem + 4.6vw, 5.4rem);
+}
+.theme-site .site-h2 {
+  font-size: clamp(2rem, 1.45rem + 2.2vw, 3.1rem);
+  line-height: 1.08;
+}
+.theme-site .site-h3 {
+  font-size: clamp(1.35rem, 1.2rem + 0.6vw, 1.7rem);
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+
+.theme-site .site-lead {
+  font-size: clamp(1.125rem, 1.05rem + 0.35vw, 1.3rem);
+  line-height: 1.55;
+  max-width: 40ch;
+  color: hsl(var(--foreground) / 0.86);
+}
+
+.theme-site .site-prose {
+  max-width: var(--site-measure);
+}
+.theme-site .site-prose p + p {
+  margin-top: 1em;
+}
+.theme-site .site-prose h2 {
+  font-family: var(--site-display-font);
+  font-weight: 450;
+  font-size: 1.6rem;
+  line-height: 1.2;
+  margin: 2.2rem 0 0.6rem;
+}
+.theme-site .site-prose ul {
+  list-style: disc;
+  padding-left: 1.25rem;
+  margin-top: 0.6em;
+}
+.theme-site .site-prose li + li {
+  margin-top: 0.3em;
+}
+.theme-site .site-prose a {
+  color: hsl(var(--primary));
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* ------------------------------------------------------------------ */
+/* Impaginazione                                                       */
+/* ------------------------------------------------------------------ */
+
+.theme-site .site-container {
+  width: 100%;
+  max-width: calc(var(--site-max) + 2 * var(--site-gutter));
+  margin-inline: auto;
+  padding-inline: var(--site-gutter);
+}
+
+/* ------------------------------------------------------------------ */
+/* Pulsanti (collegamenti) del sito                                    */
+/* ------------------------------------------------------------------ */
+
+.theme-site .site-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 3rem;
+  padding: 0.7rem 1.4rem;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 1rem;
+  line-height: 1.2;
+  text-decoration: none;
+  transition: background-color 160ms ease, color 160ms ease, border-color 160ms ease;
+}
+.theme-site .site-btn-primary {
+  background: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+}
+.theme-site .site-btn-primary:hover {
+  background: hsl(var(--primary) / 0.88);
+}
+.theme-site .site-btn-quiet {
+  border: 1.5px solid hsl(var(--foreground) / 0.25);
+  color: hsl(var(--foreground));
+}
+.theme-site .site-btn-quiet:hover {
+  border-color: hsl(var(--foreground) / 0.6);
+}
+
+/* Focus sempre visibile, anche sui collegamenti di testo. */
+.theme-site :focus-visible {
+  outline: 3px solid hsl(var(--site-gold));
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* ------------------------------------------------------------------ */
+/* Materiali: venatura del legno e carta da disegno                    */
+/* ------------------------------------------------------------------ */
+
+/* Venatura disegnata con gradienti (nessuna immagine): fasce irregolari di toni rovere. */
+.theme-site .site-grain {
+  background-color: hsl(30 42% 58%);
+  background-image:
+    repeating-linear-gradient(
+      93deg,
+      hsl(28 45% 46% / 0.0) 0px,
+      hsl(28 45% 46% / 0.35) 2px,
+      hsl(28 45% 46% / 0.0) 5px,
+      hsl(28 45% 46% / 0.0) 19px
+    ),
+    repeating-linear-gradient(
+      88deg,
+      hsl(26 50% 38% / 0.0) 0px,
+      hsl(26 50% 38% / 0.25) 1px,
+      hsl(26 50% 38% / 0.0) 3px,
+      hsl(26 50% 38% / 0.0) 41px
+    ),
+    linear-gradient(90deg, hsl(32 48% 64%), hsl(28 44% 54%) 38%, hsl(31 46% 62%) 61%, hsl(27 42% 52%));
+}
+
+/* Carta millimetrata appena accennata, sotto i disegni tecnici. */
+.theme-site .site-drafting {
+  background-color: hsl(var(--card));
+  background-image:
+    linear-gradient(hsl(var(--primary) / 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, hsl(var(--primary) / 0.06) 1px, transparent 1px);
+  background-size: 24px 24px;
+  background-position: -1px -1px;
+}
+
+/* Miniature isometriche: contorni e ombre seguono `currentColor`. */
+.theme-site .site-drawing svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* Un solo momento di movimento: il disegno dell'eroe che si "traccia" all'apertura. */
+@media (prefers-reduced-motion: no-preference) {
+  .theme-site .site-trace {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    animation: site-trace 1.4s 0.2s cubic-bezier(0.65, 0, 0.35, 1) forwards;
+  }
+  .theme-site .site-reveal {
+    opacity: 0;
+    animation: site-reveal 0.9s 0.9s ease-out forwards;
+  }
+}
+@keyframes site-trace {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes site-reveal {
+  to {
+    opacity: 1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .theme-site *,
+  .theme-site *::before,
+  .theme-site *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
