@@ -2,7 +2,8 @@
 
 import * as React from "react"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
-import { ParamFields, StaleNotice, TypologySelect } from "./param-form"
+import { ParamFields, StaleNotice } from "./param-form"
+import { TypologyChooser } from "./typology-picker"
 
 /** Contenuto del pannello parametri: sezioni richiudibili (tipologia, sezioni, ingombro). */
 export function ParamsPanel({ envelope }: { envelope?: React.ReactNode }) {
@@ -13,7 +14,7 @@ export function ParamsPanel({ envelope }: { envelope?: React.ReactNode }) {
         <AccordionItem value="tipologia">
           <AccordionTrigger className="py-3 text-sm">Tipologia e dimensioni</AccordionTrigger>
           <AccordionContent className="space-y-4 px-1">
-            <TypologySelect />
+            <TypologyChooser />
             <ParamFields part="main" />
           </AccordionContent>
         </AccordionItem>

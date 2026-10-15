@@ -7,14 +7,15 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Slider } from "@/components/ui/slider"
 import { Switch } from "@/components/ui/switch"
-import { getTypology, listTypologies, type ParamSpec, type ParamValue, type TypologyTemplate } from "@/domain"
+import { getTypology, type ParamSpec, type ParamValue, type TypologyTemplate } from "@/domain"
 import { useConfiguratore } from "@/stores/use-configuratore"
 import { NumberField } from "./fields"
+import { TypologyChooser } from "./typology-picker"
 import { formatRange, groupParams, numberParamError, sectionOptions, unitLabel } from "./form-helpers"
 
 /**
  * Form parametrico (spec `configuratore-ui`, "Form parametrico per tipologia"):
- * select della tipologia dal registro e campi generati dai `ParamSpec` del
+ * selettore della tipologia con miniature (`typology-picker.tsx`) e campi generati dai `ParamSpec` del
  * template (unità, min/max/step/default). Un valore fuori limite è scritto
  * nello store (`derived.paramErrors`), mostrato inline e non rigenera l'assieme.
  */
@@ -96,34 +97,6 @@ function ParamField({ spec, value, storeError }: { spec: ParamSpec; value: Param
   }
 }
 
-export function TypologySelect() {
-  const typology = useConfiguratore((s) => s.config.typology)
-  const setTypology = useConfiguratore((s) => s.setTypology)
-  const typologies = React.useMemo(() => listTypologies(), [])
-  const template = useTemplate(typology)
-
-  return (
-    <div className="space-y-1.5">
-      <Label htmlFor="param-typology" className="text-xs font-medium">
-        Tipologia
-      </Label>
-      <Select value={typology} onValueChange={(v) => setTypology(v)}>
-        <SelectTrigger id="param-typology" className="h-9">
-          <SelectValue placeholder="Scegli la tipologia" />
-        </SelectTrigger>
-        <SelectContent>
-          {typologies.map((t) => (
-            <SelectItem key={t.slug} value={t.slug}>
-              {t.name}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-      {template && <p className="text-xs text-muted-foreground">{template.description}</p>}
-    </div>
-  )
-}
-
 /** Campi della tipologia corrente: `part` sceglie geometria/struttura o le sezioni per famiglia. */
 export function ParamFields({ part }: { part: "main" | "sections" }) {
   const typology = useConfiguratore((s) => s.config.typology)
@@ -163,7 +136,7 @@ export function ParamForm() {
   return (
     <div className="space-y-6">
       <StaleNotice />
-      <TypologySelect />
+      <TypologyChooser />
       <ParamFields part="main" />
       <div className="space-y-3">
         <h3 className="text-sm font-semibold">Sezioni per famiglia</h3>
