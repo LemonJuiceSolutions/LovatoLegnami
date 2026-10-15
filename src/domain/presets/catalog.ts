@@ -249,6 +249,7 @@ export const PRESET_CATALOG: readonly Preset[] = [
       campate: 1,
       interasse: 750,
       attaccoMuro: "listoni-paralleli",
+      sbalzoLaterale: 105,
       sezionePilastro: "120×120",
       sezioneTavola: "45×145",
       sezioneTravetto: "45×120",
@@ -259,6 +260,7 @@ export const PRESET_CATALOG: readonly Preset[] = [
       "Distinta del sito: 2 pilastri, 4 tavole 45×145×4000, 6 travetti 45×120×4000, 2 staffe a muro listoni paralleli 120.",
       "[dedotto] Bulloni, viti e tasselli non sono nella distinta rilevata: 6 bulloni 12×240 (2 per pilastro + 1 per staffa), 24 viti 6×200, 4 tasselli.",
       "Interasse 750: 6 travetti come la distinta.",
+      "sbalzoLaterale 105 = metà della sandwich 45+120+45: le tavole dei telai d'estremità restano a filo delle teste dei travetti (con 90 sporgerebbero di 15 mm).",
     ],
     expected: {
       pieces: { pilastro: 2, tavola: 4, travetto: 6 },
@@ -362,6 +364,7 @@ export const PRESET_CATALOG: readonly Preset[] = [
       profondita: 5000,
       campate: 2,
       sbalzoFrontale: 2550,
+      sbalzo: 105,
       sezionePilastro: "120×120",
       sezioneTravetto: "45×120",
       sezioneControvento: "120×120",
@@ -372,6 +375,7 @@ export const PRESET_CATALOG: readonly Preset[] = [
       "Distinta del sito: 6 pilastri lamellari 120×120×2500, 3 archi 120×120, 6 tavole 45×145×5000, 16 travetti 45×120×3000, 9 staffe a P greco 120, 6 controventi 120×120×750.",
       "sbalzoFrontale 2550 invece di 2500: con l'arco 120×120 di raggio 2400 lo sbalzo minimo che lascia 5 mm dal pilastro è 2525.",
       "Bulloni dell'arco M8×240 invece degli 8×140 del sito (tavola + arco + tavola = 210 mm); pilastri a filo dell'estradosso delle tavole come nel carport 5×3.",
+      "sbalzo 105 = metà della sandwich 45+120+45: le tavole dei portali d'estremità restano a filo delle teste dei travetti (con 90 sporgerebbero di 15 mm).",
     ],
     expected: {
       pieces: { pilastro: 6, arco: 3, tavola: 6, travetto: 16, controvento: 6 },
