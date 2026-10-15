@@ -17,7 +17,7 @@ function unitGeometry() {
 }
 
 /** Ostacoli come volumi semitrasparenti colorati per tipo, con etichetta. */
-export function ObstaclesLayer({ envelope, palette }: { envelope: Envelope; palette: ViewerPalette }) {
+export function ObstaclesLayer({ envelope, palette, labels = true }: { envelope: Envelope; palette: ViewerPalette; /** Etichette tecniche (false nel wizard pubblico). */ labels?: boolean }) {
   const boxes = React.useMemo(() => obstacleBoxes(envelope), [envelope])
   const g = unitGeometry()
   return (
@@ -35,7 +35,7 @@ export function ObstaclesLayer({ envelope, palette }: { envelope: Envelope; pale
           </group>
         )
       })}
-      {boxes.map((o) => (
+      {labels && boxes.map((o) => (
         <SceneLabel key={o.id} position={[o.center[0], o.center[1], o.center[2] + o.size[2] / 2]} muted>
           {OBSTACLE_LABELS[o.type]} {o.id}
           {o.ignored ? " (fuori ingombro)" : ""}

@@ -1,4 +1,8 @@
-import { absoluteObstacles, floorFunction, planOf, sideSegment, type Envelope, type ObstacleType } from "@/domain"
+// sottomoduli del dominio (non il barile `@/domain`): il viewer è riusato dal wizard pubblico,
+// che non deve caricare il listino seed
+import { floorFunction } from "@/domain/envelope/floor"
+import { planOf, sideSegment } from "@/domain/envelope/plan"
+import { absoluteObstacles, type Envelope, type ObstacleType } from "@/domain/envelope/types"
 
 /**
  * Dati dei livelli ingombro, ostacoli e pavimento (funzioni pure, senza Three):

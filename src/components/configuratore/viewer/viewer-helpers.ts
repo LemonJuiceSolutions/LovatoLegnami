@@ -1,5 +1,9 @@
 import { Matrix4, Quaternion, Vector3 } from "three"
-import { PIECE_FAMILIES, pieceObbs, type Assembly, type Mat4, type OBB, type Piece, type PieceFamily } from "@/domain"
+// sottomoduli del dominio (non il barile): riusato dal wizard pubblico senza il listino seed
+import { pieceObbs } from "@/domain/assembly/bounds"
+import { PIECE_FAMILIES, type Assembly, type Piece, type PieceFamily } from "@/domain/components/types"
+import type { Mat4 } from "@/domain/math/mat4"
+import type { OBB } from "@/domain/math/obb"
 import { pieceCacheKey } from "@/geometry/cache"
 import type { PieceMesh as PieceMeshData, PieceResult } from "@/geometry/protocol"
 

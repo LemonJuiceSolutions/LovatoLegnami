@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import { useStore } from "zustand"
+import type { KernelClient } from "@/geometry/client"
 import type { WizardData } from "@/server/site/wizard-data"
 import { wizardStore, type WizardState, type WizardStore } from "@/stores/wizard-store"
 
@@ -18,6 +19,8 @@ interface WizardContextValue {
   readonly hydrated: boolean
   /** Chiamata di rete della stima e dell'invio (iniettabile nei test). */
   readonly fetcher: typeof fetch
+  /** Kernel geometrico finto nei test ("Mostra dettagli"); assente = Web Worker vero. */
+  readonly kernelFactory?: () => KernelClient
 }
 
 const Ctx = React.createContext<WizardContextValue | null>(null)
@@ -26,11 +29,13 @@ export function WizardProvider({
   data,
   store,
   fetcher,
+  kernelFactory,
   children,
 }: {
   data: WizardData
   store?: WizardStore
   fetcher?: typeof fetch
+  kernelFactory?: () => KernelClient
   children: React.ReactNode
 }) {
   const s = React.useMemo(() => store ?? wizardStore(), [store])
@@ -48,7 +53,8 @@ export function WizardProvider({
       alive = false
     }
   }, [s, data.ruleSet])
-  const value = React.useMemo(() => ({ data, store: s, hydrated, fetcher: fetcher ?? ((...a: Parameters<typeof fetch>) => fetch(...a)) }), [data, s, hydrated, fetcher])
+  const fetchFn = React.useMemo(() => fetcher ?? ((...a: Parameters<typeof fetch>) => fetch(...a)), [fetcher])
+  const value = React.useMemo(() => ({ data, store: s, hydrated, fetcher: fetchFn, kernelFactory }), [data, s, hydrated, fetchFn, kernelFactory])
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>
 }
 

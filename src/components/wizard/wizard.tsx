@@ -3,6 +3,7 @@
 import * as React from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { ArrowLeft, ArrowRight } from "lucide-react"
+import type { KernelClient } from "@/geometry/client"
 import type { WizardData, WizardTypology } from "@/server/site/wizard-data"
 import type { WizardStore } from "@/stores/wizard-store"
 import { WIZARD_STEPS, stepIndex, stepPath, type WizardStep } from "./answers"
@@ -10,6 +11,8 @@ import { StepIndicator } from "./step-indicator"
 import { normalizeFinishes } from "./finishes"
 import { StepFinishes } from "./step-finishes"
 import { StepMeasures } from "./step-measures"
+import { StepSummary } from "./step-summary"
+import { takeSceneShot } from "./scene-capture"
 import { StepSpace } from "./step-space"
 import { StepTypology } from "./step-typology"
 import { WizardAside } from "./wizard-aside"
@@ -23,9 +26,21 @@ import { FieldError } from "./ui"
  * `sessionStorage`: avanti e indietro (anche con i tasti del browser) non perdono nulla.
  * `?tipologia=<slug>` sceglie il modello e salta al passo 2.
  */
-export function PreventivoWizard({ data, step, store, fetcher }: { data: WizardData; step: WizardStep; store?: WizardStore; fetcher?: typeof fetch }) {
+export function PreventivoWizard({
+  data,
+  step,
+  store,
+  fetcher,
+  kernelFactory,
+}: {
+  data: WizardData
+  step: WizardStep
+  store?: WizardStore
+  fetcher?: typeof fetch
+  kernelFactory?: () => KernelClient
+}) {
   return (
-    <WizardProvider data={data} store={store} fetcher={fetcher}>
+    <WizardProvider data={data} store={store} fetcher={fetcher} kernelFactory={kernelFactory}>
       <WizardShell step={step} />
     </WizardProvider>
   )
@@ -110,6 +125,8 @@ function WizardShell({ step }: { step: WizardStep }) {
       setProblem(p)
       return
     }
+    // l'immagine della scena per il PDF si scatta lasciando il riepilogo (il 3D c'è solo lì)
+    if (step === "riepilogo") takeSceneShot()
     if (next) go(next)
   }
 
@@ -165,6 +182,8 @@ function StepBody({ step }: { step: WizardStep }) {
         return <StepSpace />
       case "finiture":
         return <StepFinishes />
+      case "riepilogo":
+        return <StepSummary />
       default:
         return (
           <section aria-labelledby="passo-titolo">
@@ -175,6 +194,7 @@ function StepBody({ step }: { step: WizardStep }) {
         )
     }
   })()
+  if (step === "riepilogo") return content
   return (
     <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(320px,400px)] lg:gap-14">
       <div className="min-w-0">{content}</div>

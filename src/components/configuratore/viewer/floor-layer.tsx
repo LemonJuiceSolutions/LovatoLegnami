@@ -8,7 +8,7 @@ import { SceneLabel } from "./scene-label"
 import type { ViewerPalette } from "./theme-colors"
 
 /** Pavimento interpolato: superficie a griglia con le quote ai quattro angoli. */
-export function FloorLayer({ envelope, palette }: { envelope: Envelope; palette: ViewerPalette }) {
+export function FloorLayer({ envelope, palette, labels = true }: { envelope: Envelope; palette: ViewerPalette; /** Etichette tecniche (false nel wizard pubblico). */ labels?: boolean }) {
   const { box, floor } = envelope
   const grid = React.useMemo(() => floorGrid({ box, floor }), [box, floor])
   const surface = React.useMemo(() => {
@@ -48,7 +48,7 @@ export function FloorLayer({ envelope, palette }: { envelope: Envelope; palette:
       <lineSegments geometry={lines} raycast={() => null}>
         <lineBasicMaterial color={palette.mutedForeground} transparent opacity={0.45} />
       </lineSegments>
-      {grid.corners.map((c) => (
+      {labels && grid.corners.map((c) => (
         <SceneLabel key={c.name} position={[c.x, c.y, c.z]} muted>
           <span title={c.name}>{formatMm(c.z, true)}</span>
         </SceneLabel>
