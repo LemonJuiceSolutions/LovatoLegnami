@@ -28,6 +28,10 @@ export const PresetSchema = z
   .object({
     id: kebab,
     name: z.string().trim().min(1, "nome obbligatorio"),
+    /** Descrizione commerciale (dataset modificabile dall'admin, 9.7). */
+    description: z.string().trim().max(2000).optional(),
+    /** Visibile nei preset proposti (assente = visibile). */
+    visible: z.boolean().optional(),
     typologySlug: z.string().min(1),
     params: z.record(z.string().min(1), ParamValueSchema).default({}),
     envelope: EnvelopeSchema.optional(),

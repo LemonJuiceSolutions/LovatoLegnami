@@ -19,6 +19,10 @@ export interface Preset {
   readonly id: string;
   /** Nome commerciale mostrato nell'interfaccia (es. "MAXI 5×5"). */
   readonly name: string;
+  /** Descrizione commerciale facoltativa (impostata dall'admin, 9.7). */
+  readonly description?: string;
+  /** Visibile tra i preset proposti; assente = visibile (9.7). */
+  readonly visible?: boolean;
   readonly typologySlug: string;
   /** Parametri del preset; quelli omessi prendono il default della tipologia in `loadPreset`. */
   readonly params: Readonly<Record<string, ParamValue>>;
