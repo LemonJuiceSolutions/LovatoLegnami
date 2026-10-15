@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import * as SliderPrimitive from "@radix-ui/react-slider"
 import { Check, Info, TriangleAlert } from "lucide-react"
 import { cn } from "@/lib/utils"
 
@@ -14,7 +15,7 @@ export function StepHeading({ eyebrow, title, intro, id }: { eyebrow?: string; t
   return (
     <header className="mb-8">
       {eyebrow && <p className="text-sm font-semibold uppercase tracking-[0.14em] text-[hsl(var(--site-gold-ink))]">{eyebrow}</p>}
-      <h1 id={id} tabIndex={-1} className="site-display mt-2 text-[clamp(2rem,1.5rem+2vw,3rem)] outline-none">
+      <h1 id={id} tabIndex={-1} className="site-display mt-2 text-[clamp(2rem,1.5rem+2vw,3rem)] outline-none" style={{ outline: "none" }}>
         {title}
       </h1>
       {intro && <p className="mt-3 max-w-[60ch] text-lg text-foreground/80">{intro}</p>}
@@ -100,13 +101,21 @@ export function ChoiceCards<V extends string>({
 /** Campo numerico in centimetri, grande e con l'unità a vista. */
 export const CmInput = React.forwardRef<
   HTMLInputElement,
-  Omit<React.InputHTMLAttributes<HTMLInputElement>, "value" | "onChange"> & { value: number | null; onValue: (v: number) => void; unit?: string; invalid?: boolean }
->(function CmInput({ value, onValue, unit = "cm", invalid, className, ...props }, ref) {
-  const [text, setText] = React.useState(value === null || value === 0 ? "" : String(value))
+  Omit<React.InputHTMLAttributes<HTMLInputElement>, "value" | "onChange"> & {
+    value: number | null
+    onValue: (v: number) => void
+    unit?: string
+    invalid?: boolean
+    /** Lo zero è "non ancora misurato": campo vuoto. */
+    blankZero?: boolean
+  }
+>(function CmInput({ value, onValue, unit = "cm", invalid, blankZero, className, ...props }, ref) {
+  const show = React.useCallback((v: number | null) => (v === null || (blankZero && v === 0) ? "" : String(v)), [blankZero])
+  const [text, setText] = React.useState(show(value))
   const focused = React.useRef(false)
   React.useEffect(() => {
-    if (!focused.current) setText(value === null || value === 0 ? "" : String(value))
-  }, [value])
+    if (!focused.current) setText(show(value))
+  }, [value, show])
   return (
     <span className={cn("relative inline-flex w-full items-center", className)}>
       <input
@@ -124,7 +133,7 @@ export const CmInput = React.forwardRef<
         }}
         onBlur={() => {
           focused.current = false
-          setText(value === null || value === 0 ? "" : String(value))
+          setText(show(value))
         }}
         className={cn(
           "h-12 w-full rounded-lg border-2 bg-background pl-4 pr-12 text-lg tabular-nums outline-none transition-colors",
@@ -162,5 +171,27 @@ export function FieldError({ id, children }: { id: string; children: React.React
     <p id={id} role="alert" className="mt-2 font-medium text-destructive">
       {children}
     </p>
+  )
+}
+
+/** Cursore grande (pollice da 28 px) con il nome sul pollice per i lettori di schermo. */
+export function RangeSlider({ min, max, step, value, onValue, label, className }: { min: number; max: number; step: number; value: number; onValue: (v: number) => void; label: string; className?: string }) {
+  return (
+    <SliderPrimitive.Root
+      className={cn("relative flex h-10 w-full touch-none select-none items-center", className)}
+      min={min}
+      max={max}
+      step={step}
+      value={[Math.min(max, Math.max(min, value))]}
+      onValueChange={([v]) => v !== undefined && onValue(v)}
+    >
+      <SliderPrimitive.Track className="relative h-2.5 w-full grow overflow-hidden rounded-full bg-secondary">
+        <SliderPrimitive.Range className="absolute h-full bg-primary" />
+      </SliderPrimitive.Track>
+      <SliderPrimitive.Thumb
+        aria-label={label}
+        className="block h-7 w-7 rounded-full border-[3px] border-primary bg-background shadow-md transition-transform focus-visible:scale-110 focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-2 focus-visible:outline-[hsl(var(--site-gold))]"
+      />
+    </SliderPrimitive.Root>
   )
 }

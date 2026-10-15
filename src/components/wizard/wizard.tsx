@@ -7,7 +7,10 @@ import type { WizardData, WizardTypology } from "@/server/site/wizard-data"
 import type { WizardStore } from "@/stores/wizard-store"
 import { WIZARD_STEPS, stepIndex, stepPath, type WizardStep } from "./answers"
 import { StepIndicator } from "./step-indicator"
+import { StepMeasures } from "./step-measures"
+import { StepSpace } from "./step-space"
 import { StepTypology } from "./step-typology"
+import { WizardAside } from "./wizard-aside"
 import { useWizard, useWizardContext, WizardProvider } from "./wizard-context"
 import { FieldError } from "./ui"
 
@@ -65,9 +68,14 @@ function WizardShell({ step }: { step: WizardStep }) {
     if (hydrated && !requested && step !== "tipologia" && !slug) router.replace(stepPath("tipologia"))
   }, [hydrated, requested, step, slug, router])
 
-  // a ogni passo: in cima alla pagina e fuoco sul titolo (lettori di schermo)
+  // a ogni cambio di passo (non al primo caricamento): in cima e fuoco sul titolo (lettori di schermo)
+  const firstStep = React.useRef(true)
   React.useEffect(() => {
     if (!hydrated) return
+    if (firstStep.current) {
+      firstStep.current = false
+      return
+    }
     document.getElementById("wizard-top")?.scrollIntoView?.({ block: "start" })
     document.getElementById("passo-titolo")?.focus({ preventScroll: true })
   }, [step, hydrated])
@@ -112,7 +120,7 @@ function WizardShell({ step }: { step: WizardStep }) {
       )}
       {step !== "tipologia" && (
         <div className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 lg:static lg:mt-12 lg:border-0 lg:bg-transparent lg:backdrop-blur-none">
-          <div className="site-container flex items-center justify-between gap-3 py-3 lg:px-0">
+          <div className="mx-auto flex max-w-[calc(var(--site-max)+2*var(--site-gutter))] items-center justify-between gap-3 px-[var(--site-gutter)] py-3 lg:max-w-none lg:px-0">
             {prev ? (
               <button type="button" onClick={() => go(prev)} className="site-btn site-btn-quiet">
                 <ArrowLeft className="h-5 w-5" aria-hidden="true" /> Indietro
@@ -128,7 +136,7 @@ function WizardShell({ step }: { step: WizardStep }) {
             )}
           </div>
           {problem && (
-            <div className="site-container pb-3 lg:px-0">
+            <div className="px-[var(--site-gutter)] pb-3 lg:px-0">
               <FieldError id={errorId}>{problem}</FieldError>
             </div>
           )}
@@ -139,11 +147,26 @@ function WizardShell({ step }: { step: WizardStep }) {
 }
 
 function StepBody({ step }: { step: WizardStep }) {
+  const content = (() => {
+    switch (step) {
+      case "misure":
+        return <StepMeasures />
+      case "spazio":
+        return <StepSpace />
+      default:
+        return (
+          <section aria-labelledby="passo-titolo">
+            <h1 id="passo-titolo" tabIndex={-1} className="site-display text-3xl outline-none">
+              {step}
+            </h1>
+          </section>
+        )
+    }
+  })()
   return (
-    <section aria-labelledby="passo-titolo">
-      <h1 id="passo-titolo" tabIndex={-1} className="site-display text-3xl outline-none">
-        {step}
-      </h1>
-    </section>
+    <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(320px,400px)] lg:gap-14">
+      <div className="min-w-0">{content}</div>
+      <WizardAside />
+    </div>
   )
 }
