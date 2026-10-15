@@ -43,6 +43,13 @@ describe("home del sito (11.2)", () => {
     expect(within(hero).getByText("da 7.890 €")).toBeTruthy()
   })
 
+  it("senza listino il cartiglio non inventa misure né prezzi", () => {
+    render(<HomeContent content={fakeContent({ typologies: [fakeTypology({ fromPrice: null })] })} company={company} />)
+    const hero = screen.getByRole("heading", { level: 1 }).closest("section") as HTMLElement
+    expect(within(hero).getByText("Prezzo calcolato sulle tue misure")).toBeTruthy()
+    expect(within(hero).queryByText(/€/)).toBeNull()
+  })
+
   it("nessuna violazione WCAG A/AA rilevabile da axe", async () => {
     const { container } = renderPage()
     expect(await axeViolations(container)).toEqual([])

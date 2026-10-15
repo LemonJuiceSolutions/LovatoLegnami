@@ -71,10 +71,14 @@ export function Hero({ featured, foundedYear }: { featured: TypologyCardData | n
               <Link href={typologyHref(featured.seoSlug)} className="col-span-2 border-b border-foreground/70 px-4 py-2 font-semibold underline-offset-4 hover:underline">
                 {featured.title}
               </Link>
-              <span className="border-r border-foreground/70 px-4 py-2 text-muted-foreground">
-                {price ? `${metres(price.widthMm)} × ${metres(price.depthMm)}` : "Misure su richiesta"}
-              </span>
-              <span className="px-4 py-2 font-semibold text-[hsl(var(--site-gold-ink))]">{price ? `da ${euroRounded(price.totalCents)}` : "su richiesta"}</span>
+              {price ? (
+                <>
+                  <span className="border-r border-foreground/70 px-4 py-2 text-muted-foreground">{`${metres(price.widthMm)} × ${metres(price.depthMm)}`}</span>
+                  <span className="px-4 py-2 font-semibold text-[hsl(var(--site-gold-ink))]">{`da ${euroRounded(price.totalCents)}`}</span>
+                </>
+              ) : (
+                <span className="col-span-2 px-4 py-2 text-muted-foreground">Prezzo calcolato sulle tue misure</span>
+              )}
             </figcaption>
           </div>
         </figure>
