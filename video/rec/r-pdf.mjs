@@ -1,0 +1,25 @@
+// Scena 08: email di conferma → pagina /p/ del cliente → PDF
+import { setup } from "./lib.mjs";
+const V = new URL("./viewer/", import.meta.url).href;
+const s = await setup({ width: 1280, height: 720, dsf: 1.5 });
+const { page } = s;
+await s.goto(V + "mail.html");
+await s.start("s08-pdf-pagina");
+await s.wait(800);
+await s.hover(page.locator("b", { hasText: "4.190,00" }), 900);
+await s.wait(600);
+await s.click("#link", { after: 200 });
+await page.waitForLoadState("networkidle").catch(() => {});
+await s.wait(2000);
+await s.scroll(300, 1500);
+await s.wait(900);
+await s.scroll(230, 1400);
+await s.wait(800);
+await s.goto(V + "pdf.html", { waitMs: 300 });
+await s.wait(900);
+await s.scroll(380, 1800);
+await s.wait(700);
+await s.scroll(300, 1500);
+await s.wait(900);
+await s.stop();
+await s.browser.close();

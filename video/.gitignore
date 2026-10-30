@@ -1,0 +1,11 @@
+node_modules/
+out/
+remotion/public/recordings/
+remotion/public/vo/
+remotion/public/vo-en/
+remotion/public/music/*.wav
+remotion/rec-orig/
+rec/frames/
+rec/shots/
+rec/state.json
+rec/*.log

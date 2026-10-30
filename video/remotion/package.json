@@ -1,0 +1,27 @@
+{
+  "name": "espeiria-lovato-video",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "vo": "node scripts/make-vo.mjs",
+    "studio": "remotion studio src/index.ts",
+    "render:16x9": "remotion render src/index.ts Espeiria16x9 ../out/espeiria-draft-16x9.mp4 --codec=h264 --crf=20 --pixel-format=yuv420p --audio-codec=aac",
+    "render:9x16": "remotion render src/index.ts Espeiria9x16 ../out/espeiria-draft-9x16.mp4 --codec=h264 --crf=20 --pixel-format=yuv420p --audio-codec=aac",
+    "typecheck": "tsc --noEmit",
+    "vo:en": "node scripts/make-vo-en.mjs",
+    "render:en": "bash scripts/render-chunks.sh 16x9 en"
+  },
+  "dependencies": {
+    "@remotion/cli": "4.0.530",
+    "@remotion/google-fonts": "4.0.530",
+    "@remotion/media-utils": "4.0.530",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "remotion": "4.0.530"
+  },
+  "devDependencies": {
+    "@types/react": "18.3.12",
+    "typescript": "5.6.3"
+  }
+}

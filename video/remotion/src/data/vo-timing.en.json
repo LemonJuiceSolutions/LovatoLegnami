@@ -1,0 +1,1094 @@
+{
+  "voice": "en-US-AvaMultilingualNeural",
+  "rate": "+0%",
+  "fps": 30,
+  "padIn": 0.3,
+  "totalFrames": 9409,
+  "scenes": [
+    {
+      "id": "01",
+      "file": "vo-en/scene-01.wav",
+      "seconds": 15.02825,
+      "cues": [
+        {
+          "start": 0,
+          "end": 2.259836956521739,
+          "text": "Lemonjuice Solutions presenta espeirIA:"
+        },
+        {
+          "start": 2.259836956521739,
+          "end": 6.46375,
+          "text": "la piattaforma che porta la\nprogettazione dal rilievo alla macchina."
+        },
+        {
+          "start": 6.46375,
+          "end": 11.694541666666668,
+          "text": "Il primo progetto: un configuratore\nper chi produce strutture in legno."
+        },
+        {
+          "start": 11.694541666666668,
+          "end": 15.028250000000002,
+          "text": "Pergole, gazebo, carport,\ntetti pre-tagliati."
+        }
+      ],
+      "lines": [
+        {
+          "start": 0,
+          "end": 6.04375,
+          "en": "Lemonjuice Solutions presents espeirIA: the platform that takes design from site survey to machine.",
+          "it": "Lemonjuice Solutions presenta espeirIA: la piattaforma che porta la progettazione dal rilievo alla macchina."
+        },
+        {
+          "start": 6.46375,
+          "end": 11.274541666666668,
+          "en": "Its first project: a configurator for manufacturers of timber structures.",
+          "it": "Il primo progetto: un configuratore per chi produce strutture in legno."
+        },
+        {
+          "start": 11.694541666666668,
+          "end": 15.028250000000002,
+          "en": "Pergolas, gazebos, carports, pre-cut roofs.",
+          "it": "Pergole, gazebo, carport, tetti pre-tagliati."
+        }
+      ],
+      "hooks": {
+        "esp": 1.831439393939394,
+        "project": 6.46375
+      },
+      "from": 0,
+      "durationInFrames": 478,
+      "voiceStartFrame": 9
+    },
+    {
+      "id": "c1",
+      "file": "vo-en/scene-c1.wav",
+      "seconds": 3.139625,
+      "cues": [
+        {
+          "start": 0,
+          "end": 3.139625,
+          "text": "Si parte dal sito, dal\npunto di vista del cliente."
+        }
+      ],
+      "lines": [
+        {
+          "start": 0,
+          "end": 3.139625,
+          "en": "First: the website, from the customer's side.",
+          "it": "Si parte dal sito, dal punto di vista del cliente."
+        }
+      ],
+      "hooks": {},
+      "from": 478,
+      "durationInFrames": 122,
+      "voiceStartFrame": 9
+    },
+    {
+      "id": "02",
+      "file": "vo-en/scene-02.wav",
+      "seconds": 14.032,
+      "cues": [
+        {
+          "start": 0,
+          "end": 3.3693697916666667,
+          "text": "Il cliente arriva sulla\nhome e sfoglia le tipologie:"
+        },
+        {
+          "start": 3.3693697916666667,
+          "end": 8.121416666666667,
+          "text": "addossate, autoportanti,\ncarport, gazebo, pensiline."
+        },
+        {
+          "start": 8.121416666666667,
+          "end": 11.393346726190476,
+          "text": "Ogni modello ha il suo disegno\ne un prezzo «a partire da»,"
+        },
+        {
+          "start": 11.393346726190476,
+          "end": 14.032,
+          "text": "che viene dal listino\ngestito nel back-office."
+        }
+      ],
+      "lines": [
+        {
+          "start": 0,
+          "end": 7.701416666666667,
+          "en": "The customer lands on the home page and browses the categories: lean-to, freestanding, carports, gazebos, canopies.",
+          "it": "Il cliente arriva sulla home e sfoglia le tipologie: addossate, autoportanti, carport, gazebo, pensiline."
+        },
+        {
+          "start": 8.121416666666667,
+          "end": 14.032,
+          "en": "Every model has its own drawing and a \"from\" price, calculated from the price list managed in the back-office.",
+          "it": "Ogni modello ha il suo disegno e un prezzo «a partire da», che viene dal listino gestito nel back-office."
+        }
+      ],
+      "hooks": {},
+      "from": 600,
+      "durationInFrames": 448,
+      "voiceStartFrame": 9
+    },
+    {
+      "id": "03",
+      "file": "vo-en/scene-03.wav",
+      "seconds": 14.583875,
+      "cues": [
+        {
+          "start": 0,
+          "end": 2.7188749999999997,
+          "text": "Poi apre il preventivo in sei passi."
+        },
+        {
+          "start": 2.7188749999999997,
+          "end": 5.015666666666666,
+          "text": "Uno: sceglie il modello."
+        },
+        {
+          "start": 5.015666666666666,
+          "end": 9.294916666666666,
+          "text": "Due: le misure, con il\ncursore o in centimetri."
+        },
+        {
+          "start": 9.294916666666666,
+          "end": 12.017944719471947,
+          "text": "Il sito gli dice subito\nquanti pilastri servono,"
+        },
+        {
+          "start": 12.017944719471947,
+          "end": 14.583874999999999,
+          "text": "e il modello si può\ncambiare in ogni momento."
+        }
+      ],
+      "lines": [
+        {
+          "start": 0,
+          "end": 2.298875,
+          "en": "Then the customer opens the six-step quote.",
+          "it": "Poi apre il preventivo in sei passi."
+        },
+        {
+          "start": 2.7188749999999997,
+          "end": 4.595666666666666,
+          "en": "One: choose the model.",
+          "it": "Uno: sceglie il modello."
+        },
+        {
+          "start": 5.015666666666666,
+          "end": 8.874916666666666,
+          "en": "Two: the dimensions, with a slider or in centimetres.",
+          "it": "Due: le misure, con il cursore o in centimetri."
+        },
+        {
+          "start": 9.294916666666666,
+          "end": 14.583874999999999,
+          "en": "The site instantly shows how many posts are needed, and the model can be changed at any time.",
+          "it": "Il sito gli dice subito quanti pilastri servono, e il modello si può cambiare in ogni momento."
+        }
+      ],
+      "hooks": {},
+      "from": 1048,
+      "durationInFrames": 465,
+      "voiceStartFrame": 9
+    },
+    {
+      "id": "04",
+      "file": "vo-en/scene-04.wav",
+      "seconds": 17.097958333333334,
+      "cues": [
+        {
+          "start": 0,
+          "end": 2.2344583333333334,
+          "text": "Tre: lo spazio."
+        },
+        {
+          "start": 2.2344583333333334,
+          "end": 3.9571666666666667,
+          "text": "Il muro è fuori squadra?"
+        },
+        {
+          "start": 3.9571666666666667,
+          "end": 7.194192307692307,
+          "text": "Il cliente misura i quattro\nlati e le due diagonali,"
+        },
+        {
+          "start": 7.194192307692307,
+          "end": 9.637333333333332,
+          "text": "e l'angolo lo calcola espeirIA."
+        },
+        {
+          "start": 9.637333333333332,
+          "end": 12.683541666666665,
+          "text": "Il pavimento scende di sei\ncentimetri verso il fronte."
+        },
+        {
+          "start": 12.683541666666665,
+          "end": 14.332208333333332,
+          "text": "Sul muro c'è una grondaia."
+        },
+        {
+          "start": 14.332208333333332,
+          "end": 17.09795833333333,
+          "text": "Infine il CAP del\ncantiere, per il trasporto."
+        }
+      ],
+      "lines": [
+        {
+          "start": 0,
+          "end": 1.8144583333333333,
+          "en": "Three: the space.",
+          "it": "Tre: lo spazio."
+        },
+        {
+          "start": 2.2344583333333334,
+          "end": 3.537166666666667,
+          "en": "Is the wall out of square?",
+          "it": "Il muro è fuori squadra?"
+        },
+        {
+          "start": 3.9571666666666667,
+          "end": 9.217333333333332,
+          "en": "The customer measures the four sides and the two diagonals, and espeirIA works out the angle.",
+          "it": "Il cliente misura i quattro lati e le due diagonali, e l'angolo lo calcola espeirIA."
+        },
+        {
+          "start": 9.637333333333332,
+          "end": 12.263541666666665,
+          "en": "The floor drops six centimetres toward the front.",
+          "it": "Il pavimento scende di sei centimetri verso il fronte."
+        },
+        {
+          "start": 12.683541666666665,
+          "end": 13.912208333333332,
+          "en": "There's a gutter on the wall.",
+          "it": "Sul muro c'è una grondaia."
+        },
+        {
+          "start": 14.332208333333332,
+          "end": 17.09795833333333,
+          "en": "Finally, the site's postcode, for delivery.",
+          "it": "Infine il CAP del cantiere, per il trasporto."
+        }
+      ],
+      "hooks": {},
+      "from": 1513,
+      "durationInFrames": 615,
+      "voiceStartFrame": 9
+    },
+    {
+      "id": "05",
+      "file": "vo-en/scene-05.wav",
+      "seconds": 6.902291666666667,
+      "cues": [
+        {
+          "start": 0,
+          "end": 3.3470833333333334,
+          "text": "Quattro: le finiture, prese dal listino."
+        },
+        {
+          "start": 3.3470833333333334,
+          "end": 6.902291666666667,
+          "text": "Larice lamellare, impregnante\ncolorato, copertura in policarbonato."
+        }
+      ],
+      "lines": [
+        {
+          "start": 0,
+          "end": 2.9270833333333335,
+          "en": "Four: the finishes, straight from the price list.",
+          "it": "Quattro: le finiture, prese dal listino."
+        },
+        {
+          "start": 3.3470833333333334,
+          "end": 6.902291666666667,
+          "en": "Glulam larch, coloured stain, polycarbonate roofing.",
+          "it": "Larice lamellare, impregnante colorato, copertura in policarbonato."
+        }
+      ],
+      "hooks": {},
+      "from": 2128,
+      "durationInFrames": 252,
+      "voiceStartFrame": 9
+    },
+    {
+      "id": "06",
+      "file": "vo-en/scene-06.wav",
+      "seconds": 15.41825,
+      "cues": [
+        {
+          "start": 0,
+          "end": 2.2483750000000002,
+          "text": "Cinque: il riepilogo."
+        },
+        {
+          "start": 2.2483750000000002,
+          "end": 4.9863125,
+          "text": "La pergola in 3D, già\nadattata allo spazio:"
+        },
+        {
+          "start": 4.9863125,
+          "end": 8.144250000000001,
+          "text": "l'altezza scende per\npassare sotto la grondaia."
+        },
+        {
+          "start": 8.144250000000001,
+          "end": 13.257000000000001,
+          "text": "Il prezzo indicativo ha una forbice, e\nogni nota è scritta in parole semplici."
+        },
+        {
+          "start": 13.257000000000001,
+          "end": 15.41825,
+          "text": "Senza registrazione, senza impegno."
+        }
+      ],
+      "lines": [
+        {
+          "start": 0,
+          "end": 1.828375,
+          "en": "Five: the summary.",
+          "it": "Cinque: il riepilogo."
+        },
+        {
+          "start": 2.2483750000000002,
+          "end": 7.7242500000000005,
+          "en": "The pergola in 3D, already fitted to the space: its height drops to clear the gutter.",
+          "it": "La pergola in 3D, già adattata allo spazio: l'altezza scende per passare sotto la grondaia."
+        },
+        {
+          "start": 8.144250000000001,
+          "end": 12.837000000000002,
+          "en": "The indicative price comes as a range, and every note is written in plain words.",
+          "it": "Il prezzo indicativo ha una forbice, e ogni nota è scritta in parole semplici."
+        },
+        {
+          "start": 13.257000000000001,
+          "end": 15.41825,
+          "en": "No sign-up. No commitment.",
+          "it": "Senza registrazione, senza impegno."
+        }
+      ],
+      "hooks": {},
+      "from": 2380,
+      "durationInFrames": 490,
+      "voiceStartFrame": 9
+    },
+    {
+      "id": "07",
+      "file": "vo-en/scene-07.wav",
+      "seconds": 9.676333333333334,
+      "cues": [
+        {
+          "start": 0,
+          "end": 2.3423333333333334,
+          "text": "Sei: i contatti."
+        },
+        {
+          "start": 2.3423333333333334,
+          "end": 7.2804166666666665,
+          "text": "Nome, telefono, email, qualche foto\ndel muro e il consenso privacy."
+        },
+        {
+          "start": 7.2804166666666665,
+          "end": 9.676333333333332,
+          "text": "Un clic, e la richiesta è inviata."
+        }
+      ],
+      "lines": [
+        {
+          "start": 0,
+          "end": 1.9223333333333332,
+          "en": "Six: contact details.",
+          "it": "Sei: i contatti."
+        },
+        {
+          "start": 2.3423333333333334,
+          "end": 6.860416666666667,
+          "en": "Name, phone, email, a few photos of the wall, and privacy consent.",
+          "it": "Nome, telefono, email, qualche foto del muro e il consenso privacy."
+        },
+        {
+          "start": 7.2804166666666665,
+          "end": 9.676333333333332,
+          "en": "One click, and the request is sent.",
+          "it": "Un clic, e la richiesta è inviata."
+        }
+      ],
+      "hooks": {},
+      "from": 2870,
+      "durationInFrames": 378,
+      "voiceStartFrame": 9
+    },
+    {
+      "id": "08",
+      "file": "vo-en/scene-08.wav",
+      "seconds": 11.118875,
+      "cues": [
+        {
+          "start": 0,
+          "end": 5.04925,
+          "text": "Il cliente riceve subito un'email con\nil riepilogo in PDF e un link personale:"
+        },
+        {
+          "start": 5.04925,
+          "end": 9.571715686274509,
+          "text": "la sua pagina, con la pergola,\nle misure e il prezzo indicativo,"
+        },
+        {
+          "start": 9.571715686274509,
+          "end": 11.118875,
+          "text": "valida novanta giorni."
+        }
+      ],
+      "lines": [
+        {
+          "start": 0,
+          "end": 4.82925,
+          "en": "The customer instantly receives an email with a PDF summary and a personal link:",
+          "it": "Il cliente riceve subito un'email con il riepilogo in PDF e un link personale:"
+        },
+        {
+          "start": 5.04925,
+          "end": 11.118875,
+          "en": "their own page, with the pergola, the dimensions and the indicative price, valid for ninety days.",
+          "it": "la sua pagina, con la pergola, le misure e il prezzo indicativo, valida novanta giorni."
+        }
+      ],
+      "hooks": {},
+      "from": 3248,
+      "durationInFrames": 361,
+      "voiceStartFrame": 9
+    },
+    {
+      "id": "c2",
+      "file": "vo-en/scene-c2.wav",
+      "seconds": 1.774125,
+      "cues": [
+        {
+          "start": 0,
+          "end": 1.774125,
+          "text": "Ora, il lato dell'ufficio tecnico."
+        }
+      ],
+      "lines": [
+        {
+          "start": 0,
+          "end": 1.774125,
+          "en": "Next: the technical office side.",
+          "it": "Ora, il lato dell'ufficio tecnico."
+        }
+      ],
+      "hooks": {},
+      "from": 3609,
+      "durationInFrames": 108,
+      "voiceStartFrame": 9
+    },
+    {
+      "id": "09",
+      "file": "vo-en/scene-09.wav",
+      "seconds": 14.615458333333333,
+      "cues": [
+        {
+          "start": 0,
+          "end": 3.169583333333333,
+          "text": "Il tecnico entra con email e password."
+        },
+        {
+          "start": 3.169583333333333,
+          "end": 8.091501515151515,
+          "text": "In Richieste trova quella di Mario\nRossi, con misure, foto e note,"
+        },
+        {
+          "start": 8.091501515151515,
+          "end": 10.53075,
+          "text": "uno stato e un responsabile."
+        },
+        {
+          "start": 10.53075,
+          "end": 14.615458333333333,
+          "text": "«Apri nel configuratore»: la\npergola del cliente è già caricata."
+        }
+      ],
+      "lines": [
+        {
+          "start": 0,
+          "end": 2.7495833333333333,
+          "en": "The technician signs in with email and password.",
+          "it": "Il tecnico entra con email e password."
+        },
+        {
+          "start": 3.169583333333333,
+          "end": 10.11075,
+          "en": "Under Requests, there's Mario Rossi's, with dimensions, photos and notes, a status and an owner.",
+          "it": "In Richieste trova quella di Mario Rossi, con misure, foto e note, uno stato e un responsabile."
+        },
+        {
+          "start": 10.53075,
+          "end": 14.615458333333333,
+          "en": "Open in configurator: the customer's pergola is already loaded.",
+          "it": "«Apri nel configuratore»: la pergola del cliente è già caricata."
+        }
+      ],
+      "hooks": {},
+      "from": 3717,
+      "durationInFrames": 541,
+      "voiceStartFrame": 9
+    },
+    {
+      "id": "10",
+      "file": "vo-en/scene-10.wav",
+      "seconds": 16.546625,
+      "cues": [
+        {
+          "start": 0,
+          "end": 5.349753968253968,
+          "text": "Il configuratore conosce dieci tipologie,\ndalla monofalda al gazebo a otto lati,"
+        },
+        {
+          "start": 5.349753968253968,
+          "end": 8.079875000000001,
+          "text": "fino al carport ad arco lamellare."
+        },
+        {
+          "start": 8.079875000000001,
+          "end": 11.272972826086958,
+          "text": "Un filtro per categoria,\nuna miniatura per ciascuna,"
+        },
+        {
+          "start": 11.272972826086958,
+          "end": 13.395958333333335,
+          "text": "generata dal modello stesso."
+        },
+        {
+          "start": 13.395958333333335,
+          "end": 16.546625000000002,
+          "text": "E ventisette modelli di\ncatalogo, pronti da caricare."
+        }
+      ],
+      "lines": [
+        {
+          "start": 0,
+          "end": 7.659875,
+          "en": "The configurator knows ten structure types, from the lean-to to the eight-sided gazebo, all the way to the glulam arch carport.",
+          "it": "Il configuratore conosce dieci tipologie, dalla monofalda al gazebo a otto lati, fino al carport ad arco lamellare."
+        },
+        {
+          "start": 8.079875000000001,
+          "end": 12.975958333333335,
+          "en": "A category filter, and a thumbnail for each, generated by the model itself.",
+          "it": "Un filtro per categoria, una miniatura per ciascuna, generata dal modello stesso."
+        },
+        {
+          "start": 13.395958333333335,
+          "end": 16.546625000000002,
+          "en": "Plus twenty-seven catalogue models, ready to load.",
+          "it": "E ventisette modelli di catalogo, pronti da caricare."
+        }
+      ],
+      "hooks": {},
+      "from": 4258,
+      "durationInFrames": 524,
+      "voiceStartFrame": 9
+    },
+    {
+      "id": "11",
+      "file": "vo-en/scene-11.wav",
+      "seconds": 11.670625,
+      "cues": [
+        {
+          "start": 0,
+          "end": 2.3930416666666665,
+          "text": "Ogni parametro ha i suoi limiti."
+        },
+        {
+          "start": 2.3930416666666665,
+          "end": 7.634458333333333,
+          "text": "Le regole costruttive controllano luci,\ninterassi, sbalzi e sezioni minime."
+        },
+        {
+          "start": 7.634458333333333,
+          "end": 11.670625,
+          "text": "Se una trave non basta, «Auto-dimensiona»\npropone la sezione giusta."
+        }
+      ],
+      "lines": [
+        {
+          "start": 0,
+          "end": 1.9730416666666666,
+          "en": "Every parameter has its limits.",
+          "it": "Ogni parametro ha i suoi limiti."
+        },
+        {
+          "start": 2.3930416666666665,
+          "end": 7.214458333333333,
+          "en": "Building rules check spans, spacing, overhangs and minimum sections.",
+          "it": "Le regole costruttive controllano luci, interassi, sbalzi e sezioni minime."
+        },
+        {
+          "start": 7.634458333333333,
+          "end": 11.670625,
+          "en": "If a beam falls short, Auto-size proposes the right section.",
+          "it": "Se una trave non basta, «Auto-dimensiona» propone la sezione giusta."
+        }
+      ],
+      "hooks": {},
+      "from": 4782,
+      "durationInFrames": 378,
+      "voiceStartFrame": 9
+    },
+    {
+      "id": "12",
+      "file": "vo-en/scene-12.wav",
+      "seconds": 17.60875,
+      "cues": [
+        {
+          "start": 0,
+          "end": 3.9505,
+          "text": "Poi l'ingombro reale: ostacoli\ne quote del pavimento."
+        },
+        {
+          "start": 3.9505,
+          "end": 6.987,
+          "text": "Ogni pezzo che tocca la\ngrondaia diventa rosso."
+        },
+        {
+          "start": 6.987,
+          "end": 11.036208333333333,
+          "text": "«Adatta all'ingombro», e la\npergola rientra nello spazio."
+        },
+        {
+          "start": 11.036208333333333,
+          "end": 15.344260854341737,
+          "text": "Con il muro fuori squadra, banchina\ne travetti seguono il piano reale,"
+        },
+        {
+          "start": 15.344260854341737,
+          "end": 17.60875,
+          "text": "e ogni sconfinamento viene segnalato."
+        }
+      ],
+      "lines": [
+        {
+          "start": 0,
+          "end": 3.5305,
+          "en": "Then the real footprint: obstacles and floor levels.",
+          "it": "Poi l'ingombro reale: ostacoli e quote del pavimento."
+        },
+        {
+          "start": 3.9505,
+          "end": 6.567,
+          "en": "Every piece that touches the gutter turns red.",
+          "it": "Ogni pezzo che tocca la grondaia diventa rosso."
+        },
+        {
+          "start": 6.987,
+          "end": 10.616208333333333,
+          "en": "Fit to footprint, and the pergola slots back into the space.",
+          "it": "«Adatta all'ingombro», e la pergola rientra nello spazio."
+        },
+        {
+          "start": 11.036208333333333,
+          "end": 17.60875,
+          "en": "With an out-of-square wall, the wall plate and rafters follow the real plan, and every overrun is flagged.",
+          "it": "Con il muro fuori squadra, banchina e travetti seguono il piano reale, e ogni sconfinamento viene segnalato."
+        }
+      ],
+      "hooks": {},
+      "from": 5160,
+      "durationInFrames": 601,
+      "voiceStartFrame": 9
+    },
+    {
+      "id": "13",
+      "file": "vo-en/scene-13.wav",
+      "seconds": 15.577958333333333,
+      "cues": [
+        {
+          "start": 0,
+          "end": 4.24771888185654,
+          "text": "Ogni pezzo è un solido vero,\ncalcolato dal kernel OpenCascade:"
+        },
+        {
+          "start": 4.24771888185654,
+          "end": 10.007708333333333,
+          "text": "tenoni e mortase, mezzo legno, becchi\nd'uccello, fori per la ferramenta."
+        },
+        {
+          "start": 10.007708333333333,
+          "end": 12.480375,
+          "text": "Anche l'arco lamellare del carport."
+        },
+        {
+          "start": 12.480375,
+          "end": 15.577958333333333,
+          "text": "Si gira, si clicca un pezzo, e\nsi leggono sezione e lunghezza."
+        }
+      ],
+      "lines": [
+        {
+          "start": 0,
+          "end": 9.587708333333333,
+          "en": "Every piece is a true solid, computed by the OpenCascade kernel: mortise and tenon, half-laps, birdsmouth cuts, holes for the hardware.",
+          "it": "Ogni pezzo è un solido vero, calcolato dal kernel OpenCascade: tenoni e mortase, mezzo legno, becchi d'uccello, fori per la ferramenta."
+        },
+        {
+          "start": 10.007708333333333,
+          "end": 12.060375,
+          "en": "Even the carport's glulam arch.",
+          "it": "Anche l'arco lamellare del carport."
+        },
+        {
+          "start": 12.480375,
+          "end": 15.577958333333333,
+          "en": "Spin it, click a piece, and read its section and length.",
+          "it": "Si gira, si clicca un pezzo, e si leggono sezione e lunghezza."
+        }
+      ],
+      "hooks": {},
+      "from": 5761,
+      "durationInFrames": 525,
+      "voiceStartFrame": 9
+    },
+    {
+      "id": "14",
+      "file": "vo-en/scene-14.wav",
+      "seconds": 19.377791666666667,
+      "cues": [
+        {
+          "start": 0,
+          "end": 3.1805416666666666,
+          "text": "Il preventivo, in vista\nufficio, parte dai pezzi."
+        },
+        {
+          "start": 3.1805416666666666,
+          "end": 7.974083333333334,
+          "text": "Il taglio è ottimizzato sulle barre\ncommerciali, con gli sfridi reali."
+        },
+        {
+          "start": 7.974083333333334,
+          "end": 13.63704790026247,
+          "text": "Poi lavorazioni CNC, ferramenta,\nmontaggio, complicazioni di cantiere,"
+        },
+        {
+          "start": 13.63704790026247,
+          "end": 16.756833333333336,
+          "text": "trasporto per CAP, margini e IVA."
+        },
+        {
+          "start": 16.756833333333336,
+          "end": 19.37779166666667,
+          "text": "Ogni riga ha la sua spiegazione."
+        }
+      ],
+      "lines": [
+        {
+          "start": 0,
+          "end": 2.7605416666666667,
+          "en": "In office view, the quote starts from the pieces.",
+          "it": "Il preventivo, in vista ufficio, parte dai pezzi."
+        },
+        {
+          "start": 3.1805416666666666,
+          "end": 7.554083333333334,
+          "en": "Cutting is optimised on commercial stock lengths, with real offcuts.",
+          "it": "Il taglio è ottimizzato sulle barre commerciali, con gli sfridi reali."
+        },
+        {
+          "start": 7.974083333333334,
+          "end": 16.336833333333335,
+          "en": "Then CNC machining, hardware, assembly, on-site complications, delivery by postcode, margins and VAT.",
+          "it": "Poi lavorazioni CNC, ferramenta, montaggio, complicazioni di cantiere, trasporto per CAP, margini e IVA."
+        },
+        {
+          "start": 16.756833333333336,
+          "end": 19.37779166666667,
+          "en": "Every line comes with its own explanation.",
+          "it": "Ogni riga ha la sua spiegazione."
+        }
+      ],
+      "hooks": {},
+      "from": 6286,
+      "durationInFrames": 609,
+      "voiceStartFrame": 9
+    },
+    {
+      "id": "15",
+      "file": "vo-en/scene-15.wav",
+      "seconds": 9.692416666666666,
+      "cues": [
+        {
+          "start": 0,
+          "end": 6.340875,
+          "text": "Da qui l'ufficio salva il preventivo\ndefinitivo: voci manuali, sconto, IVA."
+        },
+        {
+          "start": 6.340875,
+          "end": 9.692416666666666,
+          "text": "E lo invia al cliente\nper email, con il PDF."
+        }
+      ],
+      "lines": [
+        {
+          "start": 0,
+          "end": 5.920875,
+          "en": "From here, the office saves the final quote: manual items, discount, VAT.",
+          "it": "Da qui l'ufficio salva il preventivo definitivo: voci manuali, sconto, IVA."
+        },
+        {
+          "start": 6.340875,
+          "end": 9.692416666666666,
+          "en": "And sends it to the customer by email, with the PDF.",
+          "it": "E lo invia al cliente per email, con il PDF."
+        }
+      ],
+      "hooks": {},
+      "from": 6895,
+      "durationInFrames": 393,
+      "voiceStartFrame": 9
+    },
+    {
+      "id": "16",
+      "file": "vo-en/scene-16.wav",
+      "seconds": 14.276958333333333,
+      "cues": [
+        {
+          "start": 0,
+          "end": 1.570875,
+          "text": "Poi la produzione."
+        },
+        {
+          "start": 1.570875,
+          "end": 6.946674418604652,
+          "text": "Con un clic il sistema esporta il\nfile SAT per il centro di taglio CNC,"
+        },
+        {
+          "start": 6.946674418604652,
+          "end": 11.237250000000001,
+          "text": "lo STEP e la distinta CSV\ncon tutta la ferramenta."
+        },
+        {
+          "start": 11.237250000000001,
+          "end": 14.276958333333335,
+          "text": "Dal modello alla macchina,\nsenza ridisegnare."
+        }
+      ],
+      "lines": [
+        {
+          "start": 0,
+          "end": 1.150875,
+          "en": "Then, production.",
+          "it": "Poi la produzione."
+        },
+        {
+          "start": 1.570875,
+          "end": 10.817250000000001,
+          "en": "In one click, the system exports the SAT file for the CNC cutting centre, the STEP, and the CSV bill of materials with all the hardware.",
+          "it": "Con un clic il sistema esporta il file SAT per il centro di taglio CNC, lo STEP e la distinta CSV con tutta la ferramenta."
+        },
+        {
+          "start": 11.237250000000001,
+          "end": 14.276958333333335,
+          "en": "From model to machine, without redrawing a thing.",
+          "it": "Dal modello alla macchina, senza ridisegnare."
+        }
+      ],
+      "hooks": {},
+      "from": 7288,
+      "durationInFrames": 456,
+      "voiceStartFrame": 9
+    },
+    {
+      "id": "c3",
+      "file": "vo-en/scene-c3.wav",
+      "seconds": 1.656875,
+      "cues": [
+        {
+          "start": 0,
+          "end": 1.656875,
+          "text": "Infine, il back-office."
+        }
+      ],
+      "lines": [
+        {
+          "start": 0,
+          "end": 1.656875,
+          "en": "Finally, the back-office.",
+          "it": "Infine, il back-office."
+        }
+      ],
+      "hooks": {},
+      "from": 7744,
+      "durationInFrames": 108,
+      "voiceStartFrame": 9
+    },
+    {
+      "id": "17",
+      "file": "vo-en/scene-17.wav",
+      "seconds": 19.482916666666668,
+      "cues": [
+        {
+          "start": 0,
+          "end": 1.9554713114754099,
+          "text": "Il listino è diviso per sezioni:"
+        },
+        {
+          "start": 1.9554713114754099,
+          "end": 7.046875,
+          "text": "legno, lavorazioni, ferramenta,\nmontaggio, trasporto, margini."
+        },
+        {
+          "start": 7.046875,
+          "end": 9.469333333333333,
+          "text": "Ogni modifica va in bozza."
+        },
+        {
+          "start": 9.469333333333333,
+          "end": 12.609033333333333,
+          "text": "Il simulatore confronta la\nbozza con la versione attiva;"
+        },
+        {
+          "start": 12.609033333333333,
+          "end": 16.430375,
+          "text": "poi si pubblica, con le\ndifferenze e la data di validità."
+        },
+        {
+          "start": 16.430375,
+          "end": 19.482916666666668,
+          "text": "E si importa ed esporta in CSV."
+        }
+      ],
+      "lines": [
+        {
+          "start": 0,
+          "end": 6.626875,
+          "en": "The price list is split into sections: timber, machining, hardware, assembly, delivery, margins.",
+          "it": "Il listino è diviso per sezioni: legno, lavorazioni, ferramenta, montaggio, trasporto, margini."
+        },
+        {
+          "start": 7.046875,
+          "end": 9.049333333333333,
+          "en": "Every change goes into a draft.",
+          "it": "Ogni modifica va in bozza."
+        },
+        {
+          "start": 9.469333333333333,
+          "end": 16.010375,
+          "en": "The simulator compares the draft with the live version; then it's published, with the differences and a valid-from date.",
+          "it": "Il simulatore confronta la bozza con la versione attiva; poi si pubblica, con le differenze e la data di validità."
+        },
+        {
+          "start": 16.430375,
+          "end": 19.482916666666668,
+          "en": "And everything imports and exports as CSV.",
+          "it": "E si importa ed esporta in CSV."
+        }
+      ],
+      "hooks": {},
+      "from": 7852,
+      "durationInFrames": 702,
+      "voiceStartFrame": 9
+    },
+    {
+      "id": "18",
+      "file": "vo-en/scene-18.wav",
+      "seconds": 16.097875,
+      "cues": [
+        {
+          "start": 0,
+          "end": 3.1481870503597125,
+          "text": "Le complicazioni di cantiere\nsi scrivono come frasi:"
+        },
+        {
+          "start": 3.1481870503597125,
+          "end": 8.234250000000001,
+          "text": "se il dislivello è di almeno dieci\ncentimetri, tre ore di montaggio in più."
+        },
+        {
+          "start": 8.234250000000001,
+          "end": 11.341385204081634,
+          "text": "Poi le regole costruttive, le\ntipologie visibili sul sito,"
+        },
+        {
+          "start": 11.341385204081634,
+          "end": 13.267875000000002,
+          "text": "gli utenti con i loro ruoli."
+        },
+        {
+          "start": 13.267875000000002,
+          "end": 16.097875000000002,
+          "text": "E il registro dice chi ha\ncambiato cosa, e quando."
+        }
+      ],
+      "lines": [
+        {
+          "start": 0,
+          "end": 7.81425,
+          "en": "On-site complications are written as sentences: if the height difference is at least ten centimetres, add three hours of assembly.",
+          "it": "Le complicazioni di cantiere si scrivono come frasi: se il dislivello è di almeno dieci centimetri, tre ore di montaggio in più."
+        },
+        {
+          "start": 8.234250000000001,
+          "end": 12.847875000000002,
+          "en": "Then the building rules, the types shown on the website, and the users with their roles.",
+          "it": "Poi le regole costruttive, le tipologie visibili sul sito, gli utenti con i loro ruoli."
+        },
+        {
+          "start": 13.267875000000002,
+          "end": 16.097875000000002,
+          "en": "And the log shows who changed what, and when.",
+          "it": "E il registro dice chi ha cambiato cosa, e quando."
+        }
+      ],
+      "hooks": {},
+      "from": 8554,
+      "durationInFrames": 510,
+      "voiceStartFrame": 9
+    },
+    {
+      "id": "19",
+      "file": "vo-en/scene-19.wav",
+      "seconds": 6.509041666666667,
+      "cues": [
+        {
+          "start": 0,
+          "end": 1.8210833333333332,
+          "text": "Dal rilievo alla macchina."
+        },
+        {
+          "start": 1.8210833333333332,
+          "end": 4.0609166666666665,
+          "text": "Una sola configurazione."
+        },
+        {
+          "start": 4.0609166666666665,
+          "end": 6.509041666666667,
+          "text": "espeirIA, by Lemonjuice Solutions."
+        }
+      ],
+      "lines": [
+        {
+          "start": 0,
+          "end": 1.4010833333333332,
+          "en": "From survey to machine.",
+          "it": "Dal rilievo alla macchina."
+        },
+        {
+          "start": 1.8210833333333332,
+          "end": 3.6409166666666666,
+          "en": "One single configuration.",
+          "it": "Una sola configurazione."
+        },
+        {
+          "start": 4.0609166666666665,
+          "end": 6.509041666666667,
+          "en": "espeirIA, by Lemonjuice Solutions.",
+          "it": "espeirIA, by Lemonjuice Solutions."
+        }
+      ],
+      "hooks": {
+        "lockup": 4.0609166666666665
+      },
+      "from": 9064,
+      "durationInFrames": 345,
+      "voiceStartFrame": 9
+    }
+  ]
+}

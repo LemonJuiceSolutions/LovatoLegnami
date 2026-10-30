@@ -1,0 +1,377 @@
+1
+00:00:00,300 --> 00:00:02,560
+Lemonjuice Solutions presenta espeirIA:
+
+2
+00:00:02,560 --> 00:00:06,764
+la piattaforma che porta la
+progettazione dal rilievo alla macchina.
+
+3
+00:00:06,764 --> 00:00:11,995
+Il primo progetto: un configuratore
+per chi produce strutture in legno.
+
+4
+00:00:11,995 --> 00:00:15,328
+Pergole, gazebo, carport,
+tetti pre-tagliati.
+
+5
+00:00:16,233 --> 00:00:19,373
+Si parte dal sito, dal
+punto di vista del cliente.
+
+6
+00:00:20,300 --> 00:00:23,669
+Il cliente arriva sulla
+home e sfoglia le tipologie:
+
+7
+00:00:23,669 --> 00:00:28,421
+addossate, autoportanti,
+carport, gazebo, pensiline.
+
+8
+00:00:28,421 --> 00:00:31,693
+Ogni modello ha il suo disegno
+e un prezzo «a partire da»,
+
+9
+00:00:31,693 --> 00:00:34,332
+che viene dal listino
+gestito nel back-office.
+
+10
+00:00:35,233 --> 00:00:37,952
+Poi apre il preventivo in sei passi.
+
+11
+00:00:37,952 --> 00:00:40,249
+Uno: sceglie il modello.
+
+12
+00:00:40,249 --> 00:00:44,528
+Due: le misure, con il
+cursore o in centimetri.
+
+13
+00:00:44,528 --> 00:00:47,251
+Il sito gli dice subito
+quanti pilastri servono,
+
+14
+00:00:47,251 --> 00:00:49,817
+e il modello si può
+cambiare in ogni momento.
+
+15
+00:00:50,733 --> 00:00:52,968
+Tre: lo spazio.
+
+16
+00:00:52,968 --> 00:00:54,690
+Il muro è fuori squadra?
+
+17
+00:00:54,690 --> 00:00:57,928
+Il cliente misura i quattro
+lati e le due diagonali,
+
+18
+00:00:57,928 --> 00:01:00,371
+e l'angolo lo calcola espeirIA.
+
+19
+00:01:00,371 --> 00:01:03,417
+Il pavimento scende di sei
+centimetri verso il fronte.
+
+20
+00:01:03,417 --> 00:01:05,066
+Sul muro c'è una grondaia.
+
+21
+00:01:05,066 --> 00:01:07,831
+Infine il CAP del
+cantiere, per il trasporto.
+
+22
+00:01:11,233 --> 00:01:14,580
+Quattro: le finiture, prese dal listino.
+
+23
+00:01:14,580 --> 00:01:18,136
+Larice lamellare, impregnante
+colorato, copertura in policarbonato.
+
+24
+00:01:19,633 --> 00:01:21,882
+Cinque: il riepilogo.
+
+25
+00:01:21,882 --> 00:01:24,620
+La pergola in 3D, già
+adattata allo spazio:
+
+26
+00:01:24,620 --> 00:01:27,778
+l'altezza scende per
+passare sotto la grondaia.
+
+27
+00:01:27,778 --> 00:01:32,890
+Il prezzo indicativo ha una forbice, e
+ogni nota è scritta in parole semplici.
+
+28
+00:01:32,890 --> 00:01:35,052
+Senza registrazione, senza impegno.
+
+29
+00:01:35,967 --> 00:01:38,309
+Sei: i contatti.
+
+30
+00:01:38,309 --> 00:01:43,247
+Nome, telefono, email, qualche foto
+del muro e il consenso privacy.
+
+31
+00:01:43,247 --> 00:01:45,643
+Un clic, e la richiesta è inviata.
+
+32
+00:01:48,567 --> 00:01:53,616
+Il cliente riceve subito un'email con
+il riepilogo in PDF e un link personale:
+
+33
+00:01:53,616 --> 00:01:58,138
+la sua pagina, con la pergola,
+le misure e il prezzo indicativo,
+
+34
+00:01:58,138 --> 00:01:59,686
+valida novanta giorni.
+
+35
+00:02:00,600 --> 00:02:02,374
+Ora, il lato dell'ufficio tecnico.
+
+36
+00:02:04,200 --> 00:02:07,370
+Il tecnico entra con email e password.
+
+37
+00:02:07,370 --> 00:02:12,292
+In Richieste trova quella di Mario
+Rossi, con misure, foto e note,
+
+38
+00:02:12,292 --> 00:02:14,731
+uno stato e un responsabile.
+
+39
+00:02:14,731 --> 00:02:18,815
+«Apri nel configuratore»: la
+pergola del cliente è già caricata.
+
+40
+00:02:22,233 --> 00:02:27,583
+Il configuratore conosce dieci tipologie,
+dalla monofalda al gazebo a otto lati,
+
+41
+00:02:27,583 --> 00:02:30,313
+fino al carport ad arco lamellare.
+
+42
+00:02:30,313 --> 00:02:33,506
+Un filtro per categoria,
+una miniatura per ciascuna,
+
+43
+00:02:33,506 --> 00:02:35,629
+generata dal modello stesso.
+
+44
+00:02:35,629 --> 00:02:38,780
+E ventisette modelli di
+catalogo, pronti da caricare.
+
+45
+00:02:39,700 --> 00:02:42,093
+Ogni parametro ha i suoi limiti.
+
+46
+00:02:42,093 --> 00:02:47,334
+Le regole costruttive controllano luci,
+interassi, sbalzi e sezioni minime.
+
+47
+00:02:47,334 --> 00:02:51,371
+Se una trave non basta, «Auto-dimensiona»
+propone la sezione giusta.
+
+48
+00:02:52,300 --> 00:02:56,251
+Poi l'ingombro reale: ostacoli
+e quote del pavimento.
+
+49
+00:02:56,251 --> 00:02:59,287
+Ogni pezzo che tocca la
+grondaia diventa rosso.
+
+50
+00:02:59,287 --> 00:03:03,336
+«Adatta all'ingombro», e la
+pergola rientra nello spazio.
+
+51
+00:03:03,336 --> 00:03:07,644
+Con il muro fuori squadra, banchina
+e travetti seguono il piano reale,
+
+52
+00:03:07,644 --> 00:03:09,909
+e ogni sconfinamento viene segnalato.
+
+53
+00:03:12,333 --> 00:03:16,581
+Ogni pezzo è un solido vero,
+calcolato dal kernel OpenCascade:
+
+54
+00:03:16,581 --> 00:03:22,341
+tenoni e mortase, mezzo legno, becchi
+d'uccello, fori per la ferramenta.
+
+55
+00:03:22,341 --> 00:03:24,814
+Anche l'arco lamellare del carport.
+
+56
+00:03:24,814 --> 00:03:27,911
+Si gira, si clicca un pezzo, e
+si leggono sezione e lunghezza.
+
+57
+00:03:29,833 --> 00:03:33,014
+Il preventivo, in vista
+ufficio, parte dai pezzi.
+
+58
+00:03:33,014 --> 00:03:37,807
+Il taglio è ottimizzato sulle barre
+commerciali, con gli sfridi reali.
+
+59
+00:03:37,807 --> 00:03:43,470
+Poi lavorazioni CNC, ferramenta,
+montaggio, complicazioni di cantiere,
+
+60
+00:03:43,470 --> 00:03:46,590
+trasporto per CAP, margini e IVA.
+
+61
+00:03:46,590 --> 00:03:49,211
+Ogni riga ha la sua spiegazione.
+
+62
+00:03:50,133 --> 00:03:56,474
+Da qui l'ufficio salva il preventivo
+definitivo: voci manuali, sconto, IVA.
+
+63
+00:03:56,474 --> 00:03:59,826
+E lo invia al cliente
+per email, con il PDF.
+
+64
+00:04:03,233 --> 00:04:04,804
+Poi la produzione.
+
+65
+00:04:04,804 --> 00:04:10,180
+Con un clic il sistema esporta il
+file SAT per il centro di taglio CNC,
+
+66
+00:04:10,180 --> 00:04:14,471
+lo STEP e la distinta CSV
+con tutta la ferramenta.
+
+67
+00:04:14,471 --> 00:04:17,510
+Dal modello alla macchina,
+senza ridisegnare.
+
+68
+00:04:18,433 --> 00:04:20,090
+Infine, il back-office.
+
+69
+00:04:22,033 --> 00:04:23,989
+Il listino è diviso per sezioni:
+
+70
+00:04:23,989 --> 00:04:29,080
+legno, lavorazioni, ferramenta,
+montaggio, trasporto, margini.
+
+71
+00:04:29,080 --> 00:04:31,503
+Ogni modifica va in bozza.
+
+72
+00:04:31,503 --> 00:04:34,642
+Il simulatore confronta la
+bozza con la versione attiva;
+
+73
+00:04:34,642 --> 00:04:38,464
+poi si pubblica, con le
+differenze e la data di validità.
+
+74
+00:04:38,464 --> 00:04:41,516
+E si importa ed esporta in CSV.
+
+75
+00:04:45,433 --> 00:04:48,582
+Le complicazioni di cantiere
+si scrivono come frasi:
+
+76
+00:04:48,582 --> 00:04:53,668
+se il dislivello è di almeno dieci
+centimetri, tre ore di montaggio in più.
+
+77
+00:04:53,668 --> 00:04:56,775
+Poi le regole costruttive, le
+tipologie visibili sul sito,
+
+78
+00:04:56,775 --> 00:04:58,701
+gli utenti con i loro ruoli.
+
+79
+00:04:58,701 --> 00:05:01,531
+E il registro dice chi ha
+cambiato cosa, e quando.
+
+80
+00:05:02,433 --> 00:05:04,254
+Dal rilievo alla macchina.
+
+81
+00:05:04,254 --> 00:05:06,494
+Una sola configurazione.
+
+82
+00:05:06,494 --> 00:05:08,942
+espeirIA, by Lemonjuice Solutions.

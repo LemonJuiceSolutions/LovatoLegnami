@@ -1,0 +1,923 @@
+diff --git a/src/app/(admin)/admin/layout.tsx b/src/app/(admin)/admin/layout.tsx
+index ccbe346..4e21c64 100644
+--- a/src/app/(admin)/admin/layout.tsx
++++ b/src/app/(admin)/admin/layout.tsx
+@@ -7,7 +7,7 @@ import { requirePageUser } from "@/server/auth"
+ import { PATH_HEADER } from "@/server/auth/route-guard"
+ 
+ export const dynamic = "force-dynamic"
+-export const metadata = { title: "Admin – Lovato Legnami", robots: { index: false, follow: false } }
++export const metadata = { title: "Admin – Lemonjuice Solutions", robots: { index: false, follow: false } }
+ 
+ /** Area admin (P10): stesso guscio dell'app interna, con la sotto-navigazione delle sezioni. */
+ export default async function AdminLayout({ children }: { children: React.ReactNode }) {
+diff --git a/src/app/(app)/dashboard/page.tsx b/src/app/(app)/dashboard/page.tsx
+index 1868c94..963a0b7 100644
+--- a/src/app/(app)/dashboard/page.tsx
++++ b/src/app/(app)/dashboard/page.tsx
+@@ -8,7 +8,7 @@ export default function DashboardPage() {
+     <div className="space-y-6">
+       <div>
+         <h1 className="text-2xl font-bold">Dashboard</h1>
+-        <p className="text-sm text-muted-foreground">Benvenuto in Lovato Legnami</p>
++        <p className="text-sm text-muted-foreground">Benvenuto in Lemonjuice Solutions</p>
+       </div>
+ 
+       <Card>
+diff --git a/src/app/(auth)/layout.tsx b/src/app/(auth)/layout.tsx
+index 6d02905..4b0c5df 100644
+--- a/src/app/(auth)/layout.tsx
++++ b/src/app/(auth)/layout.tsx
+@@ -2,7 +2,7 @@ import type { Metadata } from "next"
+ 
+ /** Pagine di accesso (P6): fuori dal sito pubblico e dall'area interna, mai indicizzate. */
+ export const metadata: Metadata = {
+-  title: "Accesso – LOVATO LEGNAMI",
++  title: "Accesso – LEMONJUICE SOLUTIONS",
+   robots: { index: false, follow: false },
+ }
+ 
+@@ -10,7 +10,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode })
+   return (
+     <main className="flex min-h-screen items-center justify-center bg-muted/40 px-4 py-10">
+       <div className="w-full max-w-sm rounded-xl border bg-background p-6 shadow-sm">
+-        <p className="mb-1 text-xs font-semibold tracking-widest text-muted-foreground">LOVATO LEGNAMI</p>
++        <p className="mb-1 text-xs font-semibold tracking-widest text-muted-foreground">LEMONJUICE SOLUTIONS</p>
+         {children}
+       </div>
+     </main>
+diff --git a/src/app/(site)/contatti/page.tsx b/src/app/(site)/contatti/page.tsx
+index 8d7f038..9f92a9b 100644
+--- a/src/app/(site)/contatti/page.tsx
++++ b/src/app/(site)/contatti/page.tsx
+@@ -11,7 +11,7 @@ import { PRIVACY_NOTICE_VERSION } from "@/server/consent"
+ 
+ export const metadata: Metadata = pageMetadata({
+   title: "Contatti",
+-  description: "Telefono, email, indirizzo e orari di Lovato Legnami a Settimo di Pescantina (Verona). Scrivici per una pergola su misura.",
++  description: "Telefono, email, indirizzo e orari di Lemonjuice Solutions a Verona. Scrivici per una pergola su misura.",
+   path: "/contatti",
+ })
+ 
+diff --git a/src/app/(site)/galleria/page.tsx b/src/app/(site)/galleria/page.tsx
+index 1ee333f..f2d9830 100644
+--- a/src/app/(site)/galleria/page.tsx
++++ b/src/app/(site)/galleria/page.tsx
+@@ -9,7 +9,7 @@ export const revalidate = 300
+ 
+ export const metadata: Metadata = pageMetadata({
+   title: "Galleria",
+-  description: "Pergole in legno di Lovato Legnami: realizzazioni e configurazioni di riferimento, con le misure.",
++  description: "Pergole in legno: realizzazioni e configurazioni di riferimento, con le misure.",
+   path: "/galleria",
+ })
+ 
+diff --git a/src/app/(site)/layout.tsx b/src/app/(site)/layout.tsx
+index e340d68..aef093a 100644
+--- a/src/app/(site)/layout.tsx
++++ b/src/app/(site)/layout.tsx
+@@ -1,5 +1,5 @@
+ import type { Metadata, Viewport } from "next"
+-import { Archivo, Fraunces } from "next/font/google"
++import { Bricolage_Grotesque, DM_Sans } from "next/font/google"
+ import { siteUrl } from "@/components/site/links"
+ import { SiteFooter } from "@/components/site/site-footer"
+ import SiteAnalytics from "@/components/site/site-analytics"
+@@ -11,23 +11,23 @@ import "./site.css"
+  * Fraunces (display, asse ottico e "SOFT") dà il calore del mestiere; Archivo è il
+  * carattere del sito di Lovato, robusto e leggibile nel testo corrente.
+  */
+-const display = Fraunces({ subsets: ["latin"], axes: ["opsz", "SOFT"], variable: "--font-site-display", display: "swap" })
+-const body = Archivo({ subsets: ["latin"], variable: "--font-site-body", display: "swap" })
++const display = Bricolage_Grotesque({ subsets: ["latin"], variable: "--font-site-display", display: "swap" })
++const body = DM_Sans({ subsets: ["latin"], variable: "--font-site-body", display: "swap" })
+ 
+ export const metadata: Metadata = {
+   metadataBase: new URL(siteUrl()),
+-  title: { default: "Lovato Legnami – Pergole in legno su misura a Verona", template: "%s – Lovato Legnami" },
++  title: { default: "Lemonjuice Solutions – Pergole in legno su misura", template: "%s – Lemonjuice Solutions" },
+   description:
+-    "Pergole, coperture e gazebo in legno progettati sulle tue misure da Lovato Legnami, Settimo di Pescantina (Verona), dal 1991. Prezzo indicativo online e sopralluogo.",
+-  applicationName: "Lovato Legnami",
++    "Pergole, coperture e gazebo in legno progettati sulle tue misure. Prezzo indicativo online e sopralluogo.",
++  applicationName: "Lemonjuice Solutions",
+   robots: { index: true, follow: true },
+-  openGraph: { type: "website", locale: "it_IT", siteName: "Lovato Legnami" },
++  openGraph: { type: "website", locale: "it_IT", siteName: "Lemonjuice Solutions" },
+ }
+ 
+ export const viewport: Viewport = {
+   themeColor: [
+-    { media: "(prefers-color-scheme: light)", color: "#F4F6F2" },
+-    { media: "(prefers-color-scheme: dark)", color: "#0F1A15" },
++    { media: "(prefers-color-scheme: light)", color: "#F6F5F1" },
++    { media: "(prefers-color-scheme: dark)", color: "#0B0C14" },
+   ],
+   width: "device-width",
+   initialScale: 1,
+diff --git a/src/app/(site)/page.tsx b/src/app/(site)/page.tsx
+index 8eb7549..111d032 100644
+--- a/src/app/(site)/page.tsx
++++ b/src/app/(site)/page.tsx
+@@ -11,9 +11,9 @@ export const revalidate = 300
+ 
+ export function generateMetadata(): Metadata {
+   return pageMetadata({
+-    title: "Lovato Legnami – Pergole in legno su misura a Verona",
++    title: "Lemonjuice Solutions – Pergole in legno su misura",
+     description:
+-      "Pergole in legno progettate sulle tue misure da Lovato Legnami, Settimo di Pescantina (Verona), dal 1991. Prezzo indicativo online, sopralluogo e montaggio.",
++      "Pergole in legno progettate sulle tue misure. Prezzo indicativo online, sopralluogo e montaggio.",
+     path: "/",
+     absoluteTitle: true,
+   })
+diff --git a/src/app/(site)/pergole/page.tsx b/src/app/(site)/pergole/page.tsx
+index f90331f..c99a292 100644
+--- a/src/app/(site)/pergole/page.tsx
++++ b/src/app/(site)/pergole/page.tsx
+@@ -7,7 +7,7 @@ export const revalidate = 300
+ 
+ export const metadata: Metadata = pageMetadata({
+   title: "Pergole in legno",
+-  description: "Le pergole in legno di Lovato Legnami: addossate al muro o autoportanti, progettate sulle tue misure con prezzo indicativo online.",
++  description: "Le pergole in legno: addossate al muro o autoportanti, progettate sulle tue misure con prezzo indicativo online.",
+   path: "/pergole",
+ })
+ 
+diff --git a/src/app/(site)/privacy/page.tsx b/src/app/(site)/privacy/page.tsx
+index c19ba2e..bccde42 100644
+--- a/src/app/(site)/privacy/page.tsx
++++ b/src/app/(site)/privacy/page.tsx
+@@ -6,7 +6,7 @@ import { PRIVACY_NOTICE_VERSION } from "@/server/consent"
+ 
+ export const metadata: Metadata = pageMetadata({
+   title: "Informativa sulla privacy",
+-  description: "Come Lovato Legnami tratta i dati inviati con il form Contatti e con la richiesta di preventivo.",
++  description: "Come Lemonjuice Solutions tratta i dati inviati con il form Contatti e con la richiesta di preventivo.",
+   path: "/privacy",
+ })
+ 
+diff --git a/src/app/(site)/site.css b/src/app/(site)/site.css
+index f485cdb..84b5b31 100644
+--- a/src/app/(site)/site.css
++++ b/src/app/(site)/site.css
+@@ -1,9 +1,8 @@
+ /*
+  * Tema del sito pubblico (P8, spec `sito-pubblico`): ridefinisce i token shadcn solo
+- * dentro `.theme-site`, così l'area interna resta invariata. Palette dall'identità di
+- * Lovato Legnami (lovatosrl.it): verde bosco #1B5A41, oro #BA8B49, carbone #231F20,
+- * salvia #9EC2AF. Il fondo è un bianco calce appena verde (non crema): legno e verde
+- * sono nei disegni, non nelle campiture.
++ * dentro `.theme-site`, così l'area interna resta invariata. Palette Lemonjuice Solutions
++ * (lemonjuicesolutions.it): ink #0B0C14, cream #F6F5F1, purple #6E20C2, cyan #00B8E0,
++ * magenta #C230D6; il legno resta nei disegni.
+  *
+  * Contrasti (WCAG AA, testo normale ≥ 4,5:1), chiaro: carbone su calce 15,6:1, verde
+  * bosco su calce 7,9:1, testo attenuato su calce 6,4:1, oro scuro (`--site-gold-ink`)
+@@ -12,33 +11,33 @@
+  */
+ 
+ .theme-site {
+-  --background: 90 18% 96%;
+-  --foreground: 345 6% 13%;
++  --background: 48 22% 95%;
++  --foreground: 233 29% 6%;
+   --card: 0 0% 100%;
+-  --card-foreground: 345 6% 13%;
++  --card-foreground: 233 29% 6%;
+   --popover: 0 0% 100%;
+-  --popover-foreground: 345 6% 13%;
+-  --primary: 156 54% 23%;
+-  --primary-foreground: 90 18% 97%;
+-  --secondary: 148 22% 90%;
+-  --secondary-foreground: 156 54% 16%;
+-  --muted: 90 14% 91%;
+-  --muted-foreground: 150 7% 33%;
+-  --accent: 36 45% 91%;
+-  --accent-foreground: 30 45% 20%;
+-  --destructive: 4 70% 42%;
++  --popover-foreground: 233 29% 6%;
++  --primary: 269 72% 44%;
++  --primary-foreground: 0 0% 100%;
++  --secondary: 265 54% 93%;
++  --secondary-foreground: 233 24% 15%;
++  --muted: 50 14% 91%;
++  --muted-foreground: 233 10% 33%;
++  --accent: 193 82% 93%;
++  --accent-foreground: 195 100% 21%;
++  --destructive: 4 76% 40%;
+   --destructive-foreground: 0 0% 100%;
+-  --border: 80 10% 82%;
+-  --input: 80 10% 70%;
+-  --ring: 156 54% 23%;
++  --border: 50 7% 84%;
++  --input: 48 3% 70%;
++  --ring: 269 72% 44%;
+   --radius: 0.375rem;
+ 
+   /* Token propri del sito */
+-  --site-gold: 35 45% 51%;
+-  --site-gold-ink: 34 52% 33%;
+-  --site-sage: 149 25% 69%;
++  --site-gold: 191 100% 44%;
++  --site-gold-ink: 195 100% 29%;
++  --site-sage: 293 67% 51%;
+   --site-wood: 28 52% 36%;
+-  --site-paper: 90 18% 96%;
++  --site-paper: 48 22% 95%;
+   --site-display-font: var(--font-site-display), "Iowan Old Style", Georgia, serif;
+   --site-body-font: var(--font-site-body), system-ui, -apple-system, "Segoe UI", sans-serif;
+   --site-radius: 0.375rem;
+@@ -56,38 +55,38 @@
+ }
+ 
+ .theme-site.dark {
+-  --background: 152 26% 8%;
+-  --foreground: 60 14% 92%;
+-  --card: 152 22% 11%;
+-  --card-foreground: 60 14% 92%;
+-  --popover: 152 22% 11%;
+-  --popover-foreground: 60 14% 92%;
+-  --primary: 149 30% 72%;
+-  --primary-foreground: 156 54% 11%;
+-  --secondary: 152 18% 16%;
+-  --secondary-foreground: 60 14% 92%;
+-  --muted: 152 16% 14%;
+-  --muted-foreground: 100 8% 70%;
+-  --accent: 36 28% 19%;
+-  --accent-foreground: 36 60% 82%;
+-  --destructive: 4 70% 62%;
+-  --destructive-foreground: 152 26% 8%;
+-  --border: 150 12% 22%;
+-  --input: 150 10% 34%;
+-  --ring: 149 30% 72%;
++  --background: 233 29% 6%;
++  --foreground: 48 22% 95%;
++  --card: 233 24% 15%;
++  --card-foreground: 48 22% 95%;
++  --popover: 233 24% 15%;
++  --popover-foreground: 48 22% 95%;
++  --primary: 255 100% 74%;
++  --primary-foreground: 233 29% 6%;
++  --secondary: 233 24% 15%;
++  --secondary-foreground: 48 22% 95%;
++  --muted: 233 28% 12%;
++  --muted-foreground: 233 11% 67%;
++  --accent: 208 49% 15%;
++  --accent-foreground: 192 100% 61%;
++  --destructive: 4 82% 67%;
++  --destructive-foreground: 233 29% 6%;
++  --border: 233 23% 22%;
++  --input: 233 23% 31%;
++  --ring: 255 100% 74%;
+ 
+-  --site-gold: 36 55% 60%;
+-  --site-gold-ink: 36 60% 68%;
++  --site-gold: 192 100% 61%;
++  --site-gold-ink: 192 100% 61%;
+   --site-wood: 30 50% 58%;
+-  --site-paper: 152 26% 8%;
++  --site-paper: 233 29% 6%;
+ }
+ 
+ /* Fondo della pagina anche oltre il contenuto (rimbalzo dello scorrimento). */
+ body:has(.theme-site) {
+-  background: hsl(90 18% 96%);
++  background: hsl(48 22% 95%);
+ }
+ body:has(.theme-site.dark) {
+-  background: hsl(152 26% 8%);
++  background: hsl(233 29% 6%);
+ }
+ 
+ /* ------------------------------------------------------------------ */
+diff --git a/src/app/globals.css b/src/app/globals.css
+index 52cf467..a4b0bfb 100644
+--- a/src/app/globals.css
++++ b/src/app/globals.css
+@@ -5,64 +5,64 @@
+ @layer base {
+   :root {
+     --background: 0 0% 100%;
+-    --foreground: 222.2 84% 4.9%;
++    --foreground: 233 29% 6%;
+ 
+     --card: 0 0% 100%;
+-    --card-foreground: 222.2 84% 4.9%;
++    --card-foreground: 233 29% 6%;
+ 
+     --popover: 0 0% 100%;
+-    --popover-foreground: 222.2 84% 4.9%;
++    --popover-foreground: 233 29% 6%;
+ 
+-    --primary: 222.2 47.4% 11.2%;
+-    --primary-foreground: 210 40% 98%;
++    --primary: 233 29% 6%;
++    --primary-foreground: 0 0% 100%;
+ 
+-    --secondary: 210 40% 96.1%;
+-    --secondary-foreground: 222.2 47.4% 11.2%;
++    --secondary: 48 22% 95%;
++    --secondary-foreground: 233 29% 6%;
+ 
+-    --muted: 210 40% 96.1%;
+-    --muted-foreground: 215.4 16.3% 46.9%;
++    --muted: 48 22% 95%;
++    --muted-foreground: 233 10% 33%;
+ 
+-    --accent: 210 40% 96.1%;
+-    --accent-foreground: 222.2 47.4% 11.2%;
++    --accent: 265 54% 93%;
++    --accent-foreground: 268 73% 30%;
+ 
+     --destructive: 0 84.2% 60.2%;
+     --destructive-foreground: 210 40% 98%;
+ 
+-    --border: 214.3 31.8% 91.4%;
+-    --input: 214.3 31.8% 91.4%;
+-    --ring: 222.2 84% 4.9%;
++    --border: 50 10% 88%;
++    --input: 50 10% 88%;
++    --ring: 269 72% 44%;
+ 
+     --radius: 0.5rem;
+   }
+ 
+   .dark {
+-    --background: 222.2 84% 4.9%;
+-    --foreground: 210 40% 98%;
++    --background: 233 29% 6%;
++    --foreground: 48 22% 95%;
+ 
+-    --card: 222.2 84% 4.9%;
+-    --card-foreground: 210 40% 98%;
++    --card: 233 29% 6%;
++    --card-foreground: 48 22% 95%;
+ 
+-    --popover: 222.2 84% 4.9%;
+-    --popover-foreground: 210 40% 98%;
++    --popover: 233 29% 6%;
++    --popover-foreground: 48 22% 95%;
+ 
+-    --primary: 210 40% 98%;
+-    --primary-foreground: 222.2 47.4% 11.2%;
++    --primary: 48 22% 95%;
++    --primary-foreground: 233 29% 6%;
+ 
+-    --secondary: 217.2 32.6% 17.5%;
+-    --secondary-foreground: 210 40% 98%;
++    --secondary: 233 24% 15%;
++    --secondary-foreground: 48 22% 95%;
+ 
+-    --muted: 217.2 32.6% 17.5%;
+-    --muted-foreground: 215 20.2% 65.1%;
++    --muted: 233 24% 15%;
++    --muted-foreground: 233 11% 67%;
+ 
+-    --accent: 217.2 32.6% 17.5%;
+-    --accent-foreground: 210 40% 98%;
++    --accent: 233 24% 15%;
++    --accent-foreground: 48 22% 95%;
+ 
+     --destructive: 0 62.8% 30.6%;
+     --destructive-foreground: 210 40% 98%;
+ 
+-    --border: 217.2 32.6% 17.5%;
+-    --input: 217.2 32.6% 17.5%;
+-    --ring: 212.7 26.8% 83.9%;
++    --border: 233 23% 22%;
++    --input: 233 23% 22%;
++    --ring: 255 100% 74%;
+   }
+ }
+ 
+diff --git a/src/app/layout.tsx b/src/app/layout.tsx
+index 80cc229..d5253d4 100644
+--- a/src/app/layout.tsx
++++ b/src/app/layout.tsx
+@@ -1,17 +1,17 @@
+ import type { Metadata, Viewport } from "next";
+-import { Inter } from "next/font/google";
++import { DM_Sans } from "next/font/google";
+ import "@/app/globals.css";
+ 
+-const inter = Inter({ subsets: ["latin"] });
++const inter = DM_Sans({ subsets: ["latin"] });
+ 
+ export const metadata: Metadata = {
+-  title: "LOVATO LEGNAMI",
+-  description: "Lovato Legnami",
+-  applicationName: "LOVATO LEGNAMI",
++  title: "LEMONJUICE SOLUTIONS",
++  description: "Lemonjuice Solutions",
++  applicationName: "LEMONJUICE SOLUTIONS",
+ };
+ 
+ export const viewport: Viewport = {
+-  themeColor: "#0a0a0a",
++  themeColor: "#0B0C14",
+   width: "device-width",
+   initialScale: 1,
+   viewportFit: "cover",
+diff --git a/src/components/auth/sign-in-form.tsx b/src/components/auth/sign-in-form.tsx
+index da1d445..d8f00e3 100644
+--- a/src/components/auth/sign-in-form.tsx
++++ b/src/components/auth/sign-in-form.tsx
+@@ -66,7 +66,7 @@ export function PasswordSignInForm({ action, next }: { action: SignInAction; nex
+           autoComplete="username"
+           inputMode="email"
+           required
+-          placeholder="nome@lovatolegnami.it"
++          placeholder="nome@lemonjuicesolutions.it"
+           aria-invalid={message ? true : undefined}
+           aria-describedby={describedBy}
+         />
+@@ -129,7 +129,7 @@ export function SignInForm({ action, next, error }: { action: SignInAction; next
+           autoComplete="email"
+           inputMode="email"
+           required
+-          placeholder="nome@lovatolegnami.it"
++          placeholder="nome@lemonjuicesolutions.it"
+           aria-invalid={message ? true : undefined}
+           aria-describedby={message ? "accesso-errore" : undefined}
+         />
+diff --git a/src/components/layout/sidebar.tsx b/src/components/layout/sidebar.tsx
+index 0c655d7..71fd058 100644
+--- a/src/components/layout/sidebar.tsx
++++ b/src/components/layout/sidebar.tsx
+@@ -64,10 +64,9 @@ export function Sidebar({ user }: { user?: Actor } = {}) {
+             className="flex items-center gap-2 font-bold text-lg"
+             onClick={() => setMobileOpen(false)}
+           >
+-            <div className="h-6 w-6 rounded-md bg-primary text-primary-foreground flex items-center justify-center text-xs">
+-              L
+-            </div>
+-            <span>LOVATO LEGNAMI</span>
++            {/* eslint-disable-next-line @next/next/no-img-element */}
++            <img src="/lemonjuice-logo.png" alt="" width={24} height={24} className="h-6 w-6" />
++            <span>LEMONJUICE SOLUTIONS</span>
+           </Link>
+         </div>
+ 
+@@ -102,7 +101,7 @@ export function Sidebar({ user }: { user?: Actor } = {}) {
+         {/* Footer */}
+         <div className="border-t p-4">
+           <p className="text-xs text-muted-foreground text-center">
+-            Lovato Legnami
++            Lemonjuice Solutions
+           </p>
+         </div>
+       </aside>
+diff --git a/src/components/site/company.ts b/src/components/site/company.ts
+index 500dcf2..dc778b3 100644
+--- a/src/components/site/company.ts
++++ b/src/components/site/company.ts
+@@ -41,26 +41,26 @@ export function phoneToHref(phone: string): string {
+ }
+ 
+ export function companyInfo(env: Readonly<Record<string, string | undefined>> = process.env): CompanyInfo {
+-  const phone = clean(env.SITE_COMPANY_PHONE) ?? "045 6700620"
+-  const street = clean(env.SITE_COMPANY_STREET) ?? "Via Antonio Meucci 4"
+-  const locality = "Settimo di Pescantina"
++  const phone = clean(env.SITE_COMPANY_PHONE) ?? ""
++  const street = clean(env.SITE_COMPANY_STREET) ?? "Verona, Italia"
++  const locality = "Verona"
+   return {
+-    brand: "Lovato Legnami",
+-    legalName: "Lovato Alessandro S.r.l.",
++    brand: "Lemonjuice Solutions",
++    legalName: "Lemonjuice Solutions S.R.L.",
+     foundedYear: 1991,
+-    vatNumber: "02988330235",
++    vatNumber: "05113320237",
+     street,
+-    postalCode: "37026",
++    postalCode: "37100",
+     locality,
+     province: "VR",
+     region: "Veneto",
+     country: "IT",
+     phone,
+     phoneHref: phoneToHref(phone),
+-    email: clean(env.SITE_COMPANY_EMAIL) ?? "info@lovatosrl.it",
+-    website: "https://www.lovatosrl.it",
++    email: clean(env.SITE_COMPANY_EMAIL) ?? "info@lemonjuicesolutions.it",
++    website: "https://www.lemonjuicesolutions.it",
+     hours: ["Lunedì–venerdì 8:00–12:00 e 13:30–17:30"],
+     openingHours: ["Mo-Fr 08:00-12:00", "Mo-Fr 13:30-17:30"],
+-    mapsUrl: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`Lovato Legnami, ${street}, ${locality}`)}`,
++    mapsUrl: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`Lemonjuice Solutions, ${locality}`)}`,
+   }
+ }
+diff --git a/src/components/site/hero.tsx b/src/components/site/hero.tsx
+index 40736ef..b9f6ea7 100644
+--- a/src/components/site/hero.tsx
++++ b/src/components/site/hero.tsx
+@@ -14,7 +14,7 @@ export function Hero({ featured, foundedYear }: { featured: TypologyCardData | n
+   return (
+     <section aria-labelledby="titolo-home" className="site-container grid items-center gap-12 pb-16 pt-10 md:pt-16 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] lg:gap-16 lg:pb-24">
+       <div>
+-        <p className="text-muted-foreground">Dal {foundedYear} a Settimo di Pescantina, Verona</p>
++        <p className="text-muted-foreground">Pergole su misura, progettate con espeirIA</p>
+         <h1 id="titolo-home" className="site-display site-h1 mt-5 max-w-[13ch]">
+           Pergole in legno, disegnate sulle tue misure.
+         </h1>
+diff --git a/src/components/site/home.tsx b/src/components/site/home.tsx
+index 188f17d..42fe9be 100644
+--- a/src/components/site/home.tsx
++++ b/src/components/site/home.tsx
+@@ -14,7 +14,7 @@ import { TypologyCard } from "./typology-card"
+ export const HOME_GALLERY_ITEMS = 3
+ 
+ const WORKSHOP = [
+-  { term: "Dal 1991", text: "Commercio e lavorazione del legno a Settimo di Pescantina." },
++  { term: "Progetto su misura", text: "Ogni pergola nasce dalle misure reali del tuo spazio." },
+   { term: "Centro di taglio CNC", text: "Travi, incastri e fori tagliati a macchina sul disegno della tua pergola." },
+   { term: "Lamellare certificato", text: "Abete, larice e castagno, lamellare o massello, trattati per l'esterno." },
+   { term: "Consegna e montaggio", text: "Le nostre squadre montano a Verona e provincia; fuori zona ne parliamo." },
+@@ -62,8 +62,8 @@ export function HomeContent({ content, company }: { content: SiteContent; compan
+         <div className="grid gap-12 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
+           <div className="site-prose text-[1.125rem]">
+             <p>
+-              Lovato Legnami lavora il legno da più di trent&apos;anni: semilavorati, arredo urbano, coperture e case in legno. Le pergole sono la parte del
+-              nostro lavoro che entra nei giardini di casa.
++              Lemonjuice Solutions porta la progettazione dal rilievo alla macchina: pergole, coperture e gazebo in legno, disegnati
++              sulle misure reali di ogni giardino.
+             </p>
+             <p>
+               Il disegno che vedi online è lo stesso da cui partiamo in laboratorio: le misure diventano pezzi, i pezzi passano dal centro di taglio, e la
+diff --git a/src/components/site/og-image.tsx b/src/components/site/og-image.tsx
+index 130eaa1..70f0d97 100644
+--- a/src/components/site/og-image.tsx
++++ b/src/components/site/og-image.tsx
+@@ -13,22 +13,22 @@ export { OG_ALT, OG_PATH, OG_SIZE } from "./seo"
+ export function renderOgImage(): ImageResponse {
+   return new ImageResponse(
+     (
+-      <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", background: "#1B5A41", color: "#F4F6F2" }}>
+-        <div style={{ height: 28, display: "flex", background: "linear-gradient(90deg, #C9A06B, #A9763F 40%, #C39459 62%, #9C6B38)" }} />
++      <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", background: "#0B0C14", color: "#F6F5F1" }}>
++        <div style={{ height: 28, display: "flex", background: "linear-gradient(100deg, #0096C9 0%, #6E2BD0 55%, #C230D6 100%)" }} />
+         <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "space-between", padding: "64px 80px" }}>
+           <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
+             <div style={{ position: "relative", width: 56, height: 56, display: "flex" }}>
+-              <div style={{ position: "absolute", left: 0, top: 21, width: 56, height: 14, background: "#9EC2AF" }} />
+-              <div style={{ position: "absolute", left: 21, top: 0, width: 14, height: 56, background: "#BA8B49" }} />
++              <div style={{ position: "absolute", left: 0, top: 21, width: 56, height: 14, background: "#00B8E0" }} />
++              <div style={{ position: "absolute", left: 21, top: 0, width: 14, height: 56, background: "#C230D6" }} />
+             </div>
+             <div style={{ display: "flex", flexDirection: "column" }}>
+-              <div style={{ fontSize: 44, lineHeight: 1 }}>Lovato</div>
+-              <div style={{ fontSize: 18, letterSpacing: 8, color: "#D9B98A", marginTop: 6 }}>LEGNAMI</div>
++              <div style={{ fontSize: 44, lineHeight: 1 }}>Lemonjuice</div>
++              <div style={{ fontSize: 18, letterSpacing: 8, color: "#9D7BFF", marginTop: 6 }}>SOLUTIONS</div>
+             </div>
+           </div>
+           <div style={{ display: "flex", flexDirection: "column" }}>
+             <div style={{ fontSize: 76, lineHeight: 1.05, maxWidth: 900 }}>Pergole in legno, disegnate sulle tue misure.</div>
+-            <div style={{ fontSize: 30, marginTop: 28, color: "#CFE0D6" }}>Prezzo indicativo online. Settimo di Pescantina, Verona, dal 1991.</div>
++            <div style={{ fontSize: 30, marginTop: 28, color: "#D7D8E0" }}>Prezzo indicativo online.</div>
+           </div>
+         </div>
+       </div>
+diff --git a/src/components/site/seo.ts b/src/components/site/seo.ts
+index ae208ee..130ce21 100644
+--- a/src/components/site/seo.ts
++++ b/src/components/site/seo.ts
+@@ -8,10 +8,10 @@ import { typologyHref } from "./links"
+  * contenuto di sitemap/robots come funzioni pure, testate senza Next.
+  */
+ 
+-export const SITE_NAME = "Lovato Legnami"
++export const SITE_NAME = "Lemonjuice Solutions"
+ 
+ /** Immagine Open Graph comune (`/og.png`, vedi `og-image.tsx`). */
+-export const OG_ALT = "Lovato Legnami – pergole in legno su misura, Settimo di Pescantina (Verona)"
++export const OG_ALT = "Lemonjuice Solutions – pergole in legno su misura"
+ export const OG_SIZE = { width: 1200, height: 630 } as const
+ export const OG_PATH = "/og.png"
+ 
+diff --git a/src/components/site/site-footer.tsx b/src/components/site/site-footer.tsx
+index 8200c49..aed857d 100644
+--- a/src/components/site/site-footer.tsx
++++ b/src/components/site/site-footer.tsx
+@@ -11,19 +11,13 @@ export function SiteFooter({ company = companyInfo() }: { company?: CompanyInfo
+         <div className="space-y-4">
+           <Wordmark />
+           <p className="max-w-[36ch] text-muted-foreground">
+-            Legno lavorato a Settimo di Pescantina dal {company.foundedYear}: pergole, coperture, case in legno e taglio CNC su misura.
++            Pergole, coperture e gazebo in legno, progettati su misura e tagliati a CNC.
+           </p>
+         </div>
+         <div>
+           <h2 className="mb-3 font-semibold">Dove siamo</h2>
+           <address className="not-italic text-muted-foreground">
+-            {company.street}
+-            <br />
+-            {company.postalCode} {company.locality} ({company.province})
+-            <br />
+-            <a href={`tel:${company.phoneHref}`} className="text-foreground underline-offset-4 hover:underline">
+-              {company.phone}
+-            </a>
++            {company.locality}, Italia
+             <br />
+             <a href={`mailto:${company.email}`} className="text-foreground underline-offset-4 hover:underline">
+               {company.email}
+diff --git a/src/components/site/wordmark.tsx b/src/components/site/wordmark.tsx
+index 1d82347..4a55f27 100644
+--- a/src/components/site/wordmark.tsx
++++ b/src/components/site/wordmark.tsx
+@@ -19,13 +19,14 @@ export function JointMark({ className }: { className?: string }) {
+ 
+ export function Wordmark({ className }: { className?: string }) {
+   return (
+-    <Link href="/" className={cn("group inline-flex items-center gap-3 no-underline", className)} aria-label="Lovato Legnami, pagina iniziale">
+-      <JointMark />
++    <Link href="/" className={cn("group inline-flex items-center gap-3 no-underline", className)} aria-label="Lemonjuice Solutions, pagina iniziale">
++      {/* eslint-disable-next-line @next/next/no-img-element */}
++      <img src="/lemonjuice-logo.png" alt="" width={40} height={40} className="h-10 w-10 shrink-0" />
+       <span className="flex flex-col leading-none">
+         <span className="site-display text-[1.6rem] tracking-[-0.01em]" style={{ lineHeight: 1 }}>
+-          Lovato
++          Lemonjuice
+         </span>
+-        <span className="mt-1 text-[0.8rem] font-semibold tracking-[0.28em] text-[hsl(var(--site-gold-ink))]">LEGNAMI</span>
++        <span className="mt-1 text-[0.8rem] font-semibold tracking-[0.28em] text-[hsl(var(--site-gold-ink))]">SOLUTIONS</span>
+       </span>
+     </Link>
+   )
+diff --git a/src/components/wizard/customer-summary.tsx b/src/components/wizard/customer-summary.tsx
+index dfd3d28..798377c 100644
+--- a/src/components/wizard/customer-summary.tsx
++++ b/src/components/wizard/customer-summary.tsx
+@@ -109,10 +109,12 @@ export function CustomerSummaryView({ summary, phone, email }: { summary: Custom
+ function ContactButtons({ phone, email }: { phone: string; email: string }) {
+   return (
+     <div className="mt-6 flex flex-wrap gap-3">
+-      <a href={`tel:${phone.replace(/\s+/g, "")}`} className="site-btn site-btn-primary">
+-        <Phone className="h-5 w-5" aria-hidden="true" /> Chiama {phone}
+-      </a>
+-      <a href={`mailto:${email}`} className="site-btn site-btn-quiet">
++      {phone ? (
++        <a href={`tel:${phone.replace(/\s+/g, "")}`} className="site-btn site-btn-primary">
++          <Phone className="h-5 w-5" aria-hidden="true" /> Chiama {phone}
++        </a>
++      ) : null}
++      <a href={`mailto:${email}`} className={phone ? "site-btn site-btn-quiet" : "site-btn site-btn-primary"}>
+         <Mail className="h-5 w-5" aria-hidden="true" /> Scrivi una email
+       </a>
+       <Link href="/contatti" className="site-btn site-btn-quiet">
+diff --git a/src/components/wizard/step-summary.tsx b/src/components/wizard/step-summary.tsx
+index 272a48b..06e8b4b 100644
+--- a/src/components/wizard/step-summary.tsx
++++ b/src/components/wizard/step-summary.tsx
+@@ -127,7 +127,7 @@ function PlanSketch({ plan, width, depth, wall }: { plan: EnvelopePlan | null; w
+         {wall && <line x1={pts[3]![0]} y1={pts[3]![1]} x2={pts[2]![0]} y2={pts[2]![1]} stroke="hsl(var(--site-gold))" strokeWidth="5" strokeLinecap="round" />}
+       </svg>
+       <figcaption className="mt-1 text-[0.95rem] text-muted-foreground">
+-        {wall ? "In oro il muro. " : ""}
++        {wall ? "In azzurro il muro. " : ""}
+         {dev >= 0.5 ? `Fuori squadra di circa ${Math.round(dev)}°.` : "In squadra."}
+       </figcaption>
+     </figure>
+diff --git a/src/components/wizard/wizard-viewer.tsx b/src/components/wizard/wizard-viewer.tsx
+index 6ca2189..bbb25e4 100644
+--- a/src/components/wizard/wizard-viewer.tsx
++++ b/src/components/wizard/wizard-viewer.tsx
+@@ -33,8 +33,8 @@ export interface WizardViewerProps {
+   readonly label: string
+ }
+ 
+-const LIGHT: ViewerPalette = { background: "#F4F6F2", foreground: "#231F20", primary: "#1B5A41", destructive: "#B42318", muted: "#E4E9E1", mutedForeground: "#55615A", border: "#CBD2C7", dark: false }
+-const DARK: ViewerPalette = { background: "#0F1A15", foreground: "#ECEBE3", primary: "#9EC2AF", destructive: "#F07167", muted: "#1C2A23", mutedForeground: "#A9B4AC", border: "#2E3D35", dark: true }
++const LIGHT: ViewerPalette = { background: "#F6F5F1", foreground: "#0B0C14", primary: "#6E20C2", destructive: "#B42318", muted: "#ECEBE6", mutedForeground: "#4B4D5C", border: "#D9D8D3", dark: false }
++const DARK: ViewerPalette = { background: "#0B0C14", foreground: "#F6F5F1", primary: "#9D7BFF", destructive: "#F07167", muted: "#1C1E2E", mutedForeground: "#A3A5B5", border: "#2B2E44", dark: true }
+ 
+ function CaptureRegistration() {
+   const { gl, scene, camera } = useThree()
+diff --git a/src/domain/presets/catalog.ts b/src/domain/presets/catalog.ts
+index 80f2fa2..4156cd5 100644
+--- a/src/domain/presets/catalog.ts
++++ b/src/domain/presets/catalog.ts
+@@ -493,7 +493,7 @@ export const PRESET_CATALOG: readonly Preset[] = [
+     source: `${SRC} §3 estensioni (tipologia a L, non offerta dal sito)`,
+     notes: [
+       "[dedotto] Il sito non vende strutture a L: due ali da 4000 sui due muri con un solo pilastro d'angolo e compluvio.",
+-      "Profondità 3150 invece di 3000: con 3000 lo sbalzo delle travi di gronda oltre il pilastro (940 mm) supera lo sbalzo massimo di 800 del set Lovato; con 3150 è 790. Profondità maggiori superano la luce delle travi 120×160 (3200) o del compluvio (4500).",
++      "Profondità 3150 invece di 3000: con 3000 lo sbalzo delle travi di gronda oltre il pilastro (940 mm) supera lo sbalzo massimo di 800 del set di regole; con 3150 è 790. Profondità maggiori superano la luce delle travi 120×160 (3200) o del compluvio (4500).",
+     ],
+     expected: {
+       pieces: { pilastro: 1, trave: 2, banchina: 2, cantonale: 1, travetto: 14 },
+diff --git a/src/domain/rules/data/default-lovato.ts b/src/domain/rules/data/default-lovato.ts
+index 8ac8511..799c654 100644
+--- a/src/domain/rules/data/default-lovato.ts
++++ b/src/domain/rules/data/default-lovato.ts
+@@ -133,8 +133,8 @@ export const DEFAULT_SPAN_TABLE = {
+ 
+ /** Dati grezzi del set di regole di default Lovato (validati da `loadRuleSet`). */
+ export const DEFAULT_LOVATO_DATA = {
+-  id: "default-lovato",
+-  name: "Regole costruttive Lovato (valori iniziali, da validare)",
++  id: "default-regole",
++  name: "Regole costruttive (valori iniziali, da validare)",
+   rules: [
+     {
+       id: "luce-max-sezione",
+diff --git a/src/export/sat/writer.ts b/src/export/sat/writer.ts
+index 8e5138d..e0308d5 100644
+--- a/src/export/sat/writer.ts
++++ b/src/export/sat/writer.ts
+@@ -41,7 +41,7 @@ export interface SatWriteOptions {
+   readonly date?: Date;
+ }
+ 
+-export const DEFAULT_SAT_PRODUCER = "Lovato Legnami - Configuratore pergole";
++export const DEFAULT_SAT_PRODUCER = "Lemonjuice Solutions - Configuratore pergole";
+ /** Nome usato dai traduttori ACIS (InterOp) per il nome delle entità. */
+ export const DEFAULT_NAME_ATTRIBUTE = "ATTRIB_XACIS_NAME";
+ 
+diff --git a/src/lib/ai-prompts.ts b/src/lib/ai-prompts.ts
+index 7e81b5d..15f9309 100644
+--- a/src/lib/ai-prompts.ts
++++ b/src/lib/ai-prompts.ts
+@@ -3,7 +3,7 @@
+  * Extend with domain knowledge as the app grows.
+  */
+ 
+-export const UNIVERSAL_SYSTEM_PROMPT = `Sei l'assistente AI di Lovato Legnami.
++export const UNIVERSAL_SYSTEM_PROMPT = `Sei l'assistente AI di Lemonjuice Solutions.
+ 
+ ══════════════════════════════════════════════════
+  REGOLE FONDAMENTALI
+diff --git a/src/server/consent.ts b/src/server/consent.ts
+index da15fee..06ad759 100644
+--- a/src/server/consent.ts
++++ b/src/server/consent.ts
+@@ -8,7 +8,7 @@
+ export const PRIVACY_NOTICE_VERSION = "2026-10";
+ 
+ export const CONSENT_TEXT =
+-  "Acconsento al trattamento dei miei dati personali da parte di Lovato Legnami per rispondere alla richiesta di preventivo, " +
++  "Acconsento al trattamento dei miei dati personali da parte di Lemonjuice Solutions per rispondere alla richiesta di preventivo, " +
+   "come descritto nell'informativa sulla privacy (versione " +
+   PRIVACY_NOTICE_VERSION +
+   ").";
+diff --git a/src/server/email/templates/accesso.ts b/src/server/email/templates/accesso.ts
+index d24ba19..185fa6e 100644
+--- a/src/server/email/templates/accesso.ts
++++ b/src/server/email/templates/accesso.ts
+@@ -4,7 +4,7 @@ import { escapeHtml } from "./shared";
+ /** Email con il collegamento di accesso all'area interna (HTML + testo, italiano). */
+ 
+ export function accessEmail(params: { to: string; url: string; minutes: number; siteName?: string }): EmailMessage {
+-  const site = params.siteName ?? "Lovato Legnami";
++  const site = params.siteName ?? "Lemonjuice Solutions";
+   const subject = `Accesso a ${site}`;
+   const text = [
+     `Per accedere all'area interna di ${site} apri questo collegamento:`,
+@@ -15,11 +15,11 @@ export function accessEmail(params: { to: string; url: string; minutes: number;
+     "Se non hai richiesto l'accesso ignora questa email: nessuno potrà entrare senza il collegamento.",
+   ].join("\n");
+   const url = escapeHtml(params.url);
+-  const html = `<!doctype html><html lang="it"><body style="font-family:system-ui,sans-serif;color:#1f1a17;line-height:1.5">
++  const html = `<!doctype html><html lang="it"><body style="font-family:system-ui,sans-serif;color:#0B0C14;line-height:1.5">
+ <p>Per accedere all'area interna di ${escapeHtml(site)} usa il pulsante qui sotto.</p>
+-<p><a href="${url}" style="display:inline-block;padding:10px 18px;background:#5a3a22;color:#fff;border-radius:6px;text-decoration:none">Accedi</a></p>
++<p><a href="${url}" style="display:inline-block;padding:10px 18px;background:#6E20C2;color:#fff;border-radius:6px;text-decoration:none">Accedi</a></p>
+ <p style="font-size:14px">Il collegamento vale ${params.minutes} minuti e si può usare una sola volta.<br>Se non hai richiesto l'accesso ignora questa email.</p>
+-<p style="font-size:12px;color:#6b625c">Se il pulsante non funziona copia questo indirizzo nel browser:<br>${url}</p>
++<p style="font-size:12px;color:#4B4D5C">Se il pulsante non funziona copia questo indirizzo nel browser:<br>${url}</p>
+ </body></html>`;
+   return { to: params.to, subject, html, text };
+ }
+diff --git a/src/server/email/templates/conferma-cliente.ts b/src/server/email/templates/conferma-cliente.ts
+index b3c24b4..cd6abb2 100644
+--- a/src/server/email/templates/conferma-cliente.ts
++++ b/src/server/email/templates/conferma-cliente.ts
+@@ -35,7 +35,7 @@ export type CustomerConfirmationData = z.input<typeof CustomerConfirmationSchema
+ 
+ export const customerPdfFilename = (code: string): string => `preventivo-${code}.pdf`;
+ 
+-export function customerConfirmationEmail(to: string, input: CustomerConfirmationData, pdf?: Uint8Array | null, siteName = "Lovato Legnami"): EmailMessage {
++export function customerConfirmationEmail(to: string, input: CustomerConfirmationData, pdf?: Uint8Array | null, siteName = "Lemonjuice Solutions"): EmailMessage {
+   const d = CustomerConfirmationSchema.parse(input);
+   const subject = oneLine(`${siteName}: richiesta di preventivo ${d.code} ricevuta`);
+   const price = d.total ? `Prezzo indicativo: ${d.total} IVA inclusa${d.range ? ` (fascia ${d.range})` : ""}` : "Prezzo: su richiesta (lo calcola l'ufficio dopo aver visto i dettagli)";
+@@ -63,7 +63,7 @@ ${d.notes.length ? `<ul>${d.notes.map((n) => `<li>${escapeHtml(oneLine(n, 300))}
+ <p>Il prezzo è indicativo e soggetto a sopralluogo: ti contatteremo a breve per i dettagli.</p>
+ ${button(d.link, "Rivedi il riepilogo")}
+ <p style="font-size:14px">Il collegamento è personale e vale fino al ${escapeHtml(formatDateIt(d.expiresOn))}.${pdf ? " In allegato trovi il riepilogo in PDF." : ""}</p>
+-<p style="font-size:12px;color:#6b625c">Se il pulsante non funziona copia questo indirizzo nel browser:<br>${escapeHtml(d.link)}</p>
++<p style="font-size:12px;color:#4B4D5C">Se il pulsante non funziona copia questo indirizzo nel browser:<br>${escapeHtml(d.link)}</p>
+ <p>${escapeHtml(siteName)}</p>`);
+   const attachments: EmailAttachment[] = pdf ? [{ filename: customerPdfFilename(d.code), content: pdf, contentType: "application/pdf" }] : [];
+   return { to, subject, html, text, ...(attachments.length ? { attachments } : {}) };
+diff --git a/src/server/email/templates/messaggio-contatti.ts b/src/server/email/templates/messaggio-contatti.ts
+index dc720c4..2495683 100644
+--- a/src/server/email/templates/messaggio-contatti.ts
++++ b/src/server/email/templates/messaggio-contatti.ts
+@@ -32,7 +32,7 @@ export function contactMessageEmail(to: string, input: ContactMessageData): Emai
+   const text = ["Nuovo messaggio dalla pagina Contatti del sito.", "", ...rows.map(([k, v]) => `${k}: ${v}`), "", "Messaggio:", plainText(d.message)].join("\n");
+   const html = htmlDocument(`<p>Nuovo messaggio dalla pagina Contatti del sito.</p>
+ <table style="border-collapse:collapse;font-size:14px">${rows
+-    .map(([k, v]) => `<tr><td style="padding:2px 12px 2px 0;color:#6b625c">${escapeHtml(k)}</td><td style="padding:2px 0">${escapeHtml(v)}</td></tr>`)
++    .map(([k, v]) => `<tr><td style="padding:2px 12px 2px 0;color:#4B4D5C">${escapeHtml(k)}</td><td style="padding:2px 0">${escapeHtml(v)}</td></tr>`)
+     .join("")}</table>
+ <p style="font-size:14px"><strong>Messaggio</strong><br>${htmlParagraph(d.message)}</p>`);
+   return { to, subject, html, text, replyTo: d.email };
+diff --git a/src/server/email/templates/notifica-ufficio.ts b/src/server/email/templates/notifica-ufficio.ts
+index 18b2ead..f5dacdd 100644
+--- a/src/server/email/templates/notifica-ufficio.ts
++++ b/src/server/email/templates/notifica-ufficio.ts
+@@ -58,7 +58,7 @@ export function officeNotificationEmail(to: string, input: OfficeNotificationDat
+   ].join("\n");
+   const html = htmlDocument(`<p>Nuova richiesta di preventivo dal sito: <strong>${escapeHtml(d.code)}</strong></p>
+ <table style="border-collapse:collapse;font-size:14px">${rows
+-    .map(([k, v]) => `<tr><td style="padding:2px 12px 2px 0;color:#6b625c">${escapeHtml(k)}</td><td style="padding:2px 0">${escapeHtml(v)}</td></tr>`)
++    .map(([k, v]) => `<tr><td style="padding:2px 12px 2px 0;color:#4B4D5C">${escapeHtml(k)}</td><td style="padding:2px 0">${escapeHtml(v)}</td></tr>`)
+     .join("")}</table>
+ ${d.notes ? `<p style="font-size:14px"><strong>Note del cliente</strong><br>${htmlParagraph(d.notes)}</p>` : ""}
+ ${button(d.adminUrl, "Apri la richiesta")}`);
+diff --git a/src/server/email/templates/preventivo-definitivo.ts b/src/server/email/templates/preventivo-definitivo.ts
+index 228e319..9f1f31e 100644
+--- a/src/server/email/templates/preventivo-definitivo.ts
++++ b/src/server/email/templates/preventivo-definitivo.ts
+@@ -30,7 +30,7 @@ export const FinalQuoteEmailSchema = z
+   .strict();
+ export type FinalQuoteEmailData = z.input<typeof FinalQuoteEmailSchema>;
+ 
+-export function finalQuoteEmail(to: string, input: FinalQuoteEmailData, pdf?: Uint8Array | null, siteName = "Lovato Legnami"): EmailMessage {
++export function finalQuoteEmail(to: string, input: FinalQuoteEmailData, pdf?: Uint8Array | null, siteName = "Lemonjuice Solutions"): EmailMessage {
+   const d = FinalQuoteEmailSchema.parse(input);
+   const subject = oneLine(`${siteName}: preventivo ${d.code}`);
+   const text = [
+@@ -53,7 +53,7 @@ export function finalQuoteEmail(to: string, input: FinalQuoteEmailData, pdf?: Ui
+ <p><strong>Totale: ${escapeHtml(d.total)} IVA inclusa</strong></p>
+ ${button(d.link, "Rivedi il preventivo")}
+ <p style="font-size:14px">Il collegamento è personale e vale fino al ${escapeHtml(formatDateIt(d.expiresOn))}.${pdf ? " In allegato trovi il preventivo in PDF." : ""}</p>
+-<p style="font-size:12px;color:#6b625c">Se il pulsante non funziona copia questo indirizzo nel browser:<br>${escapeHtml(d.link)}</p>
++<p style="font-size:12px;color:#4B4D5C">Se il pulsante non funziona copia questo indirizzo nel browser:<br>${escapeHtml(d.link)}</p>
+ <p>Per qualsiasi domanda rispondi pure a questa email.</p>
+ <p>${escapeHtml(siteName)}</p>`);
+   const attachments: EmailAttachment[] = pdf ? [{ filename: customerPdfFilename(d.code), content: pdf, contentType: "application/pdf" }] : [];
+diff --git a/src/server/email/templates/shared.ts b/src/server/email/templates/shared.ts
+index 1589053..55fdc86 100644
+--- a/src/server/email/templates/shared.ts
++++ b/src/server/email/templates/shared.ts
+@@ -35,10 +35,10 @@ export function formatDateIt(value: string | Date): string {
+ }
+ 
+ export function htmlDocument(body: string): string {
+-  return `<!doctype html><html lang="it"><head><meta charset="utf-8"></head><body style="font-family:system-ui,-apple-system,Segoe UI,sans-serif;color:#1f1a17;line-height:1.5;max-width:640px">
++  return `<!doctype html><html lang="it"><head><meta charset="utf-8"></head><body style="font-family:system-ui,-apple-system,Segoe UI,sans-serif;color:#0B0C14;line-height:1.5;max-width:640px">
+ ${body}
+ </body></html>`;
+ }
+ 
+ export const button = (href: string, label: string): string =>
+-  `<p><a href="${escapeHtml(href)}" style="display:inline-block;padding:10px 18px;background:#5a3a22;color:#fff;border-radius:6px;text-decoration:none">${escapeHtml(label)}</a></p>`;
++  `<p><a href="${escapeHtml(href)}" style="display:inline-block;padding:10px 18px;background:#6E20C2;color:#fff;border-radius:6px;text-decoration:none">${escapeHtml(label)}</a></p>`;
+diff --git a/src/server/env.ts b/src/server/env.ts
+index 06a9f89..87ff26b 100644
+--- a/src/server/env.ts
++++ b/src/server/env.ts
+@@ -76,7 +76,7 @@ export class EnvError extends Error {
+ const DEV_DEFAULTS = {
+   AUTH_SECRET: "sviluppo-locale-non-usare-in-produzione-0000",
+   NEXT_PUBLIC_SITE_URL: "http://localhost:3000",
+-  EMAIL_FROM: "Lovato Legnami <preventivi@localhost>",
++  EMAIL_FROM: "Lemonjuice Solutions <preventivi@localhost>",
+   OFFICE_EMAIL: "ufficio@localhost",
+ } as const;
+ 
+diff --git a/src/server/pdf/quote-pdf.tsx b/src/server/pdf/quote-pdf.tsx
+index 58eaafe..0bf3055 100644
+--- a/src/server/pdf/quote-pdf.tsx
++++ b/src/server/pdf/quote-pdf.tsx
+@@ -45,7 +45,7 @@ export interface QuotePdfData {
+ // Niente sillabazione inglese automatica sulle parole italiane.
+ Font.registerHyphenationCallback((word) => [word]);
+ 
+-const C = { ink: "#1f1a17", muted: "#6b625c", line: "#d9cfc4", accent: "#5a3a22", band: "#f4efe8" };
++const C = { ink: "#0B0C14", muted: "#4B4D5C", line: "#D9D8D3", accent: "#6E20C2", band: "#F6F5F1" };
+ 
+ const s = StyleSheet.create({
+   page: { padding: 36, fontFamily: "Helvetica", fontSize: 10, color: C.ink, lineHeight: 1.35 },
+@@ -138,7 +138,7 @@ function PlanView({ plan }: { plan: NonNullable<QuotePdfData["plan"]> }) {
+ 
+ export function QuotePdf({ data }: { data: QuotePdfData }) {
+   const q = data.quote;
+-  const site = data.siteName ?? "Lovato Legnami";
++  const site = data.siteName ?? "Lemonjuice Solutions";
+   const priced = q.status === "completo";
+   const c = {
+     name: pdfText(data.customer.name, 120),
+@@ -154,7 +154,7 @@ export function QuotePdf({ data }: { data: QuotePdfData }) {
+         <View style={s.header}>
+           <View>
+             <Text style={s.brand}>{site}</Text>
+-            <Text style={s.small}>{data.siteAddress ?? "Settimo di Pescantina (VR)"}</Text>
++            <Text style={s.small}>{data.siteAddress ?? "Verona"}</Text>
+           </View>
+           <View style={{ alignItems: "flex-end" }}>
+             <Text style={s.title}>{data.kind === "definitivo" ? "Preventivo" : "Preventivo indicativo"}</Text>

@@ -1,0 +1,639 @@
+{
+  "voice": "it-IT-GiuseppeMultilingualNeural",
+  "rate": "175",
+  "fps": 30,
+  "padIn": 0.3,
+  "totalFrames": 9110,
+  "scenes": [
+    {
+      "id": "01",
+      "file": "vo/scene-01.wav",
+      "seconds": 14.376,
+      "cues": [
+        {
+          "start": 0,
+          "end": 2.450454545454545,
+          "text": "Lemonjuice Solutions presenta espeirIA,"
+        },
+        {
+          "start": 2.450454545454545,
+          "end": 6.752363636363636,
+          "text": "la piattaforma che porta la progettazione\ndal rilievo fino alla macchina."
+        },
+        {
+          "start": 6.752363636363636,
+          "end": 7.732545454545455,
+          "text": "Il primo progetto?"
+        },
+        {
+          "start": 7.732545454545455,
+          "end": 10.89090909090909,
+          "text": "Un configuratore per chi\nproduce strutture in legno:"
+        },
+        {
+          "start": 10.89090909090909,
+          "end": 14.376,
+          "text": "pergole, gazebo, carport\ne tetti pre-tagliati."
+        }
+      ],
+      "from": 0,
+      "durationInFrames": 459,
+      "voiceStartFrame": 9
+    },
+    {
+      "id": "c1",
+      "file": "vo/scene-c1.wav",
+      "seconds": 3.312,
+      "cues": [
+        {
+          "start": 0,
+          "end": 3.312,
+          "text": "Si parte dal sito, dal\npunto di vista del cliente."
+        }
+      ],
+      "from": 459,
+      "durationInFrames": 127,
+      "voiceStartFrame": 9
+    },
+    {
+      "id": "02",
+      "file": "vo/scene-02.wav",
+      "seconds": 12.768,
+      "cues": [
+        {
+          "start": 0,
+          "end": 2.950374501992032,
+          "text": "Il cliente arriva sulla\nhome e sfoglia le tipologie:"
+        },
+        {
+          "start": 2.950374501992032,
+          "end": 6.867250996015937,
+          "text": "addossate, autoportanti,\ncarport, gazebo e pensiline."
+        },
+        {
+          "start": 6.867250996015937,
+          "end": 10.122836653386454,
+          "text": "Ogni modello ha il suo disegno\ne un prezzo «a partire da»,"
+        },
+        {
+          "start": 10.122836653386454,
+          "end": 12.768,
+          "text": "che viene dal listino\ngestito nel back-office."
+        }
+      ],
+      "from": 586,
+      "durationInFrames": 411,
+      "voiceStartFrame": 9
+    },
+    {
+      "id": "03",
+      "file": "vo/scene-03.wav",
+      "seconds": 14.256,
+      "cues": [
+        {
+          "start": 0,
+          "end": 2.666198473282443,
+          "text": "Poi apre il preventivo, in sei passi."
+        },
+        {
+          "start": 2.666198473282443,
+          "end": 4.625038167938932,
+          "text": "Uno: sceglie il modello."
+        },
+        {
+          "start": 4.625038167938932,
+          "end": 8.705954198473282,
+          "text": "Due: inserisce le misure, con\nil cursore o in centimetri."
+        },
+        {
+          "start": 8.705954198473282,
+          "end": 11.644213740458015,
+          "text": "Il sito gli dice subito\nquanti pilastri servono,"
+        },
+        {
+          "start": 11.644213740458015,
+          "end": 14.256,
+          "text": "e il modello si può cambiare quando vuole."
+        }
+      ],
+      "from": 997,
+      "durationInFrames": 455,
+      "voiceStartFrame": 9
+    },
+    {
+      "id": "04",
+      "file": "vo/scene-04.wav",
+      "seconds": 16.968,
+      "cues": [
+        {
+          "start": 0,
+          "end": 2.948537704918033,
+          "text": "Tre: lo spazio. Il muro non è in squadra?"
+        },
+        {
+          "start": 2.948537704918033,
+          "end": 6.0083409836065576,
+          "text": "Basta misurare i quattro\nlati e le due diagonali:"
+        },
+        {
+          "start": 6.0083409836065576,
+          "end": 7.955488524590164,
+          "text": "l'angolo lo calcola espeirIA."
+        },
+        {
+          "start": 7.955488524590164,
+          "end": 11.293455737704917,
+          "text": "Il pavimento scende di sei\ncentimetri verso il fronte,"
+        },
+        {
+          "start": 11.293455737704917,
+          "end": 13.184970491803279,
+          "text": "e sul muro c'è una grondaia."
+        },
+        {
+          "start": 13.184970491803279,
+          "end": 16.968,
+          "text": "Per finire, il CAP del\ncantiere, per il trasporto."
+        }
+      ],
+      "from": 1452,
+      "durationInFrames": 612,
+      "voiceStartFrame": 9
+    },
+    {
+      "id": "05",
+      "file": "vo/scene-05.wav",
+      "seconds": 8.28,
+      "cues": [
+        {
+          "start": 0,
+          "end": 3.7117241379310344,
+          "text": "Quattro: le finiture,\ndirettamente dal listino."
+        },
+        {
+          "start": 3.7117241379310344,
+          "end": 8.28,
+          "text": "Larice lamellare, impregnante\ncolorato e copertura in policarbonato."
+        }
+      ],
+      "from": 2064,
+      "durationInFrames": 276,
+      "voiceStartFrame": 9
+    },
+    {
+      "id": "06",
+      "file": "vo/scene-06.wav",
+      "seconds": 15.288,
+      "cues": [
+        {
+          "start": 0,
+          "end": 1.7890212765957447,
+          "text": "Cinque: il riepilogo."
+        },
+        {
+          "start": 1.7890212765957447,
+          "end": 4.770723404255319,
+          "text": "La pergola in 3D, già\nadattata allo spazio:"
+        },
+        {
+          "start": 4.770723404255319,
+          "end": 7.860851063829787,
+          "text": "l'altezza si abbassa per\npassare sotto la grondaia."
+        },
+        {
+          "start": 7.860851063829787,
+          "end": 12.631574468085105,
+          "text": "Il prezzo indicativo ha una forbice, e\nogni nota è scritta in modo semplice."
+        },
+        {
+          "start": 12.631574468085105,
+          "end": 15.287999999999998,
+          "text": "Niente registrazione, nessun impegno."
+        }
+      ],
+      "from": 2340,
+      "durationInFrames": 486,
+      "voiceStartFrame": 9
+    },
+    {
+      "id": "07",
+      "file": "vo/scene-07.wav",
+      "seconds": 9.168,
+      "cues": [
+        {
+          "start": 0,
+          "end": 1.5944347826086955,
+          "text": "Sei: i contatti."
+        },
+        {
+          "start": 1.5944347826086955,
+          "end": 6.776347826086956,
+          "text": "Nome, telefono, email, qualche foto\ndel muro e il consenso privacy."
+        },
+        {
+          "start": 6.776347826086956,
+          "end": 9.168,
+          "text": "Un clic, e la richiesta parte."
+        }
+      ],
+      "from": 2826,
+      "durationInFrames": 363,
+      "voiceStartFrame": 9
+    },
+    {
+      "id": "08",
+      "file": "vo/scene-08.wav",
+      "seconds": 9.648,
+      "cues": [
+        {
+          "start": 0,
+          "end": 4.177484536082474,
+          "text": "Il cliente riceve subito un'email con\nil riepilogo in PDF e un link personale:"
+        },
+        {
+          "start": 4.177484536082474,
+          "end": 8.255505154639174,
+          "text": "la sua pagina, con la pergola,\nle misure e il prezzo indicativo,"
+        },
+        {
+          "start": 8.255505154639174,
+          "end": 9.647999999999998,
+          "text": "valida novanta giorni."
+        }
+      ],
+      "from": 3189,
+      "durationInFrames": 317,
+      "voiceStartFrame": 9
+    },
+    {
+      "id": "c2",
+      "file": "vo/scene-c2.wav",
+      "seconds": 2.616,
+      "cues": [
+        {
+          "start": 0,
+          "end": 2.616,
+          "text": "Ora, il lato dell'ufficio tecnico."
+        }
+      ],
+      "from": 3506,
+      "durationInFrames": 108,
+      "voiceStartFrame": 9
+    },
+    {
+      "id": "09",
+      "file": "vo/scene-09.wav",
+      "seconds": 13.32,
+      "cues": [
+        {
+          "start": 0,
+          "end": 2.4365853658536585,
+          "text": "Il tecnico accede con email e password."
+        },
+        {
+          "start": 2.4365853658536585,
+          "end": 6.984878048780488,
+          "text": "In Richieste trova quella di Mario\nRossi, con misure, foto e note,"
+        },
+        {
+          "start": 6.984878048780488,
+          "end": 8.825853658536586,
+          "text": "uno stato e un responsabile."
+        },
+        {
+          "start": 8.825853658536586,
+          "end": 13.32,
+          "text": "Un clic su «Apri nel configuratore»,\ne la pergola del cliente è già lì."
+        }
+      ],
+      "from": 3614,
+      "durationInFrames": 502,
+      "voiceStartFrame": 9
+    },
+    {
+      "id": "10",
+      "file": "vo/scene-10.wav",
+      "seconds": 16.176,
+      "cues": [
+        {
+          "start": 0,
+          "end": 2.4446045016077167,
+          "text": "Il configuratore conosce dieci tipologie:"
+        },
+        {
+          "start": 2.4446045016077167,
+          "end": 6.865697749196141,
+          "text": "dalla monofalda al gazebo a otto lati,\nfino al carport ad arco lamellare."
+        },
+        {
+          "start": 6.865697749196141,
+          "end": 8.63413504823151,
+          "text": "C'è un filtro per categoria,"
+        },
+        {
+          "start": 8.63413504823151,
+          "end": 12.171009646302249,
+          "text": "e ogni tipologia ha una miniatura\ngenerata dal modello stesso."
+        },
+        {
+          "start": 12.171009646302249,
+          "end": 16.176,
+          "text": "In più, ventisette modelli di\ncatalogo, pronti da caricare."
+        }
+      ],
+      "from": 4116,
+      "durationInFrames": 513,
+      "voiceStartFrame": 9
+    },
+    {
+      "id": "11",
+      "file": "vo/scene-11.wav",
+      "seconds": 11.76,
+      "cues": [
+        {
+          "start": 0,
+          "end": 2.0980281690140843,
+          "text": "Ogni parametro ha i suoi limiti."
+        },
+        {
+          "start": 2.0980281690140843,
+          "end": 7.232676056338027,
+          "text": "Le regole costruttive controllano luci,\ninterassi, sbalzi e sezioni minime."
+        },
+        {
+          "start": 7.232676056338027,
+          "end": 11.759999999999998,
+          "text": "E se una trave non basta, «Auto-dimensiona» propone la sezione giusta."
+        }
+      ],
+      "from": 4629,
+      "durationInFrames": 380,
+      "voiceStartFrame": 9
+    },
+    {
+      "id": "12",
+      "file": "vo/scene-12.wav",
+      "seconds": 16.944,
+      "cues": [
+        {
+          "start": 0,
+          "end": 1.6517735849056603,
+          "text": "Poi c'è l'ingombro reale:"
+        },
+        {
+          "start": 1.6517735849056603,
+          "end": 3.6232452830188677,
+          "text": "ostacoli e quote del pavimento."
+        },
+        {
+          "start": 3.6232452830188677,
+          "end": 6.447245283018868,
+          "text": "Ogni pezzo che tocca la\ngrondaia diventa rosso."
+        },
+        {
+          "start": 6.447245283018868,
+          "end": 10.230339622641509,
+          "text": "Con «Adatta all'ingombro», la\npergola rientra nello spazio."
+        },
+        {
+          "start": 10.230339622641509,
+          "end": 14.759396226415094,
+          "text": "E con il muro fuori squadra, banchina\ne travetti seguono la pianta reale:"
+        },
+        {
+          "start": 14.759396226415094,
+          "end": 16.944,
+          "text": "ogni sconfinamento viene segnalato."
+        }
+      ],
+      "from": 5009,
+      "durationInFrames": 581,
+      "voiceStartFrame": 9
+    },
+    {
+      "id": "13",
+      "file": "vo/scene-13.wav",
+      "seconds": 15.672,
+      "cues": [
+        {
+          "start": 0,
+          "end": 3.8274851485148518,
+          "text": "Ogni pezzo è un solido vero,\ncalcolato dal kernel OpenCascade:"
+        },
+        {
+          "start": 3.8274851485148518,
+          "end": 8.792871287128714,
+          "text": "tenoni e mortase, mezzo legno, becchi\nd'uccello, fori per la ferramenta."
+        },
+        {
+          "start": 8.792871287128714,
+          "end": 10.91350495049505,
+          "text": "Anche l'arco lamellare del carport."
+        },
+        {
+          "start": 10.91350495049505,
+          "end": 15.672,
+          "text": "Si ruota il modello, si clicca un\npezzo, e si leggono sezione e lunghezza."
+        }
+      ],
+      "from": 5590,
+      "durationInFrames": 528,
+      "voiceStartFrame": 9
+    },
+    {
+      "id": "14",
+      "file": "vo/scene-14.wav",
+      "seconds": 18.312,
+      "cues": [
+        {
+          "start": 0,
+          "end": 3.6406646884273,
+          "text": "Il preventivo, in vista\nufficio, parte dai pezzi."
+        },
+        {
+          "start": 3.6406646884273,
+          "end": 8.313756676557864,
+          "text": "Il taglio viene ottimizzato sulle barre\ncommerciali, con gli sfridi reali."
+        },
+        {
+          "start": 8.313756676557864,
+          "end": 13.421554896142435,
+          "text": "Poi lavorazioni CNC, ferramenta,\nmontaggio, complicazioni di cantiere,"
+        },
+        {
+          "start": 13.421554896142435,
+          "end": 16.247145400593475,
+          "text": "trasporto in base al CAP, margini e IVA."
+        },
+        {
+          "start": 16.247145400593475,
+          "end": 18.312000000000005,
+          "text": "Ogni riga ha la sua spiegazione."
+        }
+      ],
+      "from": 6118,
+      "durationInFrames": 577,
+      "voiceStartFrame": 9
+    },
+    {
+      "id": "15",
+      "file": "vo/scene-15.wav",
+      "seconds": 9.048,
+      "cues": [
+        {
+          "start": 0,
+          "end": 5.439901840490798,
+          "text": "Da qui l'ufficio salva il preventivo definitivo, con voci manuali, sconto e IVA."
+        },
+        {
+          "start": 5.439901840490798,
+          "end": 9.048,
+          "text": "E lo manda al cliente via\nemail, con il PDF allegato."
+        }
+      ],
+      "from": 6695,
+      "durationInFrames": 374,
+      "voiceStartFrame": 9
+    },
+    {
+      "id": "16",
+      "file": "vo/scene-16.wav",
+      "seconds": 12.312,
+      "cues": [
+        {
+          "start": 0,
+          "end": 1.906725663716814,
+          "text": "Poi si passa alla produzione."
+        },
+        {
+          "start": 1.906725663716814,
+          "end": 5.774654867256636,
+          "text": "Con un clic si esportano il file\nSAT per il centro di taglio CNC,"
+        },
+        {
+          "start": 5.774654867256636,
+          "end": 8.825415929203539,
+          "text": "lo STEP e la distinta CSV\ncon tutta la ferramenta."
+        },
+        {
+          "start": 8.825415929203539,
+          "end": 12.311999999999998,
+          "text": "Dal modello alla macchina,\nsenza ridisegnare niente."
+        }
+      ],
+      "from": 7069,
+      "durationInFrames": 397,
+      "voiceStartFrame": 9
+    },
+    {
+      "id": "c3",
+      "file": "vo/scene-c3.wav",
+      "seconds": 2.688,
+      "cues": [
+        {
+          "start": 0,
+          "end": 2.688,
+          "text": "Infine, il back-office."
+        }
+      ],
+      "from": 7466,
+      "durationInFrames": 108,
+      "voiceStartFrame": 9
+    },
+    {
+      "id": "17",
+      "file": "vo/scene-17.wav",
+      "seconds": 18.792,
+      "cues": [
+        {
+          "start": 0,
+          "end": 2.046120343839542,
+          "text": "Il listino è diviso per sezioni:"
+        },
+        {
+          "start": 2.046120343839542,
+          "end": 7.053730659025789,
+          "text": "legno, lavorazioni, ferramenta,\nmontaggio, trasporto e margini."
+        },
+        {
+          "start": 7.053730659025789,
+          "end": 9.046005730659028,
+          "text": "Ogni modifica finisce in bozza."
+        },
+        {
+          "start": 9.046005730659028,
+          "end": 12.384412607449859,
+          "text": "Il simulatore confronta la\nbozza con la versione attiva;"
+        },
+        {
+          "start": 12.384412607449859,
+          "end": 16.099736389684814,
+          "text": "poi si pubblica, con le\ndifferenze e la data di validità."
+        },
+        {
+          "start": 16.099736389684814,
+          "end": 18.792,
+          "text": "E il listino si importa\ne si esporta in CSV."
+        }
+      ],
+      "from": 7574,
+      "durationInFrames": 681,
+      "voiceStartFrame": 9
+    },
+    {
+      "id": "18",
+      "file": "vo/scene-18.wav",
+      "seconds": 16.08,
+      "cues": [
+        {
+          "start": 0,
+          "end": 2.9701910828025473,
+          "text": "Le complicazioni di cantiere\nsi scrivono come frasi:"
+        },
+        {
+          "start": 2.9701910828025473,
+          "end": 7.425477707006369,
+          "text": "se il dislivello è di almeno dieci\ncentimetri, tre ore di montaggio in più."
+        },
+        {
+          "start": 7.425477707006369,
+          "end": 9.47388535031847,
+          "text": "Poi ci sono le regole costruttive,"
+        },
+        {
+          "start": 9.47388535031847,
+          "end": 12.90496815286624,
+          "text": "le tipologie visibili sul sito\ne gli utenti con i loro ruoli."
+        },
+        {
+          "start": 12.90496815286624,
+          "end": 16.08,
+          "text": "E il registro dice chi ha\ncambiato cosa, e quando."
+        }
+      ],
+      "from": 8255,
+      "durationInFrames": 510,
+      "voiceStartFrame": 9
+    },
+    {
+      "id": "19",
+      "file": "vo/scene-19.wav",
+      "seconds": 6.624,
+      "cues": [
+        {
+          "start": 0,
+          "end": 3.927504424778761,
+          "text": "Dal rilievo alla macchina,\ncon una sola configurazione."
+        },
+        {
+          "start": 3.927504424778761,
+          "end": 6.624,
+          "text": "espeirIA, by Lemonjuice Solutions."
+        }
+      ],
+      "from": 8765,
+      "durationInFrames": 345,
+      "voiceStartFrame": 9
+    }
+  ]
+}

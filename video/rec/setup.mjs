@@ -1,0 +1,11 @@
+import { chromium } from "playwright";
+const B="http://localhost:3140";
+const b = await chromium.launch(); const ctx = await b.newContext({viewport:{width:1920,height:1080}, storageState:"state.json"}); const p = await ctx.newPage();
+await p.goto(B+"/admin/tipologie"); await p.waitForTimeout(2000);
+const pick = ["monofalda-grondaia","bifalda-libera","libera-4x4","addossata-3x4","copertura-camper-404x799","moderna-427x318","carport-5x3","gazebo-ottagonale-4000","pensilina-4000-1200","pergola-a-l-4000"];
+const sels = await p.$$("select"); for (let i=0;i<sels.length;i++) await sels[i].selectOption(pick[i]);
+const sw = await p.$$("[role=switch]"); for (const s of sw) if ((await s.getAttribute("aria-checked"))!=="true") await s.click();
+await p.click("text=Salva nella bozza"); await p.waitForTimeout(2500);
+await p.screenshot({path:"shots/tip-saved.png"});
+console.log(await p.$$eval("button", bs=>bs.map(b=>b.innerText.trim()).filter(Boolean).filter(t=>t!=="Carica immagine").join(" | ")));
+await b.close();

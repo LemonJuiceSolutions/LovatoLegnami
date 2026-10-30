@@ -1,0 +1,12 @@
+﻿ID;Tipo;Sezione;Lunghezza;Quantità;Lavorazioni
+TAV-01, TAV-02, TAV-03, TAV-04;tavola;45×145;5000;4;foro ×6
+PIL-01, PIL-02, PIL-03, PIL-04;pilastro;90×90;2610;4;foro ×4
+ARC-01, ARC-02;arco;90×90;3910,1;2;taglio-testa, foro ×4
+TVT-01, TVT-02, TVT-03, TVT-04, TVT-05, TVT-06, TVT-07, TVT-08;travetto;45×90;3000;8;
+
+Codice;Descrizione;Quantità;Pezzi
+bullone-m12x200;Bullone passante M12×200;8;TAV-01, PIL-01, TAV-02, PIL-02, TAV-03, PIL-03, TAV-04, PIL-04
+bullone-m8x200;Bullone passante M8×200;4;TAV-01, ARC-01, TAV-02, TAV-03, ARC-02, TAV-04
+staffa-terra-p-greco;Staffa a P greco 90 (h 200, sp. 5);6;ARC-01, ARC-02, PIL-01, PIL-02, PIL-03, PIL-04
+tassello-10x85;Tassello FM-X5 10×85;12;ARC-01, ARC-02, PIL-01, PIL-02, PIL-03, PIL-04
+vite-6x160;Vite TORX 6×160;32;TVT-01, TAV-01, TAV-02, TAV-03, TAV-04, TVT-02, TVT-03, TVT-04, TVT-05, TVT-06, TVT-07, TVT-08

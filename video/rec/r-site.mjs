@@ -1,0 +1,28 @@
+// Scena 02: home e tipologie (desktop 1280×720 @1.5)
+import { setup } from "./lib.mjs";
+const s = await setup({ width: 1280, height: 720, dsf: 1.5 });
+const { page } = s;
+await s.goto("/");
+await s.start("s02-home-tipologie");
+await s.wait(900);
+await s.hover(page.locator("text=da 2.880 €").first(), 900).catch(() => {});
+await s.wait(500);
+await s.scroll(620, 1700);
+await s.wait(500);
+await s.moveTo(640, 300, 600);
+await s.click(page.locator("header a[href='/pergole']").first(), { after: 200 });
+await page.waitForURL("**/pergole").catch(() => {});
+await s.wait(700);
+await s.scroll(330, 1300);
+await s.hover(page.locator("strong:has-text('€')").first(), 700);
+await s.wait(400);
+await s.scroll(900, 2000);
+await s.hover(page.locator("strong:has-text('€')").nth(4), 700).catch(() => {});
+await s.wait(300);
+await s.scroll(1000, 2000);
+await s.wait(300);
+await s.scroll(1000, 2000);
+await s.hover(page.locator("strong:has-text('€')").nth(8), 700).catch(() => {});
+await s.wait(700);
+await s.stop();
+await s.browser.close();
